@@ -14,7 +14,123 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          created_at: string | null
+          icon: string | null
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          additional_images: string[] | null
+          brand: string | null
+          category: string | null
+          created_at: string | null
+          description: string | null
+          discount_percent: number | null
+          express_delivery: boolean | null
+          id: string
+          image_url: string | null
+          installments_count: number | null
+          installments_value: number | null
+          name: string
+          old_price: number | null
+          pix_price: number | null
+          price: number
+          source_url: string | null
+          stock_status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          additional_images?: string[] | null
+          brand?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          discount_percent?: number | null
+          express_delivery?: boolean | null
+          id?: string
+          image_url?: string | null
+          installments_count?: number | null
+          installments_value?: number | null
+          name: string
+          old_price?: number | null
+          pix_price?: number | null
+          price?: number
+          source_url?: string | null
+          stock_status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          additional_images?: string[] | null
+          brand?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          discount_percent?: number | null
+          express_delivery?: boolean | null
+          id?: string
+          image_url?: string | null
+          installments_count?: number | null
+          installments_value?: number | null
+          name?: string
+          old_price?: number | null
+          pix_price?: number | null
+          price?: number
+          source_url?: string | null
+          stock_status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      scrape_jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          products_found: number | null
+          status: string | null
+          url: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          products_found?: number | null
+          status?: string | null
+          url: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          products_found?: number | null
+          status?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
