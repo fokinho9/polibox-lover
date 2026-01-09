@@ -76,6 +76,7 @@ const Footer = () => {
               <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Política de Privacidade</a></li>
               <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Trocas e Devoluções</a></li>
               <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Formas de Pagamento</a></li>
+              <li><a href="/admin" className="text-primary hover:text-cyan-glow transition-colors font-medium">⚙️ Painel Admin</a></li>
             </ul>
           </div>
         </div>
