@@ -1,7 +1,9 @@
 import { ShoppingCart } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 interface ProductCardProps {
+  id?: string;
   name: string;
   image: string;
   oldPrice?: number;
@@ -13,6 +15,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({
+  id,
   name,
   image,
   oldPrice,
@@ -22,8 +25,20 @@ const ProductCard = ({
   installments,
   express = true,
 }: ProductCardProps) => {
+  const CardWrapper = ({ children }: { children: React.ReactNode }) => {
+    if (id) {
+      return (
+        <Link to={`/produto/${id}`} className="block">
+          {children}
+        </Link>
+      );
+    }
+    return <>{children}</>;
+  };
+
   return (
-    <div className="card-product group">
+    <CardWrapper>
+      <div className="card-product group">
       {/* Image */}
       <div className="relative aspect-square bg-secondary/30 overflow-hidden">
         {discount && (
@@ -77,6 +92,7 @@ const ProductCard = ({
         </Button>
       </div>
     </div>
+    </CardWrapper>
   );
 };
 
