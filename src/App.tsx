@@ -8,6 +8,9 @@ import AdminPanel from "./pages/AdminPanel";
 import CategoryPage from "./pages/CategoryPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import CalculadoraPage from "./pages/CalculadoraPage";
+import SobrePage from "./pages/SobrePage";
+import ContatoPage from "./pages/ContatoPage";
+import CarrinhoPage from "./pages/CarrinhoPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +27,9 @@ const App = () => (
           <Route path="/categoria/:category" element={<CategoryPage />} />
           <Route path="/produto/:id" element={<ProductDetailPage />} />
           <Route path="/calculadora" element={<CalculadoraPage />} />
+          <Route path="/sobre" element={<SobrePage />} />
+          <Route path="/contato" element={<ContatoPage />} />
+          <Route path="/carrinho" element={<CarrinhoPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
