@@ -93,6 +93,18 @@ export const productsApi = {
     return data;
   },
 
+  async importCsvProducts(csvContent: string, category: string): Promise<{ success: boolean; products_found?: number; products_inserted?: number; error?: string }> {
+    const { data, error } = await supabase.functions.invoke('import-csv-products', {
+      body: { csvContent, category },
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return data;
+  },
+
   async getScrapeJobs(): Promise<ScrapeJob[]> {
     const { data, error } = await supabase
       .from('scrape_jobs')
