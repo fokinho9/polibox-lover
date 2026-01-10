@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import kitsImage from "@/assets/kits-banner.jpg";
 import cerasImage from "@/assets/ceras-banner.jpg";
 
@@ -7,12 +8,14 @@ const banners = [
     title: "KITS COMPLETOS",
     subtitle: "Até 35%OFF",
     image: kitsImage,
+    href: "/categoria/kits",
   },
   {
     id: 2,
     title: "CERAS E SELANTES",
     subtitle: "Até 41%OFF",
     image: cerasImage,
+    href: "/categoria/ceras-selantes",
   },
 ];
 
@@ -22,9 +25,10 @@ const OfferBanners = () => {
       <div className="container-main">
         <div className="grid md:grid-cols-2 gap-6">
           {banners.map((banner) => (
-            <div
+            <Link
               key={banner.id}
-              className="relative h-48 md:h-56 rounded-xl overflow-hidden cursor-pointer group"
+              to={banner.href}
+              className="relative h-48 md:h-56 rounded-xl overflow-hidden cursor-pointer group block"
             >
               <img
                 src={banner.image}
@@ -39,7 +43,7 @@ const OfferBanners = () => {
                 </h3>
                 <p className="text-lg text-primary font-bold">{banner.subtitle}</p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-automotive.jpg";
@@ -11,6 +12,7 @@ const slides = [
     subtitle: "HIGIENIZAÇÃO, DETALHAMENTO E ESTÉTICA AUTOMOTIVA!",
     cta: "COMPRE AGORA",
     badge: "AQUI VOCÊ ENCONTRA A LINHA LÍDER!",
+    href: "/categoria/kits",
   },
   {
     id: 2,
@@ -19,6 +21,7 @@ const slides = [
     subtitle: "DILUIÇÃO ATÉ 1:100 - MÁXIMO RENDIMENTO!",
     cta: "VER PRODUTO",
     badge: "NOVIDADE",
+    href: "/categoria/limpadores-apc",
   },
 ];
 
@@ -64,9 +67,11 @@ const HeroBanner = () => {
               <p className="text-base md:text-lg text-muted-foreground mb-6">
                 {slide.subtitle}
               </p>
-              <Button className="btn-cyan text-lg font-display tracking-wider">
-                {slide.cta}
-              </Button>
+              <Link to={slide.href}>
+                <Button className="btn-cyan text-lg font-display tracking-wider">
+                  {slide.cta}
+                </Button>
+              </Link>
             </div>
           ))}
         </div>
