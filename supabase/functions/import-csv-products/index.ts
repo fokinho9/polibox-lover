@@ -26,97 +26,118 @@ function parsePrice(priceStr: string): number {
   return isNaN(num) ? 0 : num;
 }
 
-function parsePixPrice(intPart: string, decPart: string): number | null {
-  if (!intPart) return null;
-  const cleaned = intPart.replace(/\./g, '').trim();
-  const decimal = decPart?.replace(',', '').trim() || '00';
-  const num = parseFloat(`${cleaned}.${decimal}`);
-  return isNaN(num) ? null : num;
-}
-
 function parseCsvProducts(csvContent: string, category: string): ProductData[] {
   const products: ProductData[] = [];
   const lines = csvContent.split('\n');
   
-  // Skip header line
-  let i = 1;
+  console.log(`Total lines in CSV: ${lines.length}`);
+  
+  // Each product starts with a line containing "https://" at the beginning
+  // The format has product data spanning multiple lines due to the JavaScript code in the last column
+  
+  let i = 1; // Skip header
+  let productCount = 0;
   
   while (i < lines.length) {
     const line = lines[i]?.trim();
+    
+    // Skip empty lines
     if (!line) {
       i++;
       continue;
     }
     
     // Check if this line starts a product (starts with a URL in quotes)
-    if (line.startsWith('"https://')) {
-      // Parse CSV line - handle quoted fields properly
-      const fields: string[] = [];
-      let field = '';
-      let inQuotes = false;
+    if (line.startsWith('"https://www.polibox.com.br/')) {
+      productCount++;
       
-      for (let j = 0; j < line.length; j++) {
-        const char = line[j];
-        if (char === '"') {
-          inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-          fields.push(field);
-          field = '';
-        } else {
-          field += char;
+      // Join lines until we hit the next product or end
+      let fullLine = line;
+      let j = i + 1;
+      
+      // Keep adding lines until we find the closing of the JavaScript block
+      while (j < lines.length) {
+        const nextLine = lines[j]?.trim();
+        if (!nextLine) {
+          j++;
+          continue;
         }
+        // If this line starts a new product, stop
+        if (nextLine.startsWith('"https://www.polibox.com.br/')) {
+          break;
+        }
+        fullLine += '\n' + nextLine;
+        j++;
       }
-      fields.push(field); // Last field
       
-      // Check if this is a product line (has enough fields)
-      if (fields.length >= 6) {
+      // Now parse the full product line
+      // Use regex to extract quoted fields
+      const fieldMatches = fullLine.match(/"([^"]*(?:"""[^"]*)*)"/g);
+      
+      if (fieldMatches && fieldMatches.length >= 6) {
+        // Remove quotes from each match
+        const fields = fieldMatches.map(f => f.replace(/^"|"$/g, '').replace(/""/g, '"'));
+        
         const sourceUrl = fields[0] || null;
         let imageUrl = fields[1] || null;
+        const name = fields[5]?.trim();
         
-        // Skip loading.gif placeholder images
+        // Skip loading.gif placeholders - try to get image from source URL
         if (imageUrl && imageUrl.includes('loading.gif')) {
-          // Try to extract from source URL
           imageUrl = null;
         }
         
-        const name = fields[5]?.trim();
-        
         // Skip if no name
-        if (!name) {
-          i++;
+        if (!name || name.length < 3) {
+          i = j;
           continue;
         }
         
-        // Parse prices based on CSV structure
-        // For lavagem.csv format: fields[6]=price, fields[7]=pix_int, fields[8]=pix_dec
-        // For others: fields[7]=price, fields[8]=pix_int, fields[10]=pix_dec
+        // Parse prices
+        // Standard format: fields[7] = price, fields[8] = pix integer, fields[10] = pix decimal
+        // Lavagem format: fields[6] = price, fields[7] = pix integer, fields[8] = pix decimal
         
-        let price: number;
-        let pixPrice: number | null;
+        let price = 0;
+        let pixInt = '';
+        let pixDec = '';
         
-        // Check if this is lavagem format (fewer columns, no "R$" field)
-        if (fields.length < 15) {
-          // Lavagem format
-          price = parsePrice(fields[6] || '0');
-          pixPrice = parsePixPrice(fields[7], fields[8]);
-        } else {
-          // Standard format with R$ field
+        // Detect format by checking if field[6] is "R$" or a number
+        if (fields[6] === 'R$') {
+          // Standard format
           price = parsePrice(fields[7] || '0');
-          pixPrice = parsePixPrice(fields[8], fields[10]);
+          pixInt = fields[8] || '';
+          pixDec = fields[10] || '';
+        } else {
+          // Lavagem format (no R$ field)
+          price = parsePrice(fields[6] || '0');
+          pixInt = fields[7] || '';
+          pixDec = fields[8] || '';
+        }
+        
+        // Calculate pix price
+        let pixPrice: number | null = null;
+        if (pixInt) {
+          const cleanedInt = pixInt.replace(/\./g, '').trim();
+          const decimal = pixDec?.replace(',', '').trim() || '00';
+          pixPrice = parseFloat(`${cleanedInt}.${decimal}`);
+          if (isNaN(pixPrice)) pixPrice = null;
         }
         
         // Calculate discount
-        let discountPercent: number | null = null;
+        let discountPercent = 5; // Default discount
         if (price > 0 && pixPrice && pixPrice < price) {
           discountPercent = Math.round(((price - pixPrice) / price) * 100);
         }
         
+        // Estimate old price (10% higher)
+        const oldPrice = price > 0 ? Math.round(price * 1.1 * 100) / 100 : null;
+        
         products.push({
           name,
           price,
-          old_price: price > 0 ? price * 1.1 : null, // Estimate old price
+          old_price: oldPrice,
           pix_price: pixPrice,
-          discount_percent: discountPercent || 5,
+          discount_percent: discountPercent,
           image_url: imageUrl,
           source_url: sourceUrl,
           category,
@@ -124,17 +145,13 @@ function parseCsvProducts(csvContent: string, category: string): ProductData[] {
         });
       }
       
-      // Skip to next product (products span multiple lines in this format)
-      // Look for next line starting with "https://
-      i++;
-      while (i < lines.length && !lines[i]?.trim().startsWith('"https://')) {
-        i++;
-      }
+      i = j;
     } else {
       i++;
     }
   }
   
+  console.log(`Parsed ${products.length} products from ${productCount} product blocks`);
   return products;
 }
 
@@ -153,6 +170,9 @@ serve(async (req) => {
       );
     }
     
+    console.log(`Processing CSV for category: ${category}`);
+    console.log(`CSV content length: ${csvContent.length} characters`);
+    
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -160,16 +180,19 @@ serve(async (req) => {
     // Parse CSV
     const products = parseCsvProducts(csvContent, category);
     
+    console.log(`Found ${products.length} valid products`);
+    
     if (products.length === 0) {
       return new Response(
-        JSON.stringify({ success: false, error: "No products found in CSV" }),
+        JSON.stringify({ success: false, error: "No products found in CSV", debug: { csvLength: csvContent.length } }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
       );
     }
     
     // Insert products in batches
-    const batchSize = 50;
+    const batchSize = 100;
     let insertedCount = 0;
+    let errors: string[] = [];
     
     for (let i = 0; i < products.length; i += batchSize) {
       const batch = products.slice(i, i + batchSize);
@@ -180,8 +203,10 @@ serve(async (req) => {
       
       if (error) {
         console.error('Batch insert error:', error);
+        errors.push(`Batch ${Math.floor(i/batchSize)}: ${error.message}`);
       } else {
         insertedCount += batch.length;
+        console.log(`Inserted batch ${Math.floor(i/batchSize) + 1}: ${batch.length} products`);
       }
     }
     
@@ -191,7 +216,8 @@ serve(async (req) => {
         products_found: products.length,
         products_inserted: insertedCount,
         category,
-        sample: products.slice(0, 3)
+        errors: errors.length > 0 ? errors : undefined,
+        sample: products.slice(0, 3).map(p => ({ name: p.name, price: p.price, pix_price: p.pix_price }))
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
