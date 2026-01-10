@@ -32,11 +32,14 @@ function parseCsvProducts(csvContent: string, category: string): ProductData[] {
   
   console.log(`Total lines in CSV: ${lines.length}`);
   
-  // Each product starts with a line containing "https://" at the beginning
-  // The format has product data spanning multiple lines due to the JavaScript code in the last column
+  // Detect CSV format by checking header
+  const header = lines[0] || '';
+  const isLavagemFormat = !header.includes('"product__price"'); // Lavagem format doesn't have "R$" column
+  console.log(`CSV format detected: ${isLavagemFormat ? 'lavagem' : 'standard'}`);
   
   let i = 1; // Skip header
   let productCount = 0;
+  const seenProducts = new Set<string>(); // Track duplicates by name
   
   while (i < lines.length) {
     const line = lines[i]?.trim();
@@ -70,8 +73,7 @@ function parseCsvProducts(csvContent: string, category: string): ProductData[] {
         j++;
       }
       
-      // Now parse the full product line
-      // Use regex to extract quoted fields
+      // Now parse the full product line using regex to extract quoted fields
       const fieldMatches = fullLine.match(/"([^"]*(?:"""[^"]*)*)"/g);
       
       if (fieldMatches && fieldMatches.length >= 6) {
@@ -80,47 +82,64 @@ function parseCsvProducts(csvContent: string, category: string): ProductData[] {
         
         const sourceUrl = fields[0] || null;
         let imageUrl = fields[1] || null;
-        const name = fields[5]?.trim();
         
-        // Skip loading.gif placeholders - try to get image from source URL
-        if (imageUrl && imageUrl.includes('loading.gif')) {
-          imageUrl = null;
+        // Validate image URL - must be a valid image URL
+        if (imageUrl) {
+          if (imageUrl.includes('loading.gif') || 
+              imageUrl === '0' || 
+              !imageUrl.startsWith('http')) {
+            imageUrl = null;
+          }
         }
         
-        // Skip if no name
+        // Get product name - field[5] for both formats
+        const name = fields[5]?.trim();
+        
+        // Skip if no name or too short
         if (!name || name.length < 3) {
           i = j;
           continue;
         }
         
-        // Parse prices
-        // Standard format: fields[7] = price, fields[8] = pix integer, fields[10] = pix decimal
-        // Lavagem format: fields[6] = price, fields[7] = pix integer, fields[8] = pix decimal
+        // Skip duplicates
+        if (seenProducts.has(name)) {
+          i = j;
+          continue;
+        }
+        seenProducts.add(name);
         
         let price = 0;
-        let pixInt = '';
-        let pixDec = '';
-        
-        // Detect format by checking if field[6] is "R$" or a number
-        if (fields[6] === 'R$') {
-          // Standard format
-          price = parsePrice(fields[7] || '0');
-          pixInt = fields[8] || '';
-          pixDec = fields[10] || '';
-        } else {
-          // Lavagem format (no R$ field)
-          price = parsePrice(fields[6] || '0');
-          pixInt = fields[7] || '';
-          pixDec = fields[8] || '';
-        }
-        
-        // Calculate pix price
         let pixPrice: number | null = null;
-        if (pixInt) {
-          const cleanedInt = pixInt.replace(/\./g, '').trim();
-          const decimal = pixDec?.replace(',', '').trim() || '00';
-          pixPrice = parseFloat(`${cleanedInt}.${decimal}`);
-          if (isNaN(pixPrice)) pixPrice = null;
+        
+        if (isLavagemFormat) {
+          // Lavagem format: field[6] = price, field[7] = pix integer, field[8] = pix decimal
+          price = parsePrice(fields[6] || '0');
+          const pixInt = fields[7]?.replace(/\./g, '').trim() || '';
+          const pixDec = fields[8]?.replace(',', '').trim() || '00';
+          if (pixInt) {
+            pixPrice = parseFloat(`${pixInt}.${pixDec}`);
+            if (isNaN(pixPrice)) pixPrice = null;
+          }
+        } else {
+          // Standard format: field[6] = "R$", field[7] = price, field[8] = pix integer, field[10] = pix decimal
+          if (fields[6] === 'R$') {
+            price = parsePrice(fields[7] || '0');
+            const pixInt = fields[8]?.replace(/\./g, '').trim() || '';
+            const pixDec = fields[10]?.replace(',', '').trim() || '00';
+            if (pixInt) {
+              pixPrice = parseFloat(`${pixInt}.${pixDec}`);
+              if (isNaN(pixPrice)) pixPrice = null;
+            }
+          } else {
+            // Fallback: try to parse as lavagem format
+            price = parsePrice(fields[6] || '0');
+            const pixInt = fields[7]?.replace(/\./g, '').trim() || '';
+            const pixDec = fields[8]?.replace(',', '').trim() || '00';
+            if (pixInt) {
+              pixPrice = parseFloat(`${pixInt}.${pixDec}`);
+              if (isNaN(pixPrice)) pixPrice = null;
+            }
+          }
         }
         
         // Calculate discount
@@ -131,6 +150,8 @@ function parseCsvProducts(csvContent: string, category: string): ProductData[] {
         
         // Estimate old price (10% higher)
         const oldPrice = price > 0 ? Math.round(price * 1.1 * 100) / 100 : null;
+        
+        console.log(`Product: ${name.substring(0, 50)}... | Image: ${imageUrl ? 'YES' : 'NO'} | Price: ${price}`);
         
         products.push({
           name,
@@ -151,7 +172,10 @@ function parseCsvProducts(csvContent: string, category: string): ProductData[] {
     }
   }
   
-  console.log(`Parsed ${products.length} products from ${productCount} product blocks`);
+  console.log(`Parsed ${products.length} unique products from ${productCount} product blocks`);
+  console.log(`Products with images: ${products.filter(p => p.image_url).length}`);
+  console.log(`Products without images: ${products.filter(p => !p.image_url).length}`);
+  
   return products;
 }
 
@@ -210,14 +234,17 @@ serve(async (req) => {
       }
     }
     
+    const productsWithImages = products.filter(p => p.image_url).length;
+    
     return new Response(
       JSON.stringify({ 
         success: true, 
         products_found: products.length,
         products_inserted: insertedCount,
+        products_with_images: productsWithImages,
         category,
         errors: errors.length > 0 ? errors : undefined,
-        sample: products.slice(0, 3).map(p => ({ name: p.name, price: p.price, pix_price: p.pix_price }))
+        sample: products.slice(0, 3).map(p => ({ name: p.name, price: p.price, image_url: p.image_url }))
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
