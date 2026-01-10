@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { productsApi, Product, ScrapeJob } from "@/lib/api/products";
 import { Button } from "@/components/ui/button";
@@ -15,12 +15,34 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
-  ArrowLeft
+  ArrowLeft,
+  Upload,
+  FileSpreadsheet
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const CATEGORIES = [
+  { value: "equipamentos", label: "Equipamentos" },
+  { value: "interior", label: "Interior" },
+  { value: "polimento", label: "Polimento" },
+  { value: "lavagem", label: "Lavagem" },
+  { value: "kits", label: "Kits" },
+  { value: "ofertas", label: "Ofertas" },
+  { value: "novidades", label: "Novidades" },
+];
 
 const AdminPanel = () => {
   const [scrapeUrl, setScrapeUrl] = useState("https://www.polibox.com.br");
+  const [selectedCategory, setSelectedCategory] = useState("equipamentos");
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -32,7 +54,7 @@ const AdminPanel = () => {
   const { data: jobs = [], isLoading: jobsLoading } = useQuery({
     queryKey: ['scrape-jobs'],
     queryFn: () => productsApi.getScrapeJobs(),
-    refetchInterval: 5000, // Poll every 5 seconds
+    refetchInterval: 5000,
   });
 
   const scrapeMutation = useMutation({
@@ -85,6 +107,44 @@ const AdminPanel = () => {
     scrapeMutation.mutate(scrapeUrl);
   };
 
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    
+    try {
+      const csvContent = await file.text();
+      
+      const result = await productsApi.importCsvProducts(csvContent, selectedCategory);
+      
+      if (result.success) {
+        toast({
+          title: "Importação Concluída!",
+          description: `${result.products_inserted} produtos importados para "${selectedCategory}".`,
+        });
+        queryClient.invalidateQueries({ queryKey: ['products'] });
+      } else {
+        toast({
+          title: "Erro na Importação",
+          description: result.error || "Falha ao importar produtos.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: error instanceof Error ? error.message : "Erro ao processar arquivo.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsImporting(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
@@ -97,6 +157,14 @@ const AdminPanel = () => {
         return <Clock className="h-4 w-4 text-muted-foreground" />;
     }
   };
+
+  // Group products by category
+  const productsByCategory = products.reduce((acc, product) => {
+    const cat = product.category || 'sem-categoria';
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(product);
+    return acc;
+  }, {} as Record<string, Product[]>);
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -114,7 +182,7 @@ const AdminPanel = () => {
                 Painel Admin
               </h1>
               <p className="text-muted-foreground">
-                Gerenciar produtos e scraping
+                Gerenciar produtos e importação
               </p>
             </div>
           </div>
@@ -123,6 +191,67 @@ const AdminPanel = () => {
             {products.length} Produtos
           </Badge>
         </div>
+
+        {/* CSV Import Section */}
+        <Card className="bg-card border-border border-2 border-primary/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <FileSpreadsheet className="h-5 w-5 text-primary" />
+              Importar CSV por Categoria
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex gap-4 items-end">
+              <div className="flex-1">
+                <label className="text-sm text-muted-foreground mb-2 block">
+                  Categoria de destino:
+                </label>
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="bg-secondary border-border">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value}>
+                        {cat.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <input
+                  type="file"
+                  accept=".csv"
+                  ref={fileInputRef}
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+                <Button 
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isImporting}
+                  className="bg-primary hover:bg-cyan-glow"
+                >
+                  {isImporting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Importando...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4 mr-2" />
+                      Selecionar CSV
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Selecione um arquivo CSV exportado da Polibox para importar produtos na categoria selecionada.
+              Produtos duplicados serão adicionados normalmente.
+            </p>
+          </CardContent>
+        </Card>
 
         {/* Scraping Section */}
         <Card className="bg-card border-border">
@@ -176,6 +305,29 @@ const AdminPanel = () => {
                 <Trash2 className="h-4 w-4 mr-2" />
                 Limpar Todos
               </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Products by Category Summary */}
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <Package className="h-5 w-5 text-primary" />
+              Produtos por Categoria
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {Object.entries(productsByCategory).map(([category, categoryProducts]) => (
+                <div 
+                  key={category}
+                  className="p-4 bg-secondary/30 rounded-lg border border-border text-center"
+                >
+                  <p className="text-2xl font-bold text-primary">{categoryProducts.length}</p>
+                  <p className="text-sm text-muted-foreground capitalize">{category}</p>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
@@ -249,7 +401,7 @@ const AdminPanel = () => {
               </div>
             ) : products.length === 0 ? (
               <p className="text-muted-foreground text-center py-8">
-                Nenhum produto no banco. Use o scraping para importar produtos.
+                Nenhum produto no banco. Use o scraping ou importe um CSV.
               </p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -272,11 +424,16 @@ const AdminPanel = () => {
                       <span className="text-primary font-bold">
                         R$ {product.price?.toFixed(2).replace('.', ',')}
                       </span>
-                      {product.discount_percent && (
-                        <Badge className="bg-yellow-500 text-black">
-                          -{product.discount_percent}%
+                      <div className="flex gap-1">
+                        <Badge variant="outline" className="text-xs">
+                          {product.category}
                         </Badge>
-                      )}
+                        {product.discount_percent && (
+                          <Badge className="bg-yellow-500 text-black text-xs">
+                            -{product.discount_percent}%
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
