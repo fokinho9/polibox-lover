@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { 
   Tag, 
   Package, 
@@ -11,15 +12,15 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { icon: Tag, label: "OFERTAS", sublabel: "60%OFF", highlight: true },
-  { icon: Package, label: "KITS" },
-  { icon: Droplets, label: "LAVAGEM" },
-  { icon: Sparkles, label: "POLIMENTO" },
-  { icon: Car, label: "INTERIOR" },
-  { icon: Wrench, label: "EQUIPAMENTOS" },
-  { icon: GraduationCap, label: "CURSOS" },
-  { icon: Building2, label: "MARCAS" },
-  { icon: Star, label: "NOVIDADES" },
+  { icon: Tag, label: "OFERTAS", sublabel: "60%OFF", highlight: true, href: "/categoria/ofertas" },
+  { icon: Package, label: "KITS", href: "/categoria/kits" },
+  { icon: Droplets, label: "LAVAGEM", href: "/categoria/lavagem" },
+  { icon: Sparkles, label: "POLIMENTO", href: "/categoria/polimento" },
+  { icon: Car, label: "INTERIOR", href: "/categoria/interior" },
+  { icon: Wrench, label: "EQUIPAMENTOS", href: "/categoria/equipamentos" },
+  { icon: GraduationCap, label: "CURSOS", href: "/categoria/cursos" },
+  { icon: Building2, label: "MARCAS", href: "/categoria/marcas" },
+  { icon: Star, label: "NOVIDADES", href: "/categoria/novidades" },
 ];
 
 const Navigation = () => {
@@ -28,8 +29,9 @@ const Navigation = () => {
       <div className="container-main">
         <div className="flex items-center justify-center overflow-x-auto scrollbar-hide">
           {navItems.map((item, index) => (
-            <div
+            <Link
               key={index}
+              to={item.href}
               className={`nav-item min-w-fit ${
                 item.highlight 
                   ? "bg-primary text-primary-foreground hover:bg-cyan-glow rounded-lg mx-1" 
@@ -43,7 +45,7 @@ const Navigation = () => {
                   {item.sublabel}
                 </span>
               )}
-            </div>
+            </Link>
           ))}
         </div>
       </div>
