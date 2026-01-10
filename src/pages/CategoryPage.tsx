@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
@@ -8,6 +9,17 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import ProductCard from "@/components/ProductCard";
 import { productsApi, Product } from "@/lib/api/products";
 import { Button } from "@/components/ui/button";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
+
+const PRODUCTS_PER_PAGE = 20;
 
 const categoryTitles: Record<string, string> = {
   "kits": "Kits Completos",
@@ -28,6 +40,7 @@ const categoryTitles: Record<string, string> = {
 
 const CategoryPage = () => {
   const { category } = useParams<{ category: string }>();
+  const [currentPage, setCurrentPage] = useState(1);
   
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['products', category],
@@ -35,6 +48,32 @@ const CategoryPage = () => {
   });
 
   const title = category ? categoryTitles[category] || category : "Todos os Produtos";
+
+  // Pagination logic
+  const totalPages = Math.ceil(products.length / PRODUCTS_PER_PAGE);
+  const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
+  const paginatedProducts = products.slice(startIndex, startIndex + PRODUCTS_PER_PAGE);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const getPageNumbers = () => {
+    const pages: (number | 'ellipsis')[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push('ellipsis');
+      for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+        pages.push(i);
+      }
+      if (currentPage < totalPages - 2) pages.push('ellipsis');
+      pages.push(totalPages);
+    }
+    return pages;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -85,31 +124,73 @@ const CategoryPage = () => {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {products.map((product: Product) => (
-                <ProductCard
-                  key={product.id}
-                  name={product.name}
-                  image={product.image_url || "/placeholder.svg"}
-                  oldPrice={product.old_price || undefined}
-                  price={product.price}
-                  pixPrice={product.pix_price || product.price * 0.95}
-                  discount={product.discount_percent || undefined}
-                  installments={
-                    product.installments_count && product.installments_value
-                      ? { count: product.installments_count, value: product.installments_value }
-                      : undefined
-                  }
-                  express={product.express_delivery ?? true}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                {paginatedProducts.map((product: Product) => (
+                  <ProductCard
+                    key={product.id}
+                    id={product.id}
+                    name={product.name}
+                    image={product.image_url || "/placeholder.svg"}
+                    oldPrice={product.old_price || undefined}
+                    price={product.price}
+                    pixPrice={product.pix_price || product.price * 0.95}
+                    discount={product.discount_percent || undefined}
+                    installments={
+                      product.installments_count && product.installments_value
+                        ? { count: product.installments_count, value: product.installments_value }
+                        : undefined
+                    }
+                    express={product.express_delivery ?? true}
+                  />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-8">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious
+                          onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                          className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                        />
+                      </PaginationItem>
+                      
+                      {getPageNumbers().map((page, index) => (
+                        <PaginationItem key={index}>
+                          {page === 'ellipsis' ? (
+                            <PaginationEllipsis />
+                          ) : (
+                            <PaginationLink
+                              onClick={() => handlePageChange(page)}
+                              isActive={currentPage === page}
+                              className="cursor-pointer"
+                            >
+                              {page}
+                            </PaginationLink>
+                          )}
+                        </PaginationItem>
+                      ))}
+                      
+                      <PaginationItem>
+                        <PaginationNext
+                          onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                          className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
+            </>
           )}
 
           {/* Product count */}
           {!isLoading && products.length > 0 && (
             <p className="text-sm text-muted-foreground mt-8 text-center">
-              Exibindo {products.length} produto{products.length !== 1 ? "s" : ""}
+              Exibindo {startIndex + 1}-{Math.min(startIndex + PRODUCTS_PER_PAGE, products.length)} de {products.length} produto{products.length !== 1 ? "s" : ""}
             </p>
           )}
         </div>
