@@ -16,7 +16,14 @@ const categoryTitles: Record<string, string> = {
   "motos": "Motos",
   "pneu-pretinho": "Pneu Pretinho",
   "limpadores-apc": "Limpadores APC",
-  "calculadora": "Calculadora de Diluição",
+  "ofertas": "Ofertas",
+  "lavagem": "Lavagem",
+  "polimento": "Polimento",
+  "interior": "Interior",
+  "equipamentos": "Equipamentos",
+  "cursos": "Cursos",
+  "marcas": "Marcas",
+  "novidades": "Novidades",
 };
 
 const CategoryPage = () => {
