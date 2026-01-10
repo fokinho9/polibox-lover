@@ -26,25 +26,122 @@ function parsePrice(priceStr: string): number {
   return isNaN(num) ? 0 : num;
 }
 
-function parseCsvProducts(csvContent: string, category: string): ProductData[] {
+function detectCsvFormat(header: string): 'new' | 'lavagem' | 'standard' {
+  const headerLower = header.toLowerCase();
+  
+  // New format: Nome,Preço,Preço Promocional,Descrição,URL,Imagem Selecionada
+  if (headerLower.includes('nome') && headerLower.includes('preço') && headerLower.includes('imagem')) {
+    return 'new';
+  }
+  
+  // Standard format has "product__price" or "R$" column
+  if (header.includes('"product__price"') || header.includes('"R$"')) {
+    return 'standard';
+  }
+  
+  return 'lavagem';
+}
+
+function parseNewFormatCsv(csvContent: string, category: string): ProductData[] {
+  const products: ProductData[] = [];
+  const lines = csvContent.split('\n');
+  const seenProducts = new Set<string>();
+  
+  console.log(`Parsing NEW format CSV with ${lines.length} lines`);
+  
+  // Skip header
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i]?.trim();
+    if (!line) continue;
+    
+    // Parse CSV line considering quoted fields
+    const fields: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let j = 0; j < line.length; j++) {
+      const char = line[j];
+      
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        fields.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    fields.push(current.trim()); // Last field
+    
+    // New format columns: Nome, Preço, Preço Promocional, Descrição, URL, Imagem Selecionada
+    const name = fields[0]?.replace(/^"|"$/g, '').trim();
+    const priceStr = fields[1]?.replace(/^"|"$/g, '').trim() || '0';
+    const pixPriceStr = fields[2]?.replace(/^"|"$/g, '').trim() || '0';
+    const sourceUrl = fields[4]?.replace(/^"|"$/g, '').replace(/\\/g, '').trim() || null;
+    let imageUrl = fields[5]?.replace(/^"|"$/g, '').replace(/\\/g, '').trim() || null;
+    
+    // Skip if no name
+    if (!name || name.length < 3) continue;
+    
+    // Skip duplicates
+    if (seenProducts.has(name)) continue;
+    seenProducts.add(name);
+    
+    // Validate image URL
+    if (imageUrl) {
+      if (imageUrl.includes('loading.gif') || 
+          imageUrl === '0' || 
+          !imageUrl.startsWith('http')) {
+        imageUrl = null;
+      }
+    }
+    
+    const price = parsePrice(priceStr);
+    const pixPrice = parsePrice(pixPriceStr);
+    
+    // Skip products with no price
+    if (price === 0) continue;
+    
+    // Calculate discount
+    let discountPercent = 5;
+    if (price > 0 && pixPrice > 0 && pixPrice < price) {
+      discountPercent = Math.round(((price - pixPrice) / price) * 100);
+    }
+    
+    // Estimate old price (10% higher)
+    const oldPrice = price > 0 ? Math.round(price * 1.1 * 100) / 100 : null;
+    
+    console.log(`Product: ${name.substring(0, 50)}... | Image: ${imageUrl ? 'YES' : 'NO'} | Price: ${price}`);
+    
+    products.push({
+      name,
+      price,
+      old_price: oldPrice,
+      pix_price: pixPrice > 0 ? pixPrice : null,
+      discount_percent: discountPercent,
+      image_url: imageUrl,
+      source_url: sourceUrl,
+      category,
+      express_delivery: true,
+    });
+  }
+  
+  return products;
+}
+
+function parseLegacyCsv(csvContent: string, category: string, isLavagemFormat: boolean): ProductData[] {
   const products: ProductData[] = [];
   const lines = csvContent.split('\n');
   
-  console.log(`Total lines in CSV: ${lines.length}`);
-  
-  // Detect CSV format by checking header
-  const header = lines[0] || '';
-  const isLavagemFormat = !header.includes('"product__price"'); // Lavagem format doesn't have "R$" column
-  console.log(`CSV format detected: ${isLavagemFormat ? 'lavagem' : 'standard'}`);
+  console.log(`Parsing LEGACY format CSV with ${lines.length} lines`);
   
   let i = 1; // Skip header
   let productCount = 0;
-  const seenProducts = new Set<string>(); // Track duplicates by name
+  const seenProducts = new Set<string>();
   
   while (i < lines.length) {
     const line = lines[i]?.trim();
     
-    // Skip empty lines
     if (!line) {
       i++;
       continue;
@@ -58,14 +155,12 @@ function parseCsvProducts(csvContent: string, category: string): ProductData[] {
       let fullLine = line;
       let j = i + 1;
       
-      // Keep adding lines until we find the closing of the JavaScript block
       while (j < lines.length) {
         const nextLine = lines[j]?.trim();
         if (!nextLine) {
           j++;
           continue;
         }
-        // If this line starts a new product, stop
         if (nextLine.startsWith('"https://www.polibox.com.br/')) {
           break;
         }
@@ -73,17 +168,15 @@ function parseCsvProducts(csvContent: string, category: string): ProductData[] {
         j++;
       }
       
-      // Now parse the full product line using regex to extract quoted fields
+      // Parse the full product line
       const fieldMatches = fullLine.match(/"([^"]*(?:"""[^"]*)*)"/g);
       
       if (fieldMatches && fieldMatches.length >= 6) {
-        // Remove quotes from each match
         const fields = fieldMatches.map(f => f.replace(/^"|"$/g, '').replace(/""/g, '"'));
         
         const sourceUrl = fields[0] || null;
         let imageUrl = fields[1] || null;
         
-        // Validate image URL - must be a valid image URL
         if (imageUrl) {
           if (imageUrl.includes('loading.gif') || 
               imageUrl === '0' || 
@@ -92,16 +185,13 @@ function parseCsvProducts(csvContent: string, category: string): ProductData[] {
           }
         }
         
-        // Get product name - field[5] for both formats
         const name = fields[5]?.trim();
         
-        // Skip if no name or too short
         if (!name || name.length < 3) {
           i = j;
           continue;
         }
         
-        // Skip duplicates
         if (seenProducts.has(name)) {
           i = j;
           continue;
@@ -112,7 +202,6 @@ function parseCsvProducts(csvContent: string, category: string): ProductData[] {
         let pixPrice: number | null = null;
         
         if (isLavagemFormat) {
-          // Lavagem format: field[6] = price, field[7] = pix integer, field[8] = pix decimal
           price = parsePrice(fields[6] || '0');
           const pixInt = fields[7]?.replace(/\./g, '').trim() || '';
           const pixDec = fields[8]?.replace(',', '').trim() || '00';
@@ -121,7 +210,6 @@ function parseCsvProducts(csvContent: string, category: string): ProductData[] {
             if (isNaN(pixPrice)) pixPrice = null;
           }
         } else {
-          // Standard format: field[6] = "R$", field[7] = price, field[8] = pix integer, field[10] = pix decimal
           if (fields[6] === 'R$') {
             price = parsePrice(fields[7] || '0');
             const pixInt = fields[8]?.replace(/\./g, '').trim() || '';
@@ -131,7 +219,6 @@ function parseCsvProducts(csvContent: string, category: string): ProductData[] {
               if (isNaN(pixPrice)) pixPrice = null;
             }
           } else {
-            // Fallback: try to parse as lavagem format
             price = parsePrice(fields[6] || '0');
             const pixInt = fields[7]?.replace(/\./g, '').trim() || '';
             const pixDec = fields[8]?.replace(',', '').trim() || '00';
@@ -142,13 +229,11 @@ function parseCsvProducts(csvContent: string, category: string): ProductData[] {
           }
         }
         
-        // Calculate discount
-        let discountPercent = 5; // Default discount
+        let discountPercent = 5;
         if (price > 0 && pixPrice && pixPrice < price) {
           discountPercent = Math.round(((price - pixPrice) / price) * 100);
         }
         
-        // Estimate old price (10% higher)
         const oldPrice = price > 0 ? Math.round(price * 1.1 * 100) / 100 : null;
         
         console.log(`Product: ${name.substring(0, 50)}... | Image: ${imageUrl ? 'YES' : 'NO'} | Price: ${price}`);
@@ -173,6 +258,28 @@ function parseCsvProducts(csvContent: string, category: string): ProductData[] {
   }
   
   console.log(`Parsed ${products.length} unique products from ${productCount} product blocks`);
+  
+  return products;
+}
+
+function parseCsvProducts(csvContent: string, category: string): ProductData[] {
+  const lines = csvContent.split('\n');
+  console.log(`Total lines in CSV: ${lines.length}`);
+  
+  const header = lines[0] || '';
+  const format = detectCsvFormat(header);
+  console.log(`CSV format detected: ${format}`);
+  
+  let products: ProductData[];
+  
+  if (format === 'new') {
+    products = parseNewFormatCsv(csvContent, category);
+  } else {
+    const isLavagemFormat = format === 'lavagem';
+    products = parseLegacyCsv(csvContent, category, isLavagemFormat);
+  }
+  
+  console.log(`Found ${products.length} valid products`);
   console.log(`Products with images: ${products.filter(p => p.image_url).length}`);
   console.log(`Products without images: ${products.filter(p => !p.image_url).length}`);
   
@@ -196,6 +303,7 @@ serve(async (req) => {
     
     console.log(`Processing CSV for category: ${category}`);
     console.log(`CSV content length: ${csvContent.length} characters`);
+    console.log(`First 500 chars: ${csvContent.substring(0, 500)}`);
     
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -203,8 +311,6 @@ serve(async (req) => {
     
     // Parse CSV
     const products = parseCsvProducts(csvContent, category);
-    
-    console.log(`Found ${products.length} valid products`);
     
     if (products.length === 0) {
       return new Response(
