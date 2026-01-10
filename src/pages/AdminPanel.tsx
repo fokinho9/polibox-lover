@@ -28,7 +28,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CsvPreviewModal, parseCsvForPreview } from "@/components/admin/CsvPreviewModal";
 import { ProductEditModal } from "@/components/admin/ProductEditModal";
 
 const CATEGORIES = [
@@ -45,9 +44,6 @@ const AdminPanel = () => {
   const [scrapeUrl, setScrapeUrl] = useState("https://www.polibox.com.br");
   const [selectedCategory, setSelectedCategory] = useState("equipamentos");
   const [isImporting, setIsImporting] = useState(false);
-  const [csvPreviewOpen, setCsvPreviewOpen] = useState(false);
-  const [csvProducts, setCsvProducts] = useState<any[]>([]);
-  const [csvContent, setCsvContent] = useState("");
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -119,48 +115,12 @@ const AdminPanel = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    try {
-      const content = await file.text();
-      setCsvContent(content);
-      
-      const parsedProducts = parseCsvForPreview(content);
-      
-      if (parsedProducts.length === 0) {
-        toast({
-          title: "Erro",
-          description: "Nenhum produto encontrado no CSV.",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      setCsvProducts(parsedProducts);
-      setCsvPreviewOpen(true);
-    } catch (error) {
-      toast({
-        title: "Erro",
-        description: "Erro ao ler o arquivo CSV.",
-        variant: "destructive",
-      });
-    } finally {
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
-  };
-
-  const handleConfirmImport = async (selectedProducts: any[]) => {
     setIsImporting(true);
     
     try {
-      // Rebuild CSV with only selected products
-      const header = "Nome,Preço,Preço Promocional,Descrição,URL,Imagem Selecionada";
-      const rows = selectedProducts.map(p => 
-        `"${p.name}","${p.price}","${p.pixPrice}","via","${p.url}","${p.imageUrl}"`
-      );
-      const filteredCsv = [header, ...rows].join('\n');
+      const csvContent = await file.text();
       
-      const result = await productsApi.importCsvProducts(filteredCsv, selectedCategory);
+      const result = await productsApi.importCsvProducts(csvContent, selectedCategory);
       
       if (result.success) {
         toast({
@@ -168,7 +128,6 @@ const AdminPanel = () => {
           description: `${result.products_inserted} produtos importados para "${selectedCategory}".`,
         });
         queryClient.invalidateQueries({ queryKey: ['products'] });
-        setCsvPreviewOpen(false);
       } else {
         toast({
           title: "Erro na Importação",
@@ -179,14 +138,16 @@ const AdminPanel = () => {
     } catch (error) {
       toast({
         title: "Erro",
-        description: error instanceof Error ? error.message : "Erro ao importar.",
+        description: error instanceof Error ? error.message : "Erro ao processar arquivo.",
         variant: "destructive",
       });
     } finally {
       setIsImporting(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
-
   const handleSaveProduct = async (updates: Partial<Product>) => {
     if (!updates.id) return;
     
@@ -539,15 +500,6 @@ const AdminPanel = () => {
         </Card>
       </div>
 
-      {/* CSV Preview Modal */}
-      <CsvPreviewModal
-        open={csvPreviewOpen}
-        onClose={() => setCsvPreviewOpen(false)}
-        products={csvProducts}
-        category={selectedCategory}
-        onConfirm={handleConfirmImport}
-        isImporting={isImporting}
-      />
 
       {/* Product Edit Modal */}
       <ProductEditModal
