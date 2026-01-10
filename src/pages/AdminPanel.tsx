@@ -46,6 +46,8 @@ const AdminPanel = () => {
   const [isImporting, setIsImporting] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 50;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -441,60 +443,111 @@ const AdminPanel = () => {
                 Nenhum produto no banco. Use o scraping ou importe um CSV.
               </p>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {products.slice(0, 40).map((product: Product) => (
-                  <div 
-                    key={product.id} 
-                    className="p-4 bg-secondary/30 rounded-lg border border-border hover:border-primary/50 cursor-pointer transition-all group"
-                    onClick={() => setEditingProduct(product)}
-                  >
-                    <div className="relative">
-                      {product.image_url && (
-                        <img 
-                          src={product.image_url} 
-                          alt={product.name}
-                          className="w-full h-32 object-contain mb-3 rounded"
-                        />
-                      )}
-                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="bg-primary rounded-full p-1.5">
-                          <Pencil className="h-3 w-3 text-white" />
-                        </div>
-                      </div>
-                    </div>
-                    <h3 className="text-sm font-medium text-foreground line-clamp-2 mb-2">
-                      {product.name}
-                    </h3>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-primary font-bold">
-                          R$ {product.price?.toFixed(2).replace('.', ',')}
-                        </span>
-                        {product.pix_price && (
-                          <p className="text-xs text-green-500">
-                            PIX: R$ {product.pix_price.toFixed(2).replace('.', ',')}
-                          </p>
+              <>
+                <div className="flex justify-between items-center mb-4">
+                  <p className="text-sm text-muted-foreground">
+                    Página {currentPage} de {Math.ceil(products.length / productsPerPage)} 
+                    ({products.length} produtos)
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      Anterior
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(p => Math.min(Math.ceil(products.length / productsPerPage), p + 1))}
+                      disabled={currentPage >= Math.ceil(products.length / productsPerPage)}
+                    >
+                      Próximo
+                    </Button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {products
+                    .slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)
+                    .map((product: Product) => (
+                    <div 
+                      key={product.id} 
+                      className={`p-4 rounded-lg border cursor-pointer transition-all group ${
+                        product.price === 0 
+                          ? 'bg-red-500/10 border-red-500/50 hover:border-red-500' 
+                          : 'bg-secondary/30 border-border hover:border-primary/50'
+                      }`}
+                      onClick={() => setEditingProduct(product)}
+                    >
+                      <div className="relative">
+                        {product.image_url && (
+                          <img 
+                            src={product.image_url} 
+                            alt={product.name}
+                            className="w-full h-32 object-contain mb-3 rounded"
+                          />
                         )}
-                      </div>
-                      <div className="flex gap-1 flex-wrap justify-end">
-                        <Badge variant="outline" className="text-xs">
-                          {product.category}
-                        </Badge>
-                        {product.discount_percent && (
-                          <Badge className="bg-yellow-500 text-black text-xs">
-                            -{product.discount_percent}%
+                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="bg-primary rounded-full p-1.5">
+                            <Pencil className="h-3 w-3 text-white" />
+                          </div>
+                        </div>
+                        {product.price === 0 && (
+                          <Badge className="absolute top-2 left-2 bg-red-500">
+                            SEM PREÇO
                           </Badge>
                         )}
                       </div>
+                      <h3 className="text-sm font-medium text-foreground line-clamp-2 mb-2">
+                        {product.name}
+                      </h3>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className={`font-bold ${product.price === 0 ? 'text-red-500' : 'text-primary'}`}>
+                            R$ {product.price?.toFixed(2).replace('.', ',')}
+                          </span>
+                          {product.pix_price && product.pix_price > 0 && (
+                            <p className="text-xs text-green-500">
+                              PIX: R$ {product.pix_price.toFixed(2).replace('.', ',')}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex gap-1 flex-wrap justify-end">
+                          <Badge variant="outline" className="text-xs">
+                            {product.category}
+                          </Badge>
+                          {product.discount_percent && product.discount_percent > 0 && (
+                            <Badge className="bg-yellow-500 text-black text-xs">
+                              -{product.discount_percent}%
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            {products.length > 40 && (
-              <p className="text-center text-muted-foreground mt-4">
-                Mostrando 40 de {products.length} produtos
-              </p>
+                  ))}
+                </div>
+                <div className="flex justify-center gap-2 mt-4">
+                  {Array.from({ length: Math.min(10, Math.ceil(products.length / productsPerPage)) }, (_, i) => {
+                    const pageNum = i + 1;
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={currentPage === pageNum ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setCurrentPage(pageNum)}
+                        className="w-10"
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
+                  {Math.ceil(products.length / productsPerPage) > 10 && (
+                    <span className="text-muted-foreground px-2">...</span>
+                  )}
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

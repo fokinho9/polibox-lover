@@ -20,9 +20,26 @@ interface ProductData {
 
 function parsePrice(priceStr: string): number {
   if (!priceStr) return 0;
-  // Remove R$, spaces, and handle Brazilian format (1.234,56)
-  const cleaned = priceStr.replace(/R\$\s*/g, '').replace(/\./g, '').replace(',', '.').trim();
+  
+  // Log the original price string for debugging
+  console.log(`Parsing price: "${priceStr}"`);
+  
+  // Remove R$, spaces, "via", and other text
+  let cleaned = priceStr
+    .replace(/R\$\s*/gi, '')
+    .replace(/via/gi, '')
+    .replace(/\s+/g, '')
+    .trim();
+  
+  // Handle Brazilian format: 1.234,56 -> 1234.56
+  // First remove thousand separators (dots followed by 3 digits)
+  cleaned = cleaned.replace(/\.(\d{3})/g, '$1');
+  // Then replace comma with dot for decimal
+  cleaned = cleaned.replace(',', '.');
+  
   const num = parseFloat(cleaned);
+  console.log(`Cleaned: "${cleaned}" -> ${num}`);
+  
   return isNaN(num) ? 0 : num;
 }
 
