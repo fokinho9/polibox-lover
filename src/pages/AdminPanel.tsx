@@ -17,7 +17,8 @@ import {
   Loader2,
   ArrowLeft,
   Upload,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Pencil
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -27,6 +28,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CsvPreviewModal, parseCsvForPreview } from "@/components/admin/CsvPreviewModal";
+import { ProductEditModal } from "@/components/admin/ProductEditModal";
 
 const CATEGORIES = [
   { value: "equipamentos", label: "Equipamentos" },
@@ -42,6 +45,11 @@ const AdminPanel = () => {
   const [scrapeUrl, setScrapeUrl] = useState("https://www.polibox.com.br");
   const [selectedCategory, setSelectedCategory] = useState("equipamentos");
   const [isImporting, setIsImporting] = useState(false);
+  const [csvPreviewOpen, setCsvPreviewOpen] = useState(false);
+  const [csvProducts, setCsvProducts] = useState<any[]>([]);
+  const [csvContent, setCsvContent] = useState("");
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -111,12 +119,48 @@ const AdminPanel = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    try {
+      const content = await file.text();
+      setCsvContent(content);
+      
+      const parsedProducts = parseCsvForPreview(content);
+      
+      if (parsedProducts.length === 0) {
+        toast({
+          title: "Erro",
+          description: "Nenhum produto encontrado no CSV.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setCsvProducts(parsedProducts);
+      setCsvPreviewOpen(true);
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Erro ao ler o arquivo CSV.",
+        variant: "destructive",
+      });
+    } finally {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleConfirmImport = async (selectedProducts: any[]) => {
     setIsImporting(true);
     
     try {
-      const csvContent = await file.text();
+      // Rebuild CSV with only selected products
+      const header = "Nome,Preço,Preço Promocional,Descrição,URL,Imagem Selecionada";
+      const rows = selectedProducts.map(p => 
+        `"${p.name}","${p.price}","${p.pixPrice}","via","${p.url}","${p.imageUrl}"`
+      );
+      const filteredCsv = [header, ...rows].join('\n');
       
-      const result = await productsApi.importCsvProducts(csvContent, selectedCategory);
+      const result = await productsApi.importCsvProducts(filteredCsv, selectedCategory);
       
       if (result.success) {
         toast({
@@ -124,6 +168,7 @@ const AdminPanel = () => {
           description: `${result.products_inserted} produtos importados para "${selectedCategory}".`,
         });
         queryClient.invalidateQueries({ queryKey: ['products'] });
+        setCsvPreviewOpen(false);
       } else {
         toast({
           title: "Erro na Importação",
@@ -134,14 +179,51 @@ const AdminPanel = () => {
     } catch (error) {
       toast({
         title: "Erro",
-        description: error instanceof Error ? error.message : "Erro ao processar arquivo.",
+        description: error instanceof Error ? error.message : "Erro ao importar.",
         variant: "destructive",
       });
     } finally {
       setIsImporting(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+    }
+  };
+
+  const handleSaveProduct = async (updates: Partial<Product>) => {
+    if (!updates.id) return;
+    
+    setIsSaving(true);
+    try {
+      await productsApi.update(updates.id, updates);
+      toast({
+        title: "Produto Atualizado",
+        description: "As alterações foram salvas.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      setEditingProduct(null);
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao salvar produto.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteProduct = async (id: string) => {
+    try {
+      await productsApi.delete(id);
+      toast({
+        title: "Produto Excluído",
+        description: "O produto foi removido.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao excluir produto.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -232,23 +314,14 @@ const AdminPanel = () => {
                   disabled={isImporting}
                   className="bg-primary hover:bg-cyan-glow"
                 >
-                  {isImporting ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Importando...
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="h-4 w-4 mr-2" />
-                      Selecionar CSV
-                    </>
-                  )}
+                  <Upload className="h-4 w-4 mr-2" />
+                  Selecionar CSV
                 </Button>
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
-              Selecione um arquivo CSV exportado da Polibox para importar produtos na categoria selecionada.
-              Produtos duplicados serão adicionados normalmente.
+              Selecione um arquivo CSV para visualizar os produtos antes de importar.
+              Você poderá selecionar quais produtos importar e ver os preços.
             </p>
           </CardContent>
         </Card>
@@ -392,6 +465,9 @@ const AdminPanel = () => {
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Package className="h-5 w-5 text-primary" />
               Produtos no Banco de Dados
+              <span className="text-sm font-normal text-muted-foreground ml-2">
+                (Clique para editar)
+              </span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -405,26 +481,41 @@ const AdminPanel = () => {
               </p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {products.slice(0, 20).map((product: Product) => (
+                {products.slice(0, 40).map((product: Product) => (
                   <div 
                     key={product.id} 
-                    className="p-4 bg-secondary/30 rounded-lg border border-border"
+                    className="p-4 bg-secondary/30 rounded-lg border border-border hover:border-primary/50 cursor-pointer transition-all group"
+                    onClick={() => setEditingProduct(product)}
                   >
-                    {product.image_url && (
-                      <img 
-                        src={product.image_url} 
-                        alt={product.name}
-                        className="w-full h-32 object-contain mb-3 rounded"
-                      />
-                    )}
+                    <div className="relative">
+                      {product.image_url && (
+                        <img 
+                          src={product.image_url} 
+                          alt={product.name}
+                          className="w-full h-32 object-contain mb-3 rounded"
+                        />
+                      )}
+                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="bg-primary rounded-full p-1.5">
+                          <Pencil className="h-3 w-3 text-white" />
+                        </div>
+                      </div>
+                    </div>
                     <h3 className="text-sm font-medium text-foreground line-clamp-2 mb-2">
                       {product.name}
                     </h3>
                     <div className="flex items-center justify-between">
-                      <span className="text-primary font-bold">
-                        R$ {product.price?.toFixed(2).replace('.', ',')}
-                      </span>
-                      <div className="flex gap-1">
+                      <div>
+                        <span className="text-primary font-bold">
+                          R$ {product.price?.toFixed(2).replace('.', ',')}
+                        </span>
+                        {product.pix_price && (
+                          <p className="text-xs text-green-500">
+                            PIX: R$ {product.pix_price.toFixed(2).replace('.', ',')}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex gap-1 flex-wrap justify-end">
                         <Badge variant="outline" className="text-xs">
                           {product.category}
                         </Badge>
@@ -439,14 +530,34 @@ const AdminPanel = () => {
                 ))}
               </div>
             )}
-            {products.length > 20 && (
+            {products.length > 40 && (
               <p className="text-center text-muted-foreground mt-4">
-                Mostrando 20 de {products.length} produtos
+                Mostrando 40 de {products.length} produtos
               </p>
             )}
           </CardContent>
         </Card>
       </div>
+
+      {/* CSV Preview Modal */}
+      <CsvPreviewModal
+        open={csvPreviewOpen}
+        onClose={() => setCsvPreviewOpen(false)}
+        products={csvProducts}
+        category={selectedCategory}
+        onConfirm={handleConfirmImport}
+        isImporting={isImporting}
+      />
+
+      {/* Product Edit Modal */}
+      <ProductEditModal
+        open={!!editingProduct}
+        onClose={() => setEditingProduct(null)}
+        product={editingProduct}
+        onSave={handleSaveProduct}
+        onDelete={handleDeleteProduct}
+        isSaving={isSaving}
+      />
     </div>
   );
 };
