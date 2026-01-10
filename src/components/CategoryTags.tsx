@@ -1,12 +1,13 @@
+import { Link } from "react-router-dom";
 import { Calculator, Trophy, Bike, Sparkles, Circle, Droplet } from "lucide-react";
 
 const categories = [
-  { icon: Calculator, label: "Calculadora de diluição" },
-  { icon: Trophy, label: "Mais vendidos" },
-  { icon: Bike, label: "Motos" },
-  { icon: Sparkles, label: "Ceras e Selantes" },
-  { icon: Circle, label: "Pneu Pretinho" },
-  { icon: Droplet, label: "Limpadores APC" },
+  { icon: Calculator, label: "Calculadora de diluição", href: "/calculadora" },
+  { icon: Trophy, label: "Mais vendidos", href: "/categoria/mais-vendidos" },
+  { icon: Bike, label: "Motos", href: "/categoria/motos" },
+  { icon: Sparkles, label: "Ceras e Selantes", href: "/categoria/ceras-selantes" },
+  { icon: Circle, label: "Pneu Pretinho", href: "/categoria/pneu-pretinho" },
+  { icon: Droplet, label: "Limpadores APC", href: "/categoria/limpadores-apc" },
 ];
 
 const CategoryTags = () => {
@@ -15,13 +16,14 @@ const CategoryTags = () => {
       <div className="container-main">
         <div className="flex items-center justify-center gap-3 overflow-x-auto scrollbar-hide">
           {categories.map((cat, index) => (
-            <button
+            <Link
               key={index}
+              to={cat.href}
               className="category-tag flex items-center gap-2 whitespace-nowrap"
             >
               <cat.icon className="h-4 w-4" />
               <span>{cat.label}</span>
-            </button>
+            </Link>
           ))}
         </div>
       </div>
