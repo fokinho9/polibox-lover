@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
 import FloatingCart from "@/components/FloatingCart";
+import ScrollToTop from "@/components/ScrollToTop";
 import Index from "./pages/Index";
 import AdminPanel from "./pages/AdminPanel";
 import CategoryPage from "./pages/CategoryPage";
@@ -29,6 +30,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <FloatingCart />
           <Routes>
             <Route path="/" element={<Index />} />

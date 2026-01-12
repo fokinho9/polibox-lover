@@ -11,10 +11,11 @@ import {
   Building2, 
   Star,
   Menu,
-  X
+  Calculator
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
 
 const navItems = [
   { icon: Tag, label: "OFERTAS", sublabel: "60%OFF", highlight: true, href: "/categoria/ofertas" },
@@ -28,6 +29,8 @@ const navItems = [
   { icon: Star, label: "NOVIDADES", href: "/categoria/novidades" },
 ];
 
+const calculatorItem = { icon: Calculator, label: "CALCULADORA", href: "/calculadora" };
+
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -35,7 +38,7 @@ const Navigation = () => {
     <nav className="bg-background border-b border-border">
       <div className="container-main">
         <div className="flex items-center gap-2">
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button - Only shows on mobile */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button 
@@ -72,12 +75,26 @@ const Navigation = () => {
                     )}
                   </Link>
                 ))}
+                
+                {/* Separator and Calculator */}
+                <Separator className="my-2 bg-border" />
+                <Link
+                  to={calculatorItem.href}
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors bg-gradient-to-r from-primary/20 to-cyan-glow/20 hover:from-primary/30 hover:to-cyan-glow/30 text-primary border border-primary/30"
+                >
+                  <calculatorItem.icon className="h-5 w-5" />
+                  <span className="font-medium">{calculatorItem.label}</span>
+                  <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded font-bold ml-auto">
+                    NOVO
+                  </span>
+                </Link>
               </div>
             </SheetContent>
           </Sheet>
 
-          {/* Desktop Navigation */}
-          <div className="flex-1 flex items-center justify-center overflow-x-auto scrollbar-hide">
+          {/* Desktop Navigation - Hidden on mobile */}
+          <div className="hidden md:flex flex-1 items-center justify-center overflow-x-auto scrollbar-hide">
             {navItems.map((item, index) => (
               <Link
                 key={index}
@@ -97,6 +114,19 @@ const Navigation = () => {
                 )}
               </Link>
             ))}
+            
+            {/* Separator bar and Calculator on Desktop */}
+            <div className="h-8 w-px bg-border mx-2" />
+            <Link
+              to={calculatorItem.href}
+              className="nav-item min-w-fit bg-gradient-to-r from-primary/20 to-cyan-glow/20 hover:from-primary/30 hover:to-cyan-glow/30 text-primary rounded-lg mx-1 border border-primary/30"
+            >
+              <calculatorItem.icon className="h-5 w-5" />
+              <span className="text-xs font-medium whitespace-nowrap">{calculatorItem.label}</span>
+              <span className="text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded font-bold">
+                NOVO
+              </span>
+            </Link>
           </div>
         </div>
       </div>

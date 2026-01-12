@@ -1,4 +1,4 @@
-import { Search, Truck, User, ShoppingCart, MapPin, ChevronDown, Sparkles } from "lucide-react";
+import { Search, Truck, MapPin, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -48,26 +48,12 @@ const Header = () => {
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2 md:gap-4">
+          {/* Actions - Only rastreio on desktop */}
+          <div className="flex items-center gap-2 md:gap-4 ml-auto">
             <Button variant="ghost" className="text-muted-foreground hover:text-primary flex items-center gap-2 hidden lg:flex">
               <MapPin className="h-4 w-4" />
               <span>RASTREIO</span>
             </Button>
-
-            <Button className="bg-secondary hover:bg-secondary/80 text-foreground flex items-center gap-2 rounded-xl hidden md:flex">
-              <User className="h-4 w-4" />
-              <span>ENTRAR</span>
-            </Button>
-
-            <Link to="/carrinho">
-              <Button variant="ghost" size="icon" className="relative text-primary hover:bg-primary/10 h-12 w-12 rounded-xl">
-                <ShoppingCart className="h-6 w-6" />
-                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold shadow-lg shadow-primary/30">
-                  0
-                </span>
-              </Button>
-            </Link>
           </div>
         </div>
       </div>

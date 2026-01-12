@@ -1,6 +1,8 @@
 import { ShoppingCart, Zap, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/contexts/CartContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProductCardProps {
   id?: string;
@@ -27,6 +29,35 @@ const ProductCard = ({
   express = true,
   brand,
 }: ProductCardProps) => {
+  const { addToCart } = useCart();
+  const { toast } = useToast();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!id) return;
+
+    // Create a product object for cart
+    const product = {
+      id,
+      name,
+      price,
+      image_url: image,
+      pix_price: pixPrice,
+      old_price: oldPrice,
+      discount_percent: discount,
+      brand,
+    };
+
+    addToCart(product as any, 1);
+    
+    toast({
+      title: "🛒 Produto adicionado!",
+      description: `${name} foi adicionado ao carrinho`,
+    });
+  };
+
   const CardWrapper = ({ children }: { children: React.ReactNode }) => {
     if (id) {
       return (
@@ -103,7 +134,7 @@ const ProductCard = ({
           </div>
 
           {/* Buy button */}
-          <Button className="w-full mt-5 btn-buy h-12 text-sm gap-2" onClick={(e) => e.preventDefault()}>
+          <Button className="w-full mt-5 btn-buy h-12 text-sm gap-2" onClick={handleAddToCart}>
             <ShoppingCart className="h-4 w-4" />
             COMPRAR AGORA
           </Button>
