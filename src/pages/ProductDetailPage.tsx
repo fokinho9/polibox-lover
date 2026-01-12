@@ -2,19 +2,22 @@ import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { 
-  ArrowLeft, ShoppingCart, Truck, Shield, CreditCard, Zap, Star, Check, 
-  Package, Heart, MapPin, Award, RefreshCw, Clock, ChevronDown, ChevronUp,
+  ArrowLeft, ShoppingCart, Truck, Shield, Zap, Star, Check, 
+  Package, MapPin, Award, RefreshCw, Clock, ChevronDown, ChevronUp,
   ThumbsUp, MessageSquare
 } from "lucide-react";
 import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import FloatingBuyButton from "@/components/FloatingBuyButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useCart } from "@/contexts/CartContext";
+import { useToast } from "@/hooks/use-toast";
 
 const ProductDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,6 +27,8 @@ const ProductDetailPage = () => {
   const [shippingResult, setShippingResult] = useState<{ price: string; days: string } | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const { addToCart } = useCart();
+  const { toast } = useToast();
 
   const { data: product, isLoading } = useQuery({
     queryKey: ['product', id],
@@ -40,11 +45,21 @@ const ProductDetailPage = () => {
     enabled: !!id,
   });
 
+  const handleBuyNow = () => {
+    if (!product) return;
+    
+    addToCart(product, quantity);
+    
+    toast({
+      title: "🛒 Produto adicionado!",
+      description: `${product.name} foi adicionado ao carrinho`,
+    });
+  };
+
   const handleCalculateShipping = async () => {
     if (!cep || cep.length < 8) return;
     setIsCalculating(true);
     
-    // Simular cálculo de frete
     await new Promise(resolve => setTimeout(resolve, 800));
     
     const price = product?.price && product.price >= 299 ? "GRÁTIS" : "R$ 19,90";
@@ -54,7 +69,6 @@ const ProductDetailPage = () => {
     setIsCalculating(false);
   };
 
-  // Mock reviews data
   const reviews = [
     { id: 1, author: "Carlos M.", rating: 5, date: "15/12/2025", comment: "Produto excelente, chegou muito rápido! Recomendo demais.", helpful: 12 },
     { id: 2, author: "Amanda S.", rating: 5, date: "10/12/2025", comment: "Qualidade top! Já é a terceira vez que compro.", helpful: 8 },
@@ -118,9 +132,9 @@ const ProductDetailPage = () => {
       <Header />
       <Navigation />
       
-      <main className="py-4 md:py-8">
+      <main className="py-4 md:py-8 pb-32">
         <div className="container-main">
-          {/* Breadcrumb - Mobile optimized */}
+          {/* Breadcrumb */}
           <div className="flex items-center gap-2 md:gap-4 mb-4 md:mb-8 overflow-x-auto scrollbar-hide">
             <Link to={product.category ? `/categoria/${product.category}` : "/"}>
               <Button variant="ghost" size="sm" className="gap-1 md:gap-2 hover:text-primary px-2 md:px-3">
@@ -142,9 +156,8 @@ const ProductDetailPage = () => {
             </nav>
           </div>
 
-          {/* Product Details */}
           <div className="grid lg:grid-cols-2 gap-6 lg:gap-12">
-            {/* Images - Mobile optimized */}
+            {/* Images */}
             <div className="space-y-3 md:space-y-4">
               <div className="relative aspect-square bg-gradient-to-br from-card to-secondary/30 rounded-xl md:rounded-2xl overflow-hidden border border-border">
                 {product.discount_percent && (
@@ -192,7 +205,7 @@ const ProductDetailPage = () => {
               )}
             </div>
 
-            {/* Info - Mobile optimized */}
+            {/* Info */}
             <div className="space-y-4 md:space-y-6">
               {/* Brand and Rating */}
               <div className="flex flex-wrap items-center gap-2 md:gap-3">
@@ -233,15 +246,13 @@ const ProductDetailPage = () => {
                 )}
                 
                 <div className="space-y-1">
-                  <p className="text-sm md:text-base text-muted-foreground">
-                    Por apenas:
-                  </p>
+                  <p className="text-sm md:text-base text-muted-foreground">Por apenas:</p>
                   <p className="text-3xl md:text-4xl font-display font-bold text-foreground">
                     R$ {product.price.toFixed(2).replace('.', ',')}
                   </p>
                 </div>
 
-                {/* PIX Price - Highlighted */}
+                {/* PIX Price */}
                 <div className="flex items-center gap-3 bg-primary/10 rounded-lg md:rounded-xl p-3 md:p-4 border border-primary/30">
                   <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-primary animate-pulse-glow" />
                   <div className="flex-1">
@@ -250,57 +261,37 @@ const ProductDetailPage = () => {
                     </p>
                     <p className="text-xs md:text-sm text-primary/80">à vista no Pix (5% desconto)</p>
                   </div>
-                  <Badge className="bg-primary text-primary-foreground text-xs">
-                    5% OFF
-                  </Badge>
+                  <Badge className="bg-primary text-primary-foreground text-xs">5% OFF</Badge>
                 </div>
 
-                {/* Installments */}
-                {product.installments_count && product.installments_value ? (
-                  <p className="text-xs md:text-sm text-muted-foreground flex items-center gap-2">
-                    <CreditCard className="h-4 w-4" />
-                    ou <span className="font-bold text-foreground">{product.installments_count}x</span> de{" "}
-                    <span className="font-bold text-foreground">R$ {product.installments_value.toFixed(2).replace('.', ',')}</span> sem juros
-                  </p>
-                ) : (
-                  <p className="text-xs md:text-sm text-muted-foreground flex items-center gap-2">
-                    <CreditCard className="h-4 w-4" />
-                    ou até <span className="font-bold text-foreground">10x</span> de{" "}
-                    <span className="font-bold text-foreground">R$ {(product.price / 10).toFixed(2).replace('.', ',')}</span> sem juros
-                  </p>
-                )}
+                <p className="text-xs md:text-sm text-muted-foreground">
+                  ou até <span className="font-bold text-foreground">10x</span> de{" "}
+                  <span className="font-bold text-foreground">R$ {(product.price / 10).toFixed(2).replace('.', ',')}</span> sem juros
+                </p>
               </div>
 
               {/* Shipping Calculator */}
               <div className="bg-card rounded-xl border border-border p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <Truck className="h-5 w-5 text-primary" />
-                  <span className="font-semibold text-sm md:text-base">Calcular Frete e Prazo</span>
+                  <span className="font-semibold text-sm md:text-base">Calcular Frete</span>
                   {isFreeShipping && (
-                    <Badge className="bg-green-500/20 text-green-400 text-xs ml-auto">
-                      FRETE GRÁTIS
-                    </Badge>
+                    <Badge className="bg-green-500/20 text-green-400 text-xs ml-auto">FRETE GRÁTIS</Badge>
                   )}
                 </div>
                 <div className="flex gap-2">
-                  <div className="flex-1">
-                    <Input
-                      placeholder="Digite seu CEP"
-                      value={cep}
-                      onChange={(e) => setCep(e.target.value.replace(/\D/g, '').slice(0, 8))}
-                      className="bg-secondary border-border text-sm"
-                    />
-                  </div>
+                  <Input
+                    placeholder="CEP"
+                    value={cep}
+                    onChange={(e) => setCep(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                    className="bg-secondary border-border text-sm"
+                  />
                   <Button 
                     onClick={handleCalculateShipping}
                     disabled={isCalculating || cep.length < 8}
                     className="bg-primary hover:bg-cyan-glow text-sm px-4"
                   >
-                    {isCalculating ? (
-                      <RefreshCw className="h-4 w-4 animate-spin" />
-                    ) : (
-                      "Calcular"
-                    )}
+                    {isCalculating ? <RefreshCw className="h-4 w-4 animate-spin" /> : "OK"}
                   </Button>
                 </div>
                 
@@ -308,7 +299,7 @@ const ProductDetailPage = () => {
                   <div className="mt-3 p-3 bg-secondary/50 rounded-lg flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <MapPin className="h-4 w-4 text-primary" />
-                      <span className="text-sm">Entrega para CEP {cep}</span>
+                      <span className="text-sm">CEP {cep}</span>
                     </div>
                     <div className="text-right">
                       <p className={`font-bold ${shippingResult.price === "GRÁTIS" ? "text-green-400" : "text-foreground"}`}>
@@ -321,16 +312,9 @@ const ProductDetailPage = () => {
                     </div>
                   </div>
                 )}
-                
-                {!shippingResult && isFreeShipping && (
-                  <p className="text-xs text-green-400 mt-2 flex items-center gap-1">
-                    <Check className="h-3 w-3" />
-                    Este produto tem frete grátis para todo Brasil!
-                  </p>
-                )}
               </div>
 
-              {/* Quantity & Actions */}
+              {/* Quantity & Buy Button */}
               <div className="space-y-3 md:space-y-4">
                 <div className="flex items-center gap-3 md:gap-4">
                   <span className="text-sm font-medium">Quantidade:</span>
@@ -338,34 +322,23 @@ const ProductDetailPage = () => {
                     <button 
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
                       className="px-3 md:px-4 py-2 hover:bg-secondary transition-colors text-lg font-bold"
-                    >
-                      −
-                    </button>
+                    >−</button>
                     <span className="px-4 md:px-6 py-2 font-bold bg-secondary/50 min-w-[48px] text-center">{quantity}</span>
                     <button 
                       onClick={() => setQuantity(quantity + 1)}
                       className="px-3 md:px-4 py-2 hover:bg-secondary transition-colors text-lg font-bold"
-                    >
-                      +
-                    </button>
+                    >+</button>
                   </div>
                 </div>
 
-                <Button className="w-full h-14 md:h-16 text-base md:text-lg btn-buy gap-2 md:gap-3 font-display tracking-wide">
-                  <ShoppingCart className="h-5 w-5 md:h-6 md:w-6" />
+                <Button 
+                  onClick={handleBuyNow}
+                  className="w-full h-16 md:h-20 text-lg md:text-xl btn-buy gap-3 font-display tracking-wide relative overflow-hidden"
+                >
+                  <ShoppingCart className="h-6 w-6 md:h-7 md:w-7" />
                   COMPRAR AGORA
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-shimmer" />
                 </Button>
-                
-                <div className="grid grid-cols-2 gap-2 md:gap-3">
-                  <Button variant="outline" className="h-11 md:h-12 gap-2 hover:border-primary hover:text-primary text-sm">
-                    <Heart className="h-4 w-4 md:h-5 md:w-5" />
-                    Favoritar
-                  </Button>
-                  <Button variant="outline" className="h-11 md:h-12 gap-2 hover:border-primary hover:text-primary text-sm">
-                    <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
-                    Add Carrinho
-                  </Button>
-                </div>
               </div>
 
               {/* Trust Badges */}
@@ -379,18 +352,6 @@ const ProductDetailPage = () => {
                     <p className="text-[10px] md:text-xs text-muted-foreground">Acima de R$299</p>
                   </div>
                 </div>
-                
-                {product.express_delivery && (
-                  <div className="flex items-center gap-2 md:gap-3 p-3 md:p-4 rounded-lg md:rounded-xl bg-card border border-border">
-                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <Zap className="h-4 w-4 md:h-5 md:w-5 text-primary" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-semibold text-xs md:text-sm truncate">Entrega Express</p>
-                      <p className="text-[10px] md:text-xs text-muted-foreground">Receba em 24h</p>
-                    </div>
-                  </div>
-                )}
                 
                 <div className="flex items-center gap-2 md:gap-3 p-3 md:p-4 rounded-lg md:rounded-xl bg-card border border-border">
                   <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -411,25 +372,31 @@ const ProductDetailPage = () => {
                     <p className="text-[10px] md:text-xs text-muted-foreground">Garantia Total</p>
                   </div>
                 </div>
+                
+                {product.express_delivery && (
+                  <div className="flex items-center gap-2 md:gap-3 p-3 md:p-4 rounded-lg md:rounded-xl bg-card border border-border">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Zap className="h-4 w-4 md:h-5 md:w-5 text-primary" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-xs md:text-sm truncate">Express</p>
+                      <p className="text-[10px] md:text-xs text-muted-foreground">Receba em 24h</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Tabs Section - Description & Reviews */}
+          {/* Tabs Section */}
           <div className="mt-8 md:mt-12">
             <Tabs defaultValue="description" className="w-full">
               <TabsList className="w-full justify-start bg-card border-b border-border rounded-none h-auto p-0 gap-0">
-                <TabsTrigger 
-                  value="description" 
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 md:px-6 py-3 md:py-4 text-sm md:text-base"
-                >
+                <TabsTrigger value="description" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 md:px-6 py-3 md:py-4 text-sm md:text-base">
                   <Package className="h-4 w-4 mr-2" />
                   Descrição
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="reviews" 
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 md:px-6 py-3 md:py-4 text-sm md:text-base"
-                >
+                <TabsTrigger value="reviews" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 md:px-6 py-3 md:py-4 text-sm md:text-base">
                   <Star className="h-4 w-4 mr-2" />
                   Avaliações ({totalReviews})
                 </TabsTrigger>
@@ -442,7 +409,7 @@ const ProductDetailPage = () => {
                     Descrição do Produto
                   </h2>
                   {product.description ? (
-                    <div className="prose prose-invert prose-sm max-w-none">
+                    <div>
                       <p className={`text-muted-foreground whitespace-pre-line leading-relaxed text-sm md:text-base ${!showFullDescription && 'line-clamp-6'}`}>
                         {product.description}
                       </p>
@@ -463,7 +430,7 @@ const ProductDetailPage = () => {
                   ) : (
                     <p className="text-muted-foreground text-sm">
                       Produto de alta qualidade para estética automotiva profissional. 
-                      Entre em contato para mais informações sobre este produto.
+                      Entre em contato para mais informações.
                     </p>
                   )}
                 </div>
@@ -471,17 +438,13 @@ const ProductDetailPage = () => {
               
               <TabsContent value="reviews" className="mt-4 md:mt-6">
                 <div className="bg-card rounded-xl border border-border p-4 md:p-6">
-                  {/* Rating Summary */}
                   <div className="flex flex-col md:flex-row gap-4 md:gap-8 mb-6 pb-6 border-b border-border">
                     <div className="flex items-center gap-4">
                       <div className="text-center">
                         <p className="text-4xl md:text-5xl font-display font-bold text-primary">{averageRating}</p>
                         <div className="flex items-center justify-center gap-1 mt-1">
                           {[...Array(5)].map((_, i) => (
-                            <Star 
-                              key={i} 
-                              className={`h-4 w-4 ${i < Math.floor(averageRating) ? 'text-yellow-400 fill-current' : 'text-muted-foreground'}`} 
-                            />
+                            <Star key={i} className={`h-4 w-4 ${i < Math.floor(averageRating) ? 'text-yellow-400 fill-current' : 'text-muted-foreground'}`} />
                           ))}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">{totalReviews} avaliações</p>
@@ -495,10 +458,7 @@ const ProductDetailPage = () => {
                           <div key={star} className="flex items-center gap-2">
                             <span className="text-xs w-12">{star} estrelas</span>
                             <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
-                              <div 
-                                className="h-full bg-yellow-400 rounded-full"
-                                style={{ width: `${percentage}%` }}
-                              />
+                              <div className="h-full bg-yellow-400 rounded-full" style={{ width: `${percentage}%` }} />
                             </div>
                             <span className="text-xs text-muted-foreground w-10">{percentage}%</span>
                           </div>
@@ -507,7 +467,6 @@ const ProductDetailPage = () => {
                     </div>
                   </div>
                   
-                  {/* Reviews List */}
                   <div className="space-y-4">
                     {reviews.map((review) => (
                       <div key={review.id} className="p-4 bg-secondary/30 rounded-lg">
@@ -517,10 +476,7 @@ const ProductDetailPage = () => {
                             <div className="flex items-center gap-2 mt-1">
                               <div className="flex">
                                 {[...Array(5)].map((_, i) => (
-                                  <Star 
-                                    key={i} 
-                                    className={`h-3 w-3 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-muted-foreground'}`} 
-                                  />
+                                  <Star key={i} className={`h-3 w-3 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-muted-foreground'}`} />
                                 ))}
                               </div>
                               <span className="text-xs text-muted-foreground">{review.date}</span>
@@ -528,7 +484,7 @@ const ProductDetailPage = () => {
                           </div>
                           <Badge variant="outline" className="text-xs">
                             <Check className="h-3 w-3 mr-1" />
-                            Compra Verificada
+                            Verificada
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground mt-2">{review.comment}</p>
@@ -545,16 +501,15 @@ const ProductDetailPage = () => {
                       </div>
                     ))}
                   </div>
-                  
-                  <Button variant="outline" className="w-full mt-4">
-                    Ver todas as avaliações
-                  </Button>
                 </div>
               </TabsContent>
             </Tabs>
           </div>
         </div>
       </main>
+
+      {/* Floating Buy Button */}
+      <FloatingBuyButton onBuy={handleBuyNow} price={product.price} pixPrice={pixPrice} />
 
       <Footer />
       <WhatsAppButton />
