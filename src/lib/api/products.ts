@@ -42,6 +42,17 @@ export const productsApi = {
     return data || [];
   },
 
+  async create(product: Omit<Product, 'id' | 'created_at' | 'updated_at'>): Promise<Product> {
+    const { data, error } = await supabase
+      .from('products')
+      .insert(product)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
   async getByCategory(category: string): Promise<Product[]> {
     const { data, error } = await supabase
       .from('products')
@@ -137,5 +148,17 @@ export const productsApi = {
 
     if (error) throw error;
     return data || [];
+  },
+
+  async fixProductPrices(): Promise<{ success: boolean; fixed?: number; error?: string }> {
+    const { data, error } = await supabase.functions.invoke('fix-product-prices', {
+      body: {},
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return data;
   },
 };

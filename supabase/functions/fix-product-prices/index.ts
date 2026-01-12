@@ -122,6 +122,32 @@ Deno.serve(async (req) => {
         
         console.log(`Markdown length: ${markdown.length}`);
 
+        // Check if product is out of stock
+        const isOutOfStock = /esgotado|indisponível|fora de estoque|out of stock|sem estoque/i.test(markdown);
+        
+        if (isOutOfStock) {
+          console.log(`Product is out of stock: ${product.name}`);
+          
+          // Update product as esgotado
+          const { error: updateError } = await supabase
+            .from('products')
+            .update({ stock_status: 'esgotado' })
+            .eq('source_url', sourceUrl);
+
+          if (updateError) {
+            console.error(`Error updating stock status: ${updateError.message}`);
+          }
+          
+          results.push({ 
+            id: product.id, 
+            name: product.name, 
+            oldPrice: 0, 
+            newPrice: null, 
+            status: 'marked_as_esgotado' 
+          });
+          continue;
+        }
+
         // Try to find price patterns in the markdown
         // Look for PIX price first (usually the lowest), then regular price
         let price: number | null = null;
@@ -173,6 +199,7 @@ Deno.serve(async (req) => {
               price: finalPrice,
               pix_price: pixPrice,
               old_price: oldPrice,
+              stock_status: 'in_stock',
             })
             .eq('source_url', sourceUrl);
 
