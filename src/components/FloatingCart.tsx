@@ -41,7 +41,7 @@ const FloatingCart = () => {
         <>
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 bg-black/50 z-40 animate-fade-in"
+            className="fixed inset-0 bg-black/50 z-40 animate-fade-in cursor-pointer"
             onClick={() => setIsCartOpen(false)}
           />
           
@@ -50,15 +50,18 @@ const FloatingCart = () => {
               {/* Header */}
               <div className="p-4 border-b border-border flex items-center justify-between bg-gradient-to-r from-primary/10 to-cyan-glow/10">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                    <ShoppingCart className="h-5 w-5 text-primary" />
-                  </div>
+                  <button 
+                    onClick={() => setIsCartOpen(false)}
+                    className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center hover:bg-primary/30 transition-colors"
+                  >
+                    <X className="h-5 w-5 text-primary" />
+                  </button>
                   <div>
                     <h2 className="font-display text-lg font-bold">Carrinho</h2>
                     <p className="text-xs text-muted-foreground">{totalItems} item(s)</p>
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => setIsCartOpen(false)}>
+                <Button variant="ghost" size="icon" onClick={() => setIsCartOpen(false)} className="hover:bg-destructive/10 hover:text-destructive">
                   <X className="h-5 w-5" />
                 </Button>
               </div>

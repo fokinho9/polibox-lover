@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { 
   Tag, 
   Package, 
@@ -11,7 +11,8 @@ import {
   Building2, 
   Star,
   Menu,
-  Calculator
+  Calculator,
+  Search
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -33,18 +34,24 @@ const calculatorItem = { icon: Calculator, label: "CALCULADORA", href: "/calcula
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleSearchClick = () => {
+    navigate("/busca");
+  };
 
   return (
     <nav className="bg-background border-b border-border">
       <div className="container-main">
         <div className="flex items-center gap-2">
-          {/* Mobile Menu Button - Only shows on mobile */}
+          {/* Menu Button - Shows on all devices */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="md:hidden flex items-center gap-2 text-primary hover:bg-primary/10"
+                className="flex items-center gap-2 text-primary hover:bg-primary/10"
               >
                 <Menu className="h-5 w-5" />
                 <span className="text-xs font-semibold">MENU</span>
@@ -93,40 +100,56 @@ const Navigation = () => {
             </SheetContent>
           </Sheet>
 
-          {/* Desktop Navigation - Hidden on mobile */}
-          <div className="hidden md:flex flex-1 items-center justify-center overflow-x-auto scrollbar-hide">
-            {navItems.map((item, index) => (
+          {/* Search Button */}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="flex items-center gap-2 text-muted-foreground hover:text-primary hover:bg-primary/10"
+            onClick={handleSearchClick}
+          >
+            <Search className="h-5 w-5" />
+            <span className="text-xs font-semibold hidden sm:inline">BUSCAR</span>
+          </Button>
+
+          {/* Scrollable Navigation */}
+          <div 
+            ref={scrollRef}
+            className="flex-1 overflow-x-auto scrollbar-hide"
+          >
+            <div className="flex items-center gap-1 min-w-max px-2">
+              {navItems.map((item, index) => (
+                <Link
+                  key={index}
+                  to={item.href}
+                  className={`nav-item min-w-fit ${
+                    item.highlight 
+                      ? "bg-primary text-primary-foreground hover:bg-cyan-glow rounded-lg" 
+                      : ""
+                  }`}
+                >
+                  <item.icon className="h-5 w-5" />
+                  <span className="text-xs font-medium whitespace-nowrap">{item.label}</span>
+                  {item.sublabel && (
+                    <span className="text-[10px] bg-yellow-500 text-black px-1.5 py-0.5 rounded font-bold">
+                      {item.sublabel}
+                    </span>
+                  )}
+                </Link>
+              ))}
+              
+              {/* Separator bar and Calculator */}
+              <div className="h-8 w-px bg-border mx-2 flex-shrink-0" />
               <Link
-                key={index}
-                to={item.href}
-                className={`nav-item min-w-fit ${
-                  item.highlight 
-                    ? "bg-primary text-primary-foreground hover:bg-cyan-glow rounded-lg mx-1" 
-                    : ""
-                }`}
+                to={calculatorItem.href}
+                className="nav-item min-w-fit bg-gradient-to-r from-primary/20 to-cyan-glow/20 hover:from-primary/30 hover:to-cyan-glow/30 text-primary rounded-lg border border-primary/30"
               >
-                <item.icon className="h-5 w-5" />
-                <span className="text-xs font-medium whitespace-nowrap">{item.label}</span>
-                {item.sublabel && (
-                  <span className="text-[10px] bg-yellow-500 text-black px-1.5 py-0.5 rounded font-bold">
-                    {item.sublabel}
-                  </span>
-                )}
+                <calculatorItem.icon className="h-5 w-5" />
+                <span className="text-xs font-medium whitespace-nowrap">{calculatorItem.label}</span>
+                <span className="text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded font-bold">
+                  NOVO
+                </span>
               </Link>
-            ))}
-            
-            {/* Separator bar and Calculator on Desktop */}
-            <div className="h-8 w-px bg-border mx-2" />
-            <Link
-              to={calculatorItem.href}
-              className="nav-item min-w-fit bg-gradient-to-r from-primary/20 to-cyan-glow/20 hover:from-primary/30 hover:to-cyan-glow/30 text-primary rounded-lg mx-1 border border-primary/30"
-            >
-              <calculatorItem.icon className="h-5 w-5" />
-              <span className="text-xs font-medium whitespace-nowrap">{calculatorItem.label}</span>
-              <span className="text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded font-bold">
-                NOVO
-              </span>
-            </Link>
+            </div>
           </div>
         </div>
       </div>
