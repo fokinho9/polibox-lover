@@ -301,18 +301,18 @@ const ProductDetailPage = () => {
             </nav>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-6 lg:gap-12">
-            {/* Images */}
-            <div className="space-y-3 md:space-y-4">
-              <div className="relative aspect-square bg-gradient-to-br from-card to-secondary/30 rounded-xl md:rounded-2xl overflow-hidden border border-border">
+          <div className="grid lg:grid-cols-[400px_1fr] xl:grid-cols-[450px_1fr] gap-6 lg:gap-10">
+            {/* Images - Smaller on desktop */}
+            <div className="space-y-3">
+              <div className="relative aspect-square max-w-[350px] md:max-w-none lg:max-w-[400px] xl:max-w-[450px] mx-auto bg-gradient-to-br from-card to-secondary/30 rounded-xl overflow-hidden border border-border">
                 {product.discount_percent && (
-                  <Badge className="absolute top-3 left-3 md:top-4 md:left-4 z-10 discount-badge text-xs md:text-sm">
+                  <Badge className="absolute top-2 left-2 md:top-3 md:left-3 z-10 discount-badge text-xs">
                     <Zap className="h-3 w-3 mr-1" />
                     -{product.discount_percent}% OFF
                   </Badge>
                 )}
                 {product.express_delivery && (
-                  <Badge className="absolute top-3 right-3 md:top-4 md:right-4 z-10 bg-primary text-primary-foreground text-xs">
+                  <Badge className="absolute top-2 right-2 md:top-3 md:right-3 z-10 bg-primary text-primary-foreground text-xs">
                     <Truck className="h-3 w-3 mr-1" />
                     EXPRESS
                   </Badge>
@@ -320,7 +320,7 @@ const ProductDetailPage = () => {
                 <img
                   src={allImages[selectedImage] || "/placeholder.svg"}
                   alt={product.name}
-                  className="w-full h-full object-contain p-4 md:p-8 transition-transform duration-500"
+                  className="w-full h-full object-contain p-4 md:p-6 transition-transform duration-500"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = "/placeholder.svg";
                   }}
@@ -328,12 +328,12 @@ const ProductDetailPage = () => {
               </div>
               
               {allImages.length > 1 && (
-                <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide justify-center lg:justify-start">
                   {allImages.map((img, index) => (
                     <button
                       key={index}
                       onClick={() => setSelectedImage(index)}
-                      className={`w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg md:rounded-xl overflow-hidden border-2 transition-all duration-300 ${
+                      className={`w-14 h-14 md:w-16 md:h-16 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
                         selectedImage === index 
                           ? 'border-primary shadow-lg shadow-primary/30' 
                           : 'border-border hover:border-primary/50'
@@ -342,7 +342,7 @@ const ProductDetailPage = () => {
                       <img
                         src={img || "/placeholder.svg"}
                         alt={`${product.name} - ${index + 1}`}
-                        className="w-full h-full object-contain p-1 md:p-2 bg-card"
+                        className="w-full h-full object-contain p-1 bg-card"
                       />
                     </button>
                   ))}
