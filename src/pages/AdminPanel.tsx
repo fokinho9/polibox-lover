@@ -18,7 +18,10 @@ import {
   ArrowLeft,
   Upload,
   FileSpreadsheet,
-  Pencil
+  Pencil,
+  Plus,
+  Wrench,
+  AlertTriangle
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -29,6 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ProductEditModal } from "@/components/admin/ProductEditModal";
+import { ProductCreateModal, NewProduct } from "@/components/admin/ProductCreateModal";
 
 // Categorias do menu principal
 const MENU_CATEGORIES = [
@@ -66,7 +70,9 @@ const AdminPanel = () => {
   const [scrapeUrl, setScrapeUrl] = useState("https://www.polibox.com.br");
   const [selectedCategory, setSelectedCategory] = useState("equipamentos");
   const [isImporting, setIsImporting] = useState(false);
+  const [isFixingPrices, setIsFixingPrices] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [isCreatingProduct, setIsCreatingProduct] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 50;
@@ -212,6 +218,55 @@ const AdminPanel = () => {
     }
   };
 
+  const handleCreateProduct = async (newProduct: NewProduct) => {
+    setIsSaving(true);
+    try {
+      await productsApi.create(newProduct as any);
+      toast({
+        title: "Produto Criado",
+        description: "O novo produto foi adicionado.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      setIsCreatingProduct(false);
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao criar produto.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleFixPrices = async () => {
+    setIsFixingPrices(true);
+    try {
+      const result = await productsApi.fixProductPrices();
+      if (result.success) {
+        toast({
+          title: "Preços Corrigidos",
+          description: `${result.fixed || 0} produtos atualizados.`,
+        });
+        queryClient.invalidateQueries({ queryKey: ['products'] });
+      } else {
+        toast({
+          title: "Erro",
+          description: result.error || "Falha ao corrigir preços.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao executar correção de preços.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsFixingPrices(false);
+    }
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
@@ -232,6 +287,9 @@ const AdminPanel = () => {
     acc[cat].push(product);
     return acc;
   }, {} as Record<string, Product[]>);
+
+  // Count products without price
+  const productsWithoutPrice = products.filter(p => !p.price || p.price === 0).length;
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -257,6 +315,43 @@ const AdminPanel = () => {
             <Package className="h-4 w-4 mr-2" />
             {products.length} Produtos
           </Badge>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-wrap gap-3">
+          <Button 
+            onClick={() => setIsCreatingProduct(true)}
+            className="bg-primary hover:bg-cyan-glow"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Adicionar Produto
+          </Button>
+          
+          <Button 
+            onClick={handleFixPrices}
+            disabled={isFixingPrices || productsWithoutPrice === 0}
+            variant="outline"
+            className="border-yellow-500 text-yellow-500 hover:bg-yellow-500/10"
+          >
+            {isFixingPrices ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Corrigindo...
+              </>
+            ) : (
+              <>
+                <Wrench className="h-4 w-4 mr-2" />
+                Corrigir Preços ({productsWithoutPrice})
+              </>
+            )}
+          </Button>
+          
+          {productsWithoutPrice > 0 && (
+            <Badge variant="outline" className="border-red-500 text-red-400 px-3 py-2">
+              <AlertTriangle className="h-4 w-4 mr-2" />
+              {productsWithoutPrice} sem preço
+            </Badge>
+          )}
         </div>
 
         {/* CSV Import Section */}
@@ -584,6 +679,15 @@ const AdminPanel = () => {
         onSave={handleSaveProduct}
         onDelete={handleDeleteProduct}
         isSaving={isSaving}
+      />
+
+      {/* Product Create Modal */}
+      <ProductCreateModal
+        open={isCreatingProduct}
+        onClose={() => setIsCreatingProduct(false)}
+        onSave={handleCreateProduct}
+        isSaving={isSaving}
+        categories={CATEGORIES}
       />
     </div>
   );
