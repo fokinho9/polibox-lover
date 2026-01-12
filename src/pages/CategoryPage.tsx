@@ -36,6 +36,17 @@ const categoryTitles: Record<string, string> = {
   "cursos": "Cursos",
   "marcas": "Marcas",
   "novidades": "Novidades",
+  // Brand categories
+  "marca-vonixx": "VONIXX",
+  "marca-3m": "3M",
+  "marca-easytech": "EASYTECH",
+  "marca-wurth": "WURTH",
+  "marca-detailer": "DETAILER",
+  "marca-kers": "KERS",
+  "marca-cadillac": "CADILLAC",
+  "marca-spartan": "SPARTAN",
+  "marca-soft99": "SOFT99",
+  "marca-rapifix": "RAPIFIX",
 };
 
 const CategoryPage = () => {

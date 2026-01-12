@@ -30,14 +30,36 @@ import {
 } from "@/components/ui/select";
 import { ProductEditModal } from "@/components/admin/ProductEditModal";
 
-const CATEGORIES = [
-  { value: "equipamentos", label: "Equipamentos" },
-  { value: "interior", label: "Interior" },
-  { value: "polimento", label: "Polimento" },
-  { value: "lavagem", label: "Lavagem" },
-  { value: "kits", label: "Kits" },
+// Categorias do menu principal
+const MENU_CATEGORIES = [
   { value: "ofertas", label: "Ofertas" },
+  { value: "kits", label: "Kits" },
+  { value: "lavagem", label: "Lavagem" },
+  { value: "polimento", label: "Polimento" },
+  { value: "interior", label: "Interior" },
+  { value: "equipamentos", label: "Equipamentos" },
+  { value: "cursos", label: "Cursos" },
   { value: "novidades", label: "Novidades" },
+];
+
+// Marcas disponíveis
+const BRAND_CATEGORIES = [
+  { value: "vonixx", label: "VONIXX" },
+  { value: "3m", label: "3M" },
+  { value: "easytech", label: "EASYTECH" },
+  { value: "wurth", label: "WURTH" },
+  { value: "detailer", label: "DETAILER" },
+  { value: "kers", label: "KERS" },
+  { value: "cadillac", label: "CADILLAC" },
+  { value: "spartan", label: "SPARTAN" },
+  { value: "soft99", label: "SOFT99" },
+  { value: "rapifix", label: "RAPIFIX" },
+];
+
+// Todas as categorias combinadas para importação
+const CATEGORIES = [
+  ...MENU_CATEGORIES,
+  ...BRAND_CATEGORIES.map(b => ({ value: `marca-${b.value}`, label: `Marca: ${b.label}` })),
 ];
 
 const AdminPanel = () => {

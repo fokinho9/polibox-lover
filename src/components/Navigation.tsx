@@ -19,7 +19,7 @@ const navItems = [
   { icon: Car, label: "INTERIOR", href: "/categoria/interior" },
   { icon: Wrench, label: "EQUIPAMENTOS", href: "/categoria/equipamentos" },
   { icon: GraduationCap, label: "CURSOS", href: "/categoria/cursos" },
-  { icon: Building2, label: "MARCAS", href: "/categoria/marcas" },
+  { icon: Building2, label: "MARCAS", href: "#marcas" },
   { icon: Star, label: "NOVIDADES", href: "/categoria/novidades" },
 ];
 
