@@ -27,18 +27,12 @@ const FloatingCart = () => {
       {totalItems > 0 && !isCartOpen && (
         <button
           onClick={() => setIsCartOpen(true)}
-          className="fixed bottom-32 right-4 z-40 w-14 h-14 bg-primary hover:bg-cyan-glow text-primary-foreground rounded-full shadow-lg shadow-primary/30 flex items-center justify-center transition-all hover:scale-110 animate-fade-in animate-bounce"
-          style={{
-            animation: 'bounce 1s ease-in-out infinite, pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-          }}
+          className="fixed bottom-32 right-4 z-40 w-14 h-14 bg-primary hover:bg-cyan-glow text-primary-foreground rounded-full shadow-lg shadow-primary/30 flex items-center justify-center transition-all hover:scale-110 animate-fade-in"
         >
           <ShoppingCart className="h-6 w-6" />
-          <span className="absolute -top-1 -right-1 w-6 h-6 bg-destructive text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+          <span className="absolute -top-1 -right-1 w-6 h-6 bg-destructive text-white text-xs font-bold rounded-full flex items-center justify-center">
             {totalItems}
           </span>
-
-          {/* Glow ring effect */}
-          <div className="absolute inset-0 rounded-full bg-primary opacity-30 animate-ping" />
         </button>
       )}
 

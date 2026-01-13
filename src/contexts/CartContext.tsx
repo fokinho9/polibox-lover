@@ -39,10 +39,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       return [...prev, { product, quantity }];
     });
     setLastAddedProduct(product);
-
-    // Clear notification after 3 seconds
+    setIsCartOpen(true);
+    
+    // Auto close after 3 seconds
     setTimeout(() => {
-      setLastAddedProduct(null);
+      setIsCartOpen(false);
     }, 3000);
   }, []);
 
