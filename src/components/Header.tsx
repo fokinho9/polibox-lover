@@ -24,24 +24,24 @@ const Header = () => {
 
       {/* Main header */}
       <div className="container-main py-4">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3 md:gap-6">
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
-            <h1 className="font-display text-3xl md:text-4xl font-bold text-primary tracking-wider text-shadow-glow">
+            <h1 className="font-display text-2xl md:text-4xl font-bold text-primary tracking-wider text-shadow-glow">
               POLIBOX
             </h1>
           </Link>
 
           {/* Search */}
-          <div className="flex-1 max-w-xl hidden md:block">
+          <div className="flex-1 max-w-2xl">
             <div className="relative">
               <Input
                 placeholder="Buscar produtos..."
-                className="bg-card border-border pl-4 pr-14 py-6 text-foreground placeholder:text-muted-foreground rounded-xl focus:border-primary focus:ring-primary/20"
+                className="bg-card border-border pl-4 pr-14 py-3 md:py-6 text-sm md:text-base text-foreground placeholder:text-muted-foreground rounded-xl focus:border-primary focus:ring-primary/20"
               />
               <Button
                 size="icon"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-primary hover:bg-cyan-glow rounded-lg h-9 w-9"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-primary hover:bg-cyan-glow rounded-lg h-8 w-8 md:h-9 md:w-9"
               >
                 <Search className="h-4 w-4" />
               </Button>
@@ -49,7 +49,7 @@ const Header = () => {
           </div>
 
           {/* Actions - Only rastreio on desktop */}
-          <div className="flex items-center gap-2 md:gap-4 ml-auto">
+          <div className="flex items-center gap-2 md:gap-4">
             <Button variant="ghost" className="text-muted-foreground hover:text-primary flex items-center gap-2 hidden lg:flex">
               <MapPin className="h-4 w-4" />
               <span>RASTREIO</span>
