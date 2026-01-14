@@ -1,14 +1,18 @@
-import { ShoppingCart, X, Plus, Minus, Trash2, Check } from "lucide-react";
+import { ShoppingCart, X, Trash2, Plus, Minus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { Link } from "react-router-dom";
 
 const FloatingCart = () => {
-  const { items, isCartOpen, setIsCartOpen, totalItems, totalPrice, removeFromCart, updateQuantity, lastAddedProduct } = useCart();
+  const { items, removeFromCart, updateQuantity, totalPrice, totalItems, isCartOpen, setIsCartOpen, lastAddedProduct } = useCart();
+
+  const formatPrice = (price: number) => {
+    return price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  };
 
   return (
     <>
-      {/* Top Notification - Always visible when product is added */}
+      {/* Top notification when product is added */}
       {lastAddedProduct && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
           <div className="bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg shadow-green-500/30 flex items-center gap-3">
@@ -23,124 +27,118 @@ const FloatingCart = () => {
         </div>
       )}
 
-      {/* Floating Cart Button - Bottom right above WhatsApp */}
+      {/* Floating Cart Button with effect - Bottom right above WhatsApp */}
       {totalItems > 0 && !isCartOpen && (
         <button
           onClick={() => setIsCartOpen(true)}
-          className="fixed bottom-32 right-4 z-40 w-14 h-14 bg-primary hover:bg-cyan-glow text-primary-foreground rounded-full shadow-lg shadow-primary/30 flex items-center justify-center transition-all hover:scale-110 animate-fade-in"
+          className="fixed bottom-24 right-6 z-40 w-14 h-14 bg-primary text-primary-foreground rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 animate-fade-in group"
+          style={{
+            boxShadow: '0 0 20px hsl(var(--primary) / 0.5), 0 10px 30px -10px hsl(var(--primary) / 0.6)',
+          }}
         >
-          <ShoppingCart className="h-6 w-6" />
-          <span className="absolute -top-1 -right-1 w-6 h-6 bg-destructive text-white text-xs font-bold rounded-full flex items-center justify-center">
+          <ShoppingCart className="h-6 w-6 group-hover:scale-110 transition-transform" />
+          <span className="absolute -top-1 -right-1 w-6 h-6 bg-destructive text-white text-xs font-bold rounded-full flex items-center justify-center animate-scale-in">
             {totalItems}
           </span>
+          {/* Glow effect on hover */}
+          <div className="absolute inset-0 rounded-full bg-primary opacity-0 group-hover:opacity-30 blur-xl transition-opacity" />
         </button>
       )}
 
-      {/* Cart Panel */}
+      {/* Cart Backdrop */}
       {isCartOpen && (
-        <>
-          {/* Backdrop */}
-          <div 
-            className="fixed inset-0 bg-black/50 z-40 animate-fade-in cursor-pointer"
-            onClick={() => setIsCartOpen(false)}
-          />
-          
-          <div className="fixed top-0 right-0 h-full w-full max-w-md bg-card border-l border-border z-50 animate-slide-in-right shadow-2xl">
-            <div className="flex flex-col h-full">
-              {/* Header */}
-              <div className="p-4 border-b border-border flex items-center justify-between bg-gradient-to-r from-primary/10 to-cyan-glow/10">
-                <div className="flex items-center gap-3">
-                  <button 
-                    onClick={() => setIsCartOpen(false)}
-                    className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center hover:bg-primary/30 transition-colors"
-                  >
-                    <X className="h-5 w-5 text-primary" />
-                  </button>
-                  <div>
-                    <h2 className="font-display text-lg font-bold">Carrinho</h2>
-                    <p className="text-xs text-muted-foreground">{totalItems} item(s)</p>
-                  </div>
-                </div>
-                <Button variant="ghost" size="icon" onClick={() => setIsCartOpen(false)} className="hover:bg-destructive/10 hover:text-destructive">
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
-
-              {/* Items */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {items.length === 0 ? (
-                  <div className="text-center py-12">
-                    <ShoppingCart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">Seu carrinho está vazio</p>
-                  </div>
-                ) : (
-                  items.map((item) => (
-                    <div key={item.product.id} className="flex gap-4 p-3 bg-secondary/30 rounded-xl">
-                      <div className="w-20 h-20 rounded-lg bg-card overflow-hidden flex-shrink-0">
-                        <img 
-                          src={item.product.image_url || "/placeholder.svg"} 
-                          alt={item.product.name}
-                          className="w-full h-full object-contain p-2"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-medium line-clamp-2">{item.product.name}</h3>
-                        <p className="text-primary font-bold mt-1">
-                          R$ {item.product.price.toFixed(2).replace('.', ',')}
-                        </p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <Button 
-                            variant="outline" 
-                            size="icon" 
-                            className="h-7 w-7"
-                            onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                          >
-                            <Minus className="h-3 w-3" />
-                          </Button>
-                          <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
-                          <Button 
-                            variant="outline" 
-                            size="icon" 
-                            className="h-7 w-7"
-                            onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                          >
-                            <Plus className="h-3 w-3" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-7 w-7 text-destructive hover:text-destructive ml-auto"
-                            onClick={() => removeFromCart(item.product.id)}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-
-              {/* Footer */}
-              {items.length > 0 && (
-                <div className="p-4 border-t border-border space-y-4 bg-card">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Subtotal:</span>
-                    <span className="text-xl font-display font-bold text-primary">
-                      R$ {totalPrice.toFixed(2).replace('.', ',')}
-                    </span>
-                  </div>
-                  <Link to="/carrinho" onClick={() => setIsCartOpen(false)}>
-                    <Button className="w-full h-12 btn-buy font-display">
-                      FINALIZAR COMPRA
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        </>
+        <div 
+          className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
+          onClick={() => setIsCartOpen(false)}
+        />
       )}
+
+      {/* Cart Panel */}
+      <div className={`fixed top-0 right-0 h-full w-full max-w-md bg-background border-l border-border z-50 transform transition-transform duration-300 ${isCartOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-border">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <ShoppingCart className="h-5 w-5 text-primary" />
+              Carrinho ({totalItems})
+            </h2>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setIsCartOpen(false)}
+              className="hover:bg-secondary"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+
+          {/* Items */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {items.length === 0 ? (
+              <div className="text-center text-muted-foreground py-12">
+                <ShoppingCart className="h-16 w-16 mx-auto mb-4 opacity-30" />
+                <p>Seu carrinho está vazio</p>
+              </div>
+            ) : (
+              items.map((item) => (
+                <div key={item.product.id} className="flex gap-4 p-3 bg-card rounded-lg border border-border">
+                  <img 
+                    src={item.product.image_url || '/placeholder.svg'} 
+                    alt={item.product.name}
+                    className="w-20 h-20 object-cover rounded-md"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-sm line-clamp-2">{item.product.name}</h3>
+                    <p className="text-primary font-bold mt-1">{formatPrice(item.product.price)}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                      >
+                        <Minus className="h-3 w-3" />
+                      </Button>
+                      <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                      >
+                        <Plus className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 ml-auto text-destructive hover:bg-destructive/10"
+                        onClick={() => removeFromCart(item.product.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Footer */}
+          {items.length > 0 && (
+            <div className="border-t border-border p-4 space-y-4">
+              <div className="flex justify-between text-lg font-bold">
+                <span>Total:</span>
+                <span className="text-primary">{formatPrice(totalPrice)}</span>
+              </div>
+              <Link to="/carrinho" onClick={() => setIsCartOpen(false)}>
+                <Button className="w-full bg-primary hover:bg-cyan-glow text-primary-foreground font-semibold py-6">
+                  FINALIZAR COMPRA
+                </Button>
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
     </>
   );
 };
