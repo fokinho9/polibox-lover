@@ -2,72 +2,103 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import heroImage from "@/assets/hero-automotive.jpg";
-const slides = [{
-  id: 1,
-  brand: "VONIXX",
-  title: "OS MELHORES PRODUTOS PARA LAVAGEM, POLIMENTO",
-  subtitle: "HIGIENIZAÇÃO, DETALHAMENTO E ESTÉTICA AUTOMOTIVA!",
-  cta: "COMPRE AGORA",
-  badge: "AQUI VOCÊ ENCONTRA A LINHA LÍDER!",
-  href: "/categoria/kits"
-}, {
-  id: 2,
-  brand: "MAGIL CLEAN",
-  title: "ULTRA LIMPADOR CONCENTRADO",
-  subtitle: "DILUIÇÃO ATÉ 1:100 - MÁXIMO RENDIMENTO!",
-  cta: "VER PRODUTO",
-  badge: "NOVIDADE",
-  href: "/categoria/limpadores-apc"
-}];
+import bannerVonixx from "@/assets/banner-vonixx.jpg";
+import bannerFrete from "@/assets/banner-frete.jpg";
+import bannerMagil from "@/assets/banner-magil.jpg";
+import bannerOfertas from "@/assets/banner-ofertas.jpg";
+
+const slides = [
+  {
+    id: 1,
+    image: bannerVonixx,
+    href: "/categoria/kits"
+  },
+  {
+    id: 2,
+    image: bannerFrete,
+    href: "/frete-envio"
+  },
+  {
+    id: 3,
+    image: bannerMagil,
+    href: "/categoria/limpadores-apc"
+  },
+  {
+    id: 4,
+    image: bannerOfertas,
+    href: "/categoria/ofertas"
+  }
+];
+
 const HeroBanner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide(prev => (prev + 1) % slides.length);
     }, 5000);
     return () => clearInterval(timer);
   }, []);
+
   const nextSlide = () => setCurrentSlide(prev => (prev + 1) % slides.length);
   const prevSlide = () => setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length);
-  return <div className="relative h-[400px] md:h-[500px] overflow-hidden hero-banner">
-      {/* Background image */}
-      <div className="absolute inset-0 bg-cover bg-center" style={{
-      backgroundImage: `url(${heroImage})`
-    }}>
-        <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-background/30" />
-      </div>
 
-      {/* Content */}
-      <div className="container-main relative h-full flex items-center">
-        <div className="max-w-2xl animate-fade-in">
-          {slides.map((slide, index) => {})}
-        </div>
-
-        {/* Badge on right */}
-        <div className="hidden lg:flex absolute right-10 top-1/2 -translate-y-1/2 flex-col items-center">
-          <div className="w-32 h-32 rounded-full border-4 border-primary flex items-center justify-center bg-background/80 backdrop-blur">
-            <div className="text-center px-2">
-              <span className="font-display text-xs text-primary font-bold leading-tight block">
-                {slides[currentSlide].badge}
-              </span>
-            </div>
-          </div>
-        </div>
+  return (
+    <div className="relative w-full overflow-hidden hero-banner">
+      {/* Slides */}
+      <div 
+        className="flex transition-transform duration-500 ease-out"
+        style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+      >
+        {slides.map((slide) => (
+          <Link 
+            key={slide.id} 
+            to={slide.href}
+            className="w-full flex-shrink-0"
+          >
+            <img 
+              src={slide.image} 
+              alt={`Banner ${slide.id}`}
+              className="w-full h-auto object-cover"
+            />
+          </Link>
+        ))}
       </div>
 
       {/* Navigation arrows */}
-      <Button variant="ghost" size="icon" onClick={prevSlide} className="absolute left-4 top-1/2 -translate-y-1/2 bg-background/20 hover:bg-background/40 text-foreground">
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        onClick={prevSlide} 
+        className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/20 hover:bg-background/40 text-foreground h-10 w-10"
+      >
         <ChevronLeft className="h-6 w-6" />
       </Button>
-      <Button variant="ghost" size="icon" onClick={nextSlide} className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/20 hover:bg-background/40 text-foreground">
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        onClick={nextSlide} 
+        className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/20 hover:bg-background/40 text-foreground h-10 w-10"
+      >
         <ChevronRight className="h-6 w-6" />
       </Button>
 
       {/* Dots */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-        {slides.map((_, index) => <button key={index} onClick={() => setCurrentSlide(index)} className={`w-3 h-3 rounded-full transition-all ${index === currentSlide ? "bg-primary w-8" : "bg-foreground/30"}`} />)}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+        {slides.map((_, index) => (
+          <button 
+            key={index} 
+            onClick={() => setCurrentSlide(index)} 
+            className={`w-2.5 h-2.5 rounded-full transition-all ${
+              index === currentSlide 
+                ? "bg-primary w-6" 
+                : "bg-foreground/30 hover:bg-foreground/50"
+            }`} 
+          />
+        ))}
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default HeroBanner;
