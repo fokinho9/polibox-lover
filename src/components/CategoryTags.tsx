@@ -14,7 +14,7 @@ const CategoryTags = () => {
   return (
     <div className="bg-secondary/30 py-3 border-b border-border">
       <div className="container-main">
-        <div className="flex items-center justify-center gap-3 overflow-x-auto scrollbar-hide">
+        <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-primary/50 scrollbar-track-transparent">
           {categories.map((cat, index) => (
             <Link
               key={index}
