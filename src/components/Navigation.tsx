@@ -1,57 +1,52 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { 
-  Tag, 
-  Package, 
-  Droplets, 
-  Sparkles, 
-  Car, 
-  Wrench, 
-  GraduationCap, 
-  Building2, 
-  Star,
-  Menu,
-  Calculator,
-  Search
-} from "lucide-react";
+import { Menu, Percent, Droplet, Car, Sparkles, Calculator, Search, Paintbrush, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 
 const navItems = [
-  { icon: Tag, label: "OFERTAS", sublabel: "60%OFF", highlight: true, href: "/categoria/ofertas" },
-  { icon: Package, label: "KITS", href: "/categoria/kits" },
-  { icon: Droplets, label: "LAVAGEM", href: "/categoria/lavagem" },
+  { icon: Percent, label: "OFERTAS", href: "/categoria/ofertas", highlight: true, sublabel: "-40%" },
+  { icon: Droplet, label: "LAVAGEM", href: "/categoria/lavagem" },
   { icon: Sparkles, label: "POLIMENTO", href: "/categoria/polimento" },
   { icon: Car, label: "INTERIOR", href: "/categoria/interior" },
-  { icon: Wrench, label: "EQUIPAMENTOS", href: "/categoria/equipamentos" },
-  { icon: GraduationCap, label: "CURSOS", href: "/categoria/cursos" },
-  { icon: Building2, label: "MARCAS", href: "#marcas" },
-  { icon: Star, label: "NOVIDADES", href: "/categoria/novidades" },
+  { icon: Paintbrush, label: "CERAS", href: "/categoria/ceras" },
+  { icon: Settings, label: "EQUIPAMENTOS", href: "/categoria/equipamentos" },
 ];
 
-const calculatorItem = { icon: Calculator, label: "CALCULADORA", href: "/calculadora" };
+const calculatorItem = { icon: Calculator, label: "CALCULADORA DE DILUIÇÃO", href: "/calculadora" };
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
-  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const handleSearchClick = () => {
-    navigate("/busca");
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/busca?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+    }
   };
 
   return (
     <nav className="bg-background border-b border-border">
-      <div className="container-main">
-        <div className="flex items-center gap-2">
-          {/* Menu Button - Shows on all devices */}
+      <div className="container-main py-2">
+        <div className="flex items-center gap-3">
+          {/* Menu Button */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="flex items-center gap-2 text-primary hover:bg-primary/10"
+                className="flex items-center gap-2 text-primary hover:bg-primary/10 flex-shrink-0"
               >
                 <Menu className="h-5 w-5" />
                 <span className="text-xs font-semibold">MENU</span>
@@ -100,57 +95,24 @@ const Navigation = () => {
             </SheetContent>
           </Sheet>
 
-          {/* Search Button */}
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="flex items-center gap-2 text-muted-foreground hover:text-primary hover:bg-primary/10"
-            onClick={handleSearchClick}
-          >
-            <Search className="h-5 w-5" />
-            <span className="text-xs font-semibold hidden sm:inline">BUSCAR</span>
-          </Button>
-
-          {/* Scrollable Navigation */}
-          <div 
-            ref={scrollRef}
-            className="flex-1 overflow-x-auto scrollbar-hide"
-          >
-            <div className="flex items-center gap-1 min-w-max px-2">
-              {navItems.map((item, index) => (
-                <Link
-                  key={index}
-                  to={item.href}
-                  className={`nav-item min-w-fit ${
-                    item.highlight 
-                      ? "bg-primary text-primary-foreground hover:bg-cyan-glow rounded-lg" 
-                      : ""
-                  }`}
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span className="text-xs font-medium whitespace-nowrap">{item.label}</span>
-                  {item.sublabel && (
-                    <span className="text-[10px] bg-yellow-500 text-black px-1.5 py-0.5 rounded font-bold">
-                      {item.sublabel}
-                    </span>
-                  )}
-                </Link>
-              ))}
-              
-              {/* Separator bar and Calculator */}
-              <div className="h-8 w-px bg-border mx-2 flex-shrink-0" />
-              <Link
-                to={calculatorItem.href}
-                className="nav-item min-w-fit bg-gradient-to-r from-primary/20 to-cyan-glow/20 hover:from-primary/30 hover:to-cyan-glow/30 text-primary rounded-lg border border-primary/30"
+          {/* Search Bar */}
+          <form onSubmit={handleSearch} className="flex-1">
+            <div className="relative">
+              <Input
+                placeholder="Buscar produtos..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-card border-border pl-4 pr-12 py-2 h-10 text-sm text-foreground placeholder:text-muted-foreground rounded-lg focus:border-primary focus:ring-primary/20"
+              />
+              <Button
+                type="submit"
+                size="icon"
+                className="absolute right-1 top-1/2 -translate-y-1/2 bg-primary hover:bg-cyan-glow rounded-md h-8 w-8"
               >
-                <calculatorItem.icon className="h-5 w-5" />
-                <span className="text-xs font-medium whitespace-nowrap">{calculatorItem.label}</span>
-                <span className="text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded font-bold">
-                  NOVO
-                </span>
-              </Link>
+                <Search className="h-4 w-4" />
+              </Button>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </nav>

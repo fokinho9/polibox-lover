@@ -1,7 +1,5 @@
-import { Search, Truck, MapPin, Sparkles } from "lucide-react";
+import { Truck, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 
 const Header = () => {
   return (
@@ -23,38 +21,14 @@ const Header = () => {
       </div>
 
       {/* Main header */}
-      <div className="container-main py-4">
-        <div className="flex items-center gap-6">
+      <div className="container-main py-3">
+        <div className="flex items-center justify-center">
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
             <h1 className="font-display text-3xl md:text-4xl font-bold text-primary tracking-wider text-shadow-glow">
               POLIBOX
             </h1>
           </Link>
-
-          {/* Search */}
-          <div className="flex-1 max-w-xl hidden md:block">
-            <div className="relative">
-              <Input
-                placeholder="Buscar produtos..."
-                className="bg-card border-border pl-4 pr-14 py-6 text-foreground placeholder:text-muted-foreground rounded-xl focus:border-primary focus:ring-primary/20"
-              />
-              <Button
-                size="icon"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-primary hover:bg-cyan-glow rounded-lg h-9 w-9"
-              >
-                <Search className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Actions - Only rastreio on desktop */}
-          <div className="flex items-center gap-2 md:gap-4 ml-auto">
-            <Button variant="ghost" className="text-muted-foreground hover:text-primary flex items-center gap-2 hidden lg:flex">
-              <MapPin className="h-4 w-4" />
-              <span>RASTREIO</span>
-            </Button>
-          </div>
         </div>
       </div>
     </header>
