@@ -1,16 +1,14 @@
 import { Truck, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
-
 const Header = () => {
-  return (
-    <header className="bg-background border-b border-border sticky top-0 z-50">
+  return <header className="bg-background border-b border-border sticky top-0 z-50">
       {/* Top bar */}
       <div className="bg-gradient-to-r from-secondary via-secondary/80 to-secondary py-2.5">
         <div className="container-main flex items-center justify-center gap-8 text-sm">
           <div className="flex items-center gap-2 text-primary">
             <Truck className="h-4 w-4" />
             <span className="text-foreground font-medium">FRETE GRÁTIS</span>
-            <span className="text-xs text-muted-foreground">acima de R$299</span>
+            <span className="text-xs text-muted-foreground">por tempo limitado</span>
           </div>
           <div className="hidden md:flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-yellow-400" />
@@ -31,8 +29,6 @@ const Header = () => {
           </Link>
         </div>
       </div>
-    </header>
-  );
+    </header>;
 };
-
 export default Header;
