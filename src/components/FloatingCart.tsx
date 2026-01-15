@@ -37,7 +37,7 @@ const FloatingCart = () => {
       {totalItems > 0 && !isCartOpen && (
         <button
           onClick={() => setIsCartOpen(true)}
-          className="fixed bottom-24 right-6 z-40 w-16 h-16 bg-gradient-to-br from-primary to-cyan-glow text-primary-foreground rounded-2xl shadow-lg flex items-center justify-center transition-all hover:scale-110 animate-fade-in group"
+          className="fixed bottom-24 right-6 z-50 w-16 h-16 bg-gradient-to-br from-primary to-cyan-glow text-primary-foreground rounded-2xl shadow-lg flex items-center justify-center transition-all hover:scale-110 animate-fade-in group"
           style={{
             boxShadow: '0 0 30px hsl(var(--primary) / 0.6), 0 10px 40px -10px hsl(var(--primary) / 0.7)',
           }}

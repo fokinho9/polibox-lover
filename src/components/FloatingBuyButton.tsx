@@ -24,7 +24,7 @@ const FloatingBuyButton = ({ onBuy, price, pixPrice }: FloatingBuyButtonProps) =
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-background via-background to-transparent pb-6 pt-8 animate-fade-in">
+    <div className="fixed bottom-0 left-0 right-0 z-30 p-4 bg-gradient-to-t from-background via-background to-transparent pb-6 pt-8 animate-fade-in">
       <div className="container-main max-w-lg mx-auto">
         <div className="bg-card/95 backdrop-blur-md rounded-2xl border border-primary/30 p-4 shadow-2xl shadow-primary/20">
           <div className="flex items-center justify-between gap-4">

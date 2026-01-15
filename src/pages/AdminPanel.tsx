@@ -320,6 +320,12 @@ const AdminPanel = () => {
 
   // Count products without price
   const productsWithoutPrice = products.filter(p => !p.price || p.price === 0).length;
+  
+  // Count products with description
+  const productsWithDescription = products.filter(p => p.description && p.description.length > 10).length;
+  
+  // Count products without description
+  const productsWithoutDescription = products.filter(p => !p.description || p.description.length <= 10).length;
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -380,6 +386,18 @@ const AdminPanel = () => {
             <Badge variant="outline" className="border-red-500 text-red-400 px-3 py-2">
               <AlertTriangle className="h-4 w-4 mr-2" />
               {productsWithoutPrice} sem preço
+            </Badge>
+          )}
+          
+          <Badge variant="outline" className="border-green-500 text-green-400 px-3 py-2">
+            <FileText className="h-4 w-4 mr-2" />
+            {productsWithDescription} com descrição
+          </Badge>
+          
+          {productsWithoutDescription > 0 && (
+            <Badge variant="outline" className="border-orange-500 text-orange-400 px-3 py-2">
+              <FileText className="h-4 w-4 mr-2" />
+              {productsWithoutDescription} sem descrição
             </Badge>
           )}
         </div>
@@ -662,6 +680,11 @@ const AdminPanel = () => {
                         {product.price === 0 && (
                           <Badge className="absolute top-2 left-2 bg-red-500">
                             SEM PREÇO
+                          </Badge>
+                        )}
+                        {product.description && product.description.length > 10 && (
+                          <Badge className="absolute top-2 left-2 bg-green-500" style={{ left: product.price === 0 ? '90px' : '8px' }}>
+                            DESCRIÇÃO
                           </Badge>
                         )}
                       </div>
