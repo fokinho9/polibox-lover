@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import bannerOfertas50 from "@/assets/banner-ofertas-50-v3.jpg";
 import bannerFrete from "@/assets/banner-frete.jpg";
 import bannerMagil from "@/assets/banner-magil.jpg";
-import bannerCerasSelantes from "@/assets/banner-ceras-selantes.jpg";
+import bannerVonixx2026 from "@/assets/banner-vonixx-2026.jpg";
 
 const slides = [
   {
@@ -26,8 +26,8 @@ const slides = [
   },
   {
     id: 4,
-    image: bannerCerasSelantes,
-    href: "/categoria/ceras-selantes"
+    image: bannerVonixx2026,
+    href: "/busca?q=vonixx"
   }
 ];
 
