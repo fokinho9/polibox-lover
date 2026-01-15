@@ -13,6 +13,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import FloatingBuyButton from "@/components/FloatingBuyButton";
+import RelatedProducts from "@/components/RelatedProducts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -829,6 +830,13 @@ const ProductDetailPage = () => {
                 </div>
               </TabsContent>
             </Tabs>
+
+            {/* Related Products */}
+            <RelatedProducts 
+              currentProductId={product.id} 
+              category={product.category} 
+              brand={product.brand} 
+            />
           </div>
         </div>
       </main>
