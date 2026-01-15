@@ -467,19 +467,19 @@ const ProductDetailPage = () => {
 
               {/* MEGA Discount Banner */}
               {product.discount_percent && product.discount_percent >= 15 && (
-                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 p-1">
-                  <div className="bg-gradient-to-r from-red-900/90 via-orange-900/90 to-yellow-900/90 rounded-xl p-4 md:p-5">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-14 h-14 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center">
-                          <span className="text-3xl font-black text-white">{product.discount_percent}%</span>
+                <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 p-0.5">
+                  <div className="bg-gradient-to-r from-red-900/90 via-orange-900/90 to-yellow-900/90 rounded-lg px-3 py-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-9 h-9 rounded-lg bg-white/10 backdrop-blur flex items-center justify-center">
+                          <span className="text-lg font-black text-white">{product.discount_percent}%</span>
                         </div>
                         <div>
-                          <p className="text-white font-black text-lg md:text-xl tracking-wide">DESCONTO IMPERDÍVEL</p>
-                          <p className="text-white/80 text-sm">Economize R$ {product.old_price ? (product.old_price - product.price).toFixed(2).replace('.', ',') : '0,00'}</p>
+                          <p className="text-white font-black text-sm tracking-wide">DESCONTO IMPERDÍVEL</p>
+                          <p className="text-white/80 text-xs">Economize R$ {product.old_price ? (product.old_price - product.price).toFixed(2).replace('.', ',') : '0,00'}</p>
                         </div>
                       </div>
-                      <Flame className="h-10 w-10 text-yellow-400 animate-pulse" />
+                      <Flame className="h-6 w-6 text-yellow-400 animate-pulse" />
                     </div>
                   </div>
                 </div>
