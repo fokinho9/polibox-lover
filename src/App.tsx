@@ -14,6 +14,7 @@ import CalculadoraPage from "./pages/CalculadoraPage";
 import SobrePage from "./pages/SobrePage";
 import ContatoPage from "./pages/ContatoPage";
 import CarrinhoPage from "./pages/CarrinhoPage";
+import CheckoutPage from "./pages/CheckoutPage";
 import FreteEnvioPage from "./pages/FreteEnvioPage";
 import PagamentoPage from "./pages/PagamentoPage";
 import TrocasPage from "./pages/TrocasPage";
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/sobre" element={<SobrePage />} />
             <Route path="/contato" element={<ContatoPage />} />
             <Route path="/carrinho" element={<CarrinhoPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/frete-envio" element={<FreteEnvioPage />} />
             <Route path="/pagamento" element={<PagamentoPage />} />
             <Route path="/trocas-devolucoes" element={<TrocasPage />} />
