@@ -154,7 +154,7 @@ const FloatingCart = () => {
                 <span>Total:</span>
                 <span className="text-primary">{formatPrice(totalPrice)}</span>
               </div>
-              <Link to="/carrinho" onClick={() => setIsCartOpen(false)}>
+              <Link to="/checkout" onClick={() => setIsCartOpen(false)}>
                 <Button className="w-full bg-gradient-to-r from-primary to-cyan-glow hover:opacity-90 text-primary-foreground font-bold py-7 text-lg rounded-2xl shadow-lg shadow-primary/30">
                   FINALIZAR COMPRA
                 </Button>
