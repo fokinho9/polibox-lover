@@ -246,9 +246,15 @@ const AdminPanel = () => {
     try {
       const result = await productsApi.fixProductPrices(10);
       if (result.success) {
+        const processed = result.processed ?? 0;
+        const fixed = result.fixed ?? 0;
+        const anyResult: any = result;
+        const outOfStockCount = anyResult?.outOfStockCount ?? 0;
+        const failCount = anyResult?.failCount ?? 0;
+
         toast({
-          title: "Preços Corrigidos",
-          description: `${result.fixed || 0} produtos atualizados.`,
+          title: "Correção de preços concluída",
+          description: `Processados: ${processed} · Atualizados: ${fixed} · Esgotados: ${outOfStockCount} · Falhas: ${failCount}`,
         });
         queryClient.invalidateQueries({ queryKey: ['products'] });
       } else {
@@ -261,7 +267,7 @@ const AdminPanel = () => {
     } catch (error) {
       toast({
         title: "Erro",
-        description: "Falha ao executar correção de preços.",
+        description: error instanceof Error ? error.message : "Falha ao executar correção de preços.",
         variant: "destructive",
       });
     } finally {
@@ -275,7 +281,7 @@ const AdminPanel = () => {
       const result = await productsApi.syncDescriptions(5, false);
       if (result.success) {
         toast({
-          title: "Descrições Sincronizadas",
+          title: "Sincronização concluída",
           description: `${result.updated || 0} de ${result.processed || 0} produtos atualizados.`,
         });
         queryClient.invalidateQueries({ queryKey: ['products'] });
@@ -289,7 +295,7 @@ const AdminPanel = () => {
     } catch (error) {
       toast({
         title: "Erro",
-        description: "Falha ao executar sincronização de descrições.",
+        description: error instanceof Error ? error.message : "Falha ao executar sincronização de descrições.",
         variant: "destructive",
       });
     } finally {

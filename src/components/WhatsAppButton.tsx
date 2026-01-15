@@ -13,11 +13,6 @@ const WhatsAppButton = () => {
       <MessageCircle className="h-6 w-6 md:h-7 md:w-7 group-hover:scale-110 transition-transform" />
       <span className="sr-only">Atendimento WhatsApp</span>
       
-      {/* Tooltip */}
-      <div className="absolute right-full mr-2 bg-card border border-border rounded-lg px-2 py-1.5 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-        <span className="text-xs font-medium">Fale conosco!</span>
-        <div className="absolute top-1/2 -right-1 -translate-y-1/2 w-2 h-2 bg-card border-r border-b border-border rotate-[-45deg]" />
-      </div>
     </button>
   );
 };

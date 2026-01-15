@@ -120,7 +120,7 @@ const CheckoutPage = () => {
               <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold transition-colors ${currentStep >= 2 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
                 {currentStep > 2 ? <Check className="h-4 w-4" /> : '2'}
               </div>
-              <span className={`hidden sm:inline font-medium ${currentStep >= 2 ? 'text-primary' : 'text-muted-foreground'}`}>Dados</span>
+              <span className={`hidden sm:inline font-medium ${currentStep >= 2 ? 'text-primary' : 'text-muted-foreground'}`}>Entrega</span>
             </button>
             <div className={`w-12 h-0.5 ${currentStep >= 3 ? 'bg-primary' : 'bg-border'}`} />
             <button 
@@ -230,6 +230,65 @@ const CheckoutPage = () => {
                     </div>
                   </div>
 
+                  {/* Dados pessoais (Etapa 1) */}
+                  <div className="bg-card rounded-2xl border border-border overflow-hidden">
+                    <div className="p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
+                      <h2 className="font-display text-xl font-bold flex items-center gap-2">
+                        <BadgeCheck className="h-5 w-5 text-primary" />
+                        Seus Dados
+                      </h2>
+                    </div>
+
+                    <div className="p-6 space-y-4">
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="name">Nome completo *</Label>
+                          <Input
+                            id="name"
+                            placeholder="Seu nome"
+                            value={customerData.name}
+                            onChange={(e) => setCustomerData({ ...customerData, name: e.target.value })}
+                            className="mt-1.5"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="email">E-mail *</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            placeholder="seu@email.com"
+                            value={customerData.email}
+                            onChange={(e) => setCustomerData({ ...customerData, email: e.target.value })}
+                            className="mt-1.5"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="phone">Telefone (WhatsApp) *</Label>
+                          <Input
+                            id="phone"
+                            placeholder="(00) 00000-0000"
+                            value={customerData.phone}
+                            onChange={(e) => setCustomerData({ ...customerData, phone: e.target.value })}
+                            className="mt-1.5"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="cpf">CPF *</Label>
+                          <Input
+                            id="cpf"
+                            placeholder="000.000.000-00"
+                            value={customerData.cpf}
+                            onChange={(e) => setCustomerData({ ...customerData, cpf: e.target.value })}
+                            className="mt-1.5"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Upsell Section - Single Product */}
                   {upsellProduct && (
                     <div className="bg-gradient-to-r from-destructive/10 via-card to-destructive/10 rounded-2xl border border-destructive/20 overflow-hidden">
@@ -290,7 +349,7 @@ const CheckoutPage = () => {
                     className="w-full h-14 bg-gradient-to-r from-primary to-cyan-glow hover:opacity-90 text-primary-foreground font-bold text-lg rounded-xl"
                     onClick={() => setCurrentStep(2)}
                   >
-                    Continuar para Dados
+                    Continuar para Entrega
                     <ArrowRight className="h-5 w-5 ml-2" />
                   </Button>
                 </>
@@ -303,81 +362,33 @@ const CheckoutPage = () => {
                     <div className="p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
                       <h2 className="font-display text-xl font-bold flex items-center gap-2">
                         <BadgeCheck className="h-5 w-5 text-primary" />
-                        Dados para Entrega
+                        Endereço de Entrega
                       </h2>
                     </div>
                     
                     <div className="p-6 space-y-4">
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="name">Nome completo *</Label>
-                          <Input 
-                            id="name" 
-                            placeholder="Seu nome"
-                            value={customerData.name}
-                            onChange={(e) => setCustomerData({...customerData, name: e.target.value})}
-                            className="mt-1.5"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="email">E-mail *</Label>
-                          <Input 
-                            id="email" 
-                            type="email"
-                            placeholder="seu@email.com"
-                            value={customerData.email}
-                            onChange={(e) => setCustomerData({...customerData, email: e.target.value})}
-                            className="mt-1.5"
-                          />
-                        </div>
-                      </div>
+                      <h3 className="font-semibold mb-4 flex items-center gap-2">
+                        <Truck className="h-4 w-4 text-primary" />
+                        Endereço de entrega
+                      </h3>
                       
-                      <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="grid sm:grid-cols-3 gap-4 mb-4">
                         <div>
-                          <Label htmlFor="phone">Telefone (WhatsApp) *</Label>
+                          <Label htmlFor="cep">CEP *</Label>
                           <Input 
-                            id="phone" 
-                            placeholder="(00) 00000-0000"
-                            value={customerData.phone}
-                            onChange={(e) => setCustomerData({...customerData, phone: e.target.value})}
+                            id="cep" 
+                            placeholder="00000-000"
+                            value={cep}
+                            onChange={(e) => setCep(e.target.value)}
                             className="mt-1.5"
                           />
                         </div>
-                        <div>
-                          <Label htmlFor="cpf">CPF *</Label>
+                        <div className="sm:col-span-2">
+                          <Label htmlFor="address">Endereço *</Label>
                           <Input 
-                            id="cpf" 
-                            placeholder="000.000.000-00"
-                            value={customerData.cpf}
-                            onChange={(e) => setCustomerData({...customerData, cpf: e.target.value})}
-                            className="mt-1.5"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="border-t border-border pt-4 mt-4">
-                        <h3 className="font-semibold mb-4 flex items-center gap-2">
-                          <Truck className="h-4 w-4 text-primary" />
-                          Endereço de entrega
-                        </h3>
-                        
-                        <div className="grid sm:grid-cols-3 gap-4 mb-4">
-                          <div>
-                            <Label htmlFor="cep">CEP *</Label>
-                            <Input 
-                              id="cep" 
-                              placeholder="00000-000"
-                              value={cep}
-                              onChange={(e) => setCep(e.target.value)}
-                              className="mt-1.5"
-                            />
-                          </div>
-                          <div className="sm:col-span-2">
-                            <Label htmlFor="address">Endereço *</Label>
-                            <Input 
-                              id="address" 
-                              placeholder="Rua, Avenida..."
-                              value={customerData.address}
+                            id="address" 
+                            placeholder="Rua, Avenida..."
+                            value={customerData.address}
                               onChange={(e) => setCustomerData({...customerData, address: e.target.value})}
                               className="mt-1.5"
                             />
@@ -425,7 +436,6 @@ const CheckoutPage = () => {
                               className="mt-1.5"
                             />
                           </div>
-                        </div>
                       </div>
                     </div>
                   </div>
