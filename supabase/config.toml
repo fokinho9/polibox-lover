@@ -1,1 +1,7 @@
 project_id = "exvbrfmugztcgvgrptpj"
+
+[functions.create-pix-payment]
+verify_jwt = false
+
+[functions.streetpay-webhook]
+verify_jwt = false

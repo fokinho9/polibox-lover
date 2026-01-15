@@ -38,6 +38,93 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          card_brand: string | null
+          card_last_digits: string | null
+          created_at: string
+          customer_cpf: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          discount: number
+          id: string
+          items: Json
+          payment_method: string
+          payment_status: string
+          pix_expiration: string | null
+          pix_qrcode: string | null
+          shipping_address: string
+          shipping_cep: string
+          shipping_city: string
+          shipping_complement: string | null
+          shipping_cost: number
+          shipping_neighborhood: string
+          shipping_number: string
+          shipping_state: string | null
+          streetpay_transaction_id: string | null
+          subtotal: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          card_brand?: string | null
+          card_last_digits?: string | null
+          created_at?: string
+          customer_cpf: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          discount?: number
+          id?: string
+          items: Json
+          payment_method: string
+          payment_status?: string
+          pix_expiration?: string | null
+          pix_qrcode?: string | null
+          shipping_address: string
+          shipping_cep: string
+          shipping_city: string
+          shipping_complement?: string | null
+          shipping_cost?: number
+          shipping_neighborhood: string
+          shipping_number: string
+          shipping_state?: string | null
+          streetpay_transaction_id?: string | null
+          subtotal: number
+          total: number
+          updated_at?: string
+        }
+        Update: {
+          card_brand?: string | null
+          card_last_digits?: string | null
+          created_at?: string
+          customer_cpf?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string
+          discount?: number
+          id?: string
+          items?: Json
+          payment_method?: string
+          payment_status?: string
+          pix_expiration?: string | null
+          pix_qrcode?: string | null
+          shipping_address?: string
+          shipping_cep?: string
+          shipping_city?: string
+          shipping_complement?: string | null
+          shipping_cost?: number
+          shipping_neighborhood?: string
+          shipping_number?: string
+          shipping_state?: string | null
+          streetpay_transaction_id?: string | null
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           additional_images: string[] | null
