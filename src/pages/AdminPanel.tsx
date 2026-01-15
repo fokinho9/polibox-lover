@@ -21,7 +21,8 @@ import {
   Pencil,
   Plus,
   Wrench,
-  AlertTriangle
+  AlertTriangle,
+  FileText
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -71,6 +72,7 @@ const AdminPanel = () => {
   const [selectedCategory, setSelectedCategory] = useState("equipamentos");
   const [isImporting, setIsImporting] = useState(false);
   const [isFixingPrices, setIsFixingPrices] = useState(false);
+  const [isSyncingDescriptions, setIsSyncingDescriptions] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isCreatingProduct, setIsCreatingProduct] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -267,6 +269,34 @@ const AdminPanel = () => {
     }
   };
 
+  const handleSyncDescriptions = async () => {
+    setIsSyncingDescriptions(true);
+    try {
+      const result = await productsApi.syncDescriptions(20, false);
+      if (result.success) {
+        toast({
+          title: "Descrições Sincronizadas",
+          description: `${result.updated || 0} de ${result.processed || 0} produtos atualizados.`,
+        });
+        queryClient.invalidateQueries({ queryKey: ['products'] });
+      } else {
+        toast({
+          title: "Erro",
+          description: result.error || "Falha ao sincronizar descrições.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao executar sincronização de descrições.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSyncingDescriptions(false);
+    }
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
@@ -441,7 +471,7 @@ const AdminPanel = () => {
               </Button>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
               <Button 
                 variant="outline" 
                 onClick={() => queryClient.invalidateQueries({ queryKey: ['products'] })}
@@ -449,6 +479,24 @@ const AdminPanel = () => {
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Atualizar Lista
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={handleSyncDescriptions}
+                disabled={isSyncingDescriptions}
+                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+              >
+                {isSyncingDescriptions ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Sincronizando...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="h-4 w-4 mr-2" />
+                    Sincronizar Descrições
+                  </>
+                )}
               </Button>
               <Button 
                 variant="destructive" 
