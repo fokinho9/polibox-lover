@@ -74,6 +74,12 @@ const AdminPanel = () => {
   const [isImporting, setIsImporting] = useState(false);
   const [isFixingPrices, setIsFixingPrices] = useState(false);
   const [isSyncingDescriptions, setIsSyncingDescriptions] = useState(false);
+  const [syncProgress, setSyncProgress] = useState<{
+    current: number;
+    total: number;
+    updated: number;
+    estimatedTime: string;
+  } | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isCreatingProduct, setIsCreatingProduct] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -278,29 +284,80 @@ const AdminPanel = () => {
 
   const handleSyncDescriptions = async () => {
     setIsSyncingDescriptions(true);
+    setSyncProgress(null);
+    
+    const BATCH_SIZE = 35;
+    const TIME_PER_PRODUCT = 1.5; // seconds estimate per product
+    
     try {
-      const result = await productsApi.syncDescriptions(5, false);
-      if (result.success) {
+      // First, count how many products need syncing
+      const productsNeedingSync = products.filter(p => !p.description || p.description.length <= 10).length;
+      
+      if (productsNeedingSync === 0) {
         toast({
-          title: "Sincronização concluída",
-          description: `${result.updated || 0} de ${result.processed || 0} produtos atualizados.`,
+          title: "Tudo sincronizado!",
+          description: "Todos os produtos já têm descrições.",
         });
-        queryClient.invalidateQueries({ queryKey: ['products'] });
-      } else {
-        toast({
-          title: "Erro",
-          description: result.error || "Falha ao sincronizar descrições.",
-          variant: "destructive",
-        });
+        setIsSyncingDescriptions(false);
+        return;
       }
+      
+      let totalProcessed = 0;
+      let totalUpdated = 0;
+      let batchNumber = 0;
+      const totalBatches = Math.ceil(productsNeedingSync / BATCH_SIZE);
+      
+      while (totalProcessed < productsNeedingSync) {
+        batchNumber++;
+        const remaining = productsNeedingSync - totalProcessed;
+        const estimatedSeconds = remaining * TIME_PER_PRODUCT;
+        const estimatedMinutes = Math.ceil(estimatedSeconds / 60);
+        
+        setSyncProgress({
+          current: totalProcessed,
+          total: productsNeedingSync,
+          updated: totalUpdated,
+          estimatedTime: estimatedMinutes > 1 ? `~${estimatedMinutes} min restantes` : `< 1 min restante`,
+        });
+        
+        const result = await productsApi.syncDescriptions(BATCH_SIZE, false);
+        
+        if (!result.success) {
+          toast({
+            title: "Erro no lote " + batchNumber,
+            description: result.error || "Falha ao sincronizar lote.",
+            variant: "destructive",
+          });
+          break;
+        }
+        
+        totalProcessed += result.processed || 0;
+        totalUpdated += result.updated || 0;
+        
+        // If no products were processed, we're done
+        if (!result.processed || result.processed === 0) {
+          break;
+        }
+        
+        // Small delay between batches
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
+      toast({
+        title: "Sincronização concluída!",
+        description: `${totalUpdated} produtos atualizados de ${totalProcessed} processados.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      
     } catch (error) {
       toast({
         title: "Erro",
-        description: error instanceof Error ? error.message : "Falha ao executar sincronização de descrições.",
+        description: error instanceof Error ? error.message : "Falha ao executar sincronização.",
         variant: "destructive",
       });
     } finally {
       setIsSyncingDescriptions(false);
+      setSyncProgress(null);
     }
   };
 
@@ -519,10 +576,34 @@ const AdminPanel = () => {
                 ) : (
                   <>
                     <FileText className="h-4 w-4 mr-2" />
-                    Sincronizar Descrições
+                    Sincronizar Descrições ({productsWithoutDescription})
                   </>
                 )}
               </Button>
+              
+              {/* Sync Progress Indicator */}
+              {syncProgress && (
+                <div className="w-full bg-secondary/50 rounded-lg p-4 border border-primary/30">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-foreground">
+                      Progresso da Sincronização
+                    </span>
+                    <span className="text-xs text-primary font-semibold">
+                      {syncProgress.estimatedTime}
+                    </span>
+                  </div>
+                  <div className="w-full bg-background rounded-full h-2.5 mb-2">
+                    <div 
+                      className="bg-primary h-2.5 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min((syncProgress.current / syncProgress.total) * 100, 100)}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>{syncProgress.current} / {syncProgress.total} processados</span>
+                    <span>{syncProgress.updated} atualizados</span>
+                  </div>
+                </div>
+              )}
               <Button 
                 variant="destructive" 
                 onClick={() => deleteAllMutation.mutate()}
