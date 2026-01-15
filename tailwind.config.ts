@@ -14,8 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        display: ['Oswald', 'sans-serif'],
+        sans: ['Montserrat', 'sans-serif'],
+        display: ['Bebas Neue', 'sans-serif'],
+        body: ['Poppins', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
