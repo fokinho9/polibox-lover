@@ -208,16 +208,22 @@ export const productsApi = {
     return data || [];
   },
 
-  async fixProductPrices(): Promise<{ success: boolean; fixed?: number; error?: string }> {
+  async fixProductPrices(limit: number = 10): Promise<{ success: boolean; fixed?: number; processed?: number; error?: string }> {
     const { data, error } = await supabase.functions.invoke('fix-product-prices', {
-      body: {},
+      body: { limit },
     });
 
     if (error) {
       return { success: false, error: error.message };
     }
 
-    return data;
+    // Backward/forward compatibility: ensure `fixed` exists even if function returns `successCount`
+    const anyData: any = data;
+    if (anyData?.success && typeof anyData.fixed !== 'number' && typeof anyData.successCount === 'number') {
+      return { ...anyData, fixed: anyData.successCount };
+    }
+
+    return anyData;
   },
 
   async syncDescriptions(limit: number = 10, force: boolean = false): Promise<{ 
