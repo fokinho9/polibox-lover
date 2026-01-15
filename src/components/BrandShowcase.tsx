@@ -1,23 +1,22 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { productsApi, Product } from "@/lib/api/products";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Star } from "lucide-react";
 
 const brands = [
-  { name: "VONIXX", slug: "marca-vonixx", color: "from-orange-500 to-red-600" },
-  { name: "3M", slug: "marca-3m", color: "from-red-600 to-red-800" },
-  { name: "EASYTECH", slug: "marca-easytech", color: "from-green-500 to-green-700" },
-  { name: "WURTH", slug: "marca-wurth", color: "from-red-600 to-gray-700" },
-  { name: "DETAILER", slug: "marca-detailer", color: "from-blue-500 to-blue-700" },
-  { name: "KERS", slug: "marca-kers", color: "from-purple-500 to-purple-700" },
-  { name: "CADILLAC", slug: "marca-cadillac", color: "from-amber-600 to-amber-800" },
-  { name: "SPARTAN", slug: "marca-spartan", color: "from-cyan-500 to-cyan-700" },
-  { name: "SOFT99", slug: "marca-soft99", color: "from-pink-500 to-pink-700" },
-  { name: "RAPIFIX", slug: "marca-rapifix", color: "from-yellow-500 to-orange-600" },
+  { name: "VONIXX", slug: "marca-vonixx", color: "from-orange-500 to-orange-600" },
+  { name: "3M", slug: "marca-3m", color: "from-red-600 to-red-700" },
+  { name: "EASYTECH", slug: "marca-easytech", color: "from-emerald-500 to-emerald-600" },
+  { name: "WURTH", slug: "marca-wurth", color: "from-red-700 to-red-800" },
+  { name: "DETAILER", slug: "marca-detailer", color: "from-blue-500 to-blue-600" },
+  { name: "KERS", slug: "marca-kers", color: "from-violet-500 to-violet-600" },
+  { name: "CADILLAC", slug: "marca-cadillac", color: "from-amber-500 to-amber-600" },
+  { name: "SPARTAN", slug: "marca-spartan", color: "from-sky-500 to-sky-600" },
+  { name: "SOFT99", slug: "marca-soft99", color: "from-pink-500 to-pink-600" },
+  { name: "RAPIFIX", slug: "marca-rapifix", color: "from-yellow-500 to-yellow-600" },
 ];
 
 const BrandShowcase = () => {
-  // Fetch products for each brand to show preview
   const { data: allProducts = [] } = useQuery({
     queryKey: ['all-products-brands'],
     queryFn: productsApi.getAll,
@@ -29,21 +28,32 @@ const BrandShowcase = () => {
       .slice(0, 3);
   };
 
+  const getBrandCount = (brandName: string): number => {
+    return allProducts.filter(p => p.brand?.toLowerCase().includes(brandName.toLowerCase()) && p.price > 0).length;
+  };
+
   return (
-    <section id="marcas" className="py-16 bg-gradient-to-b from-secondary/20 to-background">
+    <section id="marcas" className="py-12 md:py-16 bg-card/30">
       <div className="container-main">
+        {/* Header */}
         <div className="text-center mb-10">
-          <h2 className="font-display text-4xl md:text-5xl text-foreground mb-3">
-            NOSSAS <span className="text-primary text-shadow-glow">MARCAS</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 border border-primary/20 rounded-full mb-4">
+            <Star className="h-4 w-4 text-primary" />
+            <span className="text-primary font-medium text-sm">Marcas Premium</span>
+          </div>
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-foreground mb-2">
+            AS MELHORES <span className="text-primary">MARCAS</span>
           </h2>
           <p className="text-muted-foreground">
-            As melhores marcas de estética automotiva em um só lugar
+            Produtos de alta qualidade para estética automotiva
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        {/* Brands Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
           {brands.map((brand, index) => {
             const brandProducts = getBrandProducts(brand.name);
+            const count = getBrandCount(brand.name);
             
             return (
               <Link
@@ -51,39 +61,44 @@ const BrandShowcase = () => {
                 to={`/categoria/${brand.slug}`}
                 className="group"
               >
-                <div className={`bg-gradient-to-br ${brand.color} rounded-2xl p-5 flex flex-col cursor-pointer hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-2xl min-h-[200px]`}>
+                <div className={`relative bg-gradient-to-br ${brand.color} rounded-xl p-4 md:p-5 h-32 md:h-36 flex flex-col cursor-pointer transition-all duration-300 overflow-hidden hover:shadow-xl hover:scale-[1.02]`}>
+                  {/* Background Pattern */}
+                  <div className="absolute inset-0 opacity-10">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-white rounded-full -translate-y-1/2 translate-x-1/2" />
+                  </div>
+                  
                   {/* Brand Name */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="font-display text-2xl font-bold text-white tracking-wider">
+                  <div className="relative flex items-start justify-between">
+                    <span className="font-display text-xl md:text-2xl font-bold text-white">
                       {brand.name}
                     </span>
-                    <ChevronRight className="h-5 w-5 text-white/80 group-hover:translate-x-1 transition-transform" />
+                    <ChevronRight className="h-5 w-5 text-white/60 group-hover:translate-x-1 group-hover:text-white transition-all" />
                   </div>
 
-                  {/* Product Previews */}
-                  {brandProducts.length > 0 ? (
-                    <div className="flex gap-2 mt-auto">
-                      {brandProducts.map((product) => (
+                  {/* Product Count */}
+                  <div className="relative mt-auto">
+                    {count > 0 ? (
+                      <span className="text-white/80 text-xs">{count} produtos</span>
+                    ) : (
+                      <span className="text-white/60 text-xs">Ver coleção</span>
+                    )}
+                  </div>
+
+                  {/* Mini Product Previews */}
+                  {brandProducts.length > 0 && (
+                    <div className="absolute bottom-3 right-3 flex -space-x-2">
+                      {brandProducts.slice(0, 2).map((product) => (
                         <div 
                           key={product.id} 
-                          className="w-14 h-14 rounded-lg bg-white/20 backdrop-blur-sm overflow-hidden flex-shrink-0"
+                          className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm overflow-hidden border border-white/30"
                         >
                           <img 
                             src={product.image_url || '/placeholder.svg'} 
-                            alt={product.name}
+                            alt=""
                             className="w-full h-full object-cover"
                           />
                         </div>
                       ))}
-                      {brandProducts.length > 0 && (
-                        <div className="w-14 h-14 rounded-lg bg-white/10 flex items-center justify-center text-white text-xs font-bold">
-                          +mais
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="mt-auto text-white/70 text-sm">
-                      Ver produtos →
                     </div>
                   )}
                 </div>

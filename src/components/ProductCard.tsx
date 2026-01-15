@@ -1,4 +1,4 @@
-import { ShoppingCart, Zap, Flame } from "lucide-react";
+import { ShoppingCart, Zap, Flame, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
@@ -38,7 +38,6 @@ const ProductCard = ({
     
     if (!id) return;
 
-    // Create a product object for cart
     const product = {
       id,
       name,
@@ -71,76 +70,104 @@ const ProductCard = ({
 
   return (
     <CardWrapper>
-      <div className="group h-full flex flex-col bg-gradient-to-b from-card to-card/80 rounded-2xl border border-border hover:border-primary/40 transition-all duration-300 overflow-hidden hover:shadow-xl hover:shadow-primary/10">
-        {/* Image */}
-        <div className="relative aspect-square bg-gradient-to-br from-secondary/30 to-background overflow-hidden">
-          {discount && (
-            <div className="absolute top-3 left-3 z-10">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-destructive to-red-600 text-white text-xs font-bold rounded-full shadow-lg shadow-destructive/30">
-                <Flame className="h-3.5 w-3.5" />
-                -{discount}% OFF
+      <div className="group h-full flex flex-col bg-card rounded-xl border border-border/50 transition-all duration-500 overflow-hidden hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1">
+        {/* Image Container */}
+        <div className="relative aspect-square bg-gradient-to-br from-muted/30 via-background to-muted/50 overflow-hidden">
+          {/* Discount Badge */}
+          {discount && discount > 0 && (
+            <div className="absolute top-2 left-2 z-10">
+              <div className="relative">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-black rounded-md shadow-lg">
+                  <Flame className="h-3 w-3" />
+                  -{discount}%
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Express Badge */}
+          {express && (
+            <div className="absolute top-2 right-2 z-10">
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/90 backdrop-blur-sm text-primary-foreground text-[9px] font-bold rounded-md">
+                <Zap className="h-2.5 w-2.5" />
+                EXPRESS
               </span>
             </div>
           )}
-          {express && (
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-primary via-cyan-glow to-primary text-primary-foreground text-xs text-center py-2 font-bold tracking-wider">
-              ⚡ ENTREGA EXPRESS
-            </div>
-          )}
-          <img
-            src={image}
-            alt={name}
-            className="w-full h-full object-contain p-6 transition-all duration-500 group-hover:scale-110"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = "/placeholder.svg";
-            }}
-          />
+
+          {/* Product Image */}
+          <div className="absolute inset-0 flex items-center justify-center p-4">
+            <img
+              src={image}
+              alt={name}
+              className="max-w-full max-h-full object-contain transition-transform duration-500 group-hover:scale-110"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "/placeholder.svg";
+              }}
+            />
+          </div>
+
+          {/* Hover overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
 
         {/* Content */}
-        <div className="p-5 flex flex-col flex-1">
+        <div className="flex flex-col flex-1 p-3 md:p-4">
+          {/* Brand */}
           {brand && (
-            <span className="text-xs text-primary font-bold uppercase tracking-wider mb-1.5">
+            <span className="text-[10px] text-primary font-bold uppercase tracking-widest mb-1">
               {brand}
             </span>
           )}
-          <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-4 min-h-[40px] group-hover:text-primary transition-colors">
+
+          {/* Name */}
+          <h3 className="text-xs md:text-sm font-medium text-foreground/90 line-clamp-2 mb-3 min-h-[32px] md:min-h-[40px] leading-tight group-hover:text-foreground transition-colors">
             {name}
           </h3>
 
           {/* Prices */}
-          <div className="space-y-2 mt-auto">
-            {oldPrice && (
-              <p className="text-muted-foreground text-xs flex items-center gap-2">
-                <span>De:</span>
-                <span className="line-through">R$ {oldPrice.toFixed(2).replace('.', ',')}</span>
+          <div className="mt-auto space-y-1.5">
+            {/* Old Price */}
+            {oldPrice && oldPrice > price && (
+              <p className="text-[10px] text-muted-foreground">
+                De: <span className="line-through">R$ {oldPrice.toFixed(2).replace('.', ',')}</span>
               </p>
             )}
-            <p className="text-muted-foreground text-sm">
-              Por: <span className="text-foreground font-bold text-base">R$ {price.toFixed(2).replace('.', ',')}</span>
+
+            {/* Current Price */}
+            <p className="text-xs text-muted-foreground">
+              Por: <span className="text-foreground font-semibold">R$ {price.toFixed(2).replace('.', ',')}</span>
             </p>
-            <div className="flex items-center gap-2 bg-gradient-to-r from-primary/20 to-primary/5 rounded-xl px-3 py-2.5 -mx-1 border border-primary/20">
-              <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shadow-lg shadow-primary/50" />
-              <p className="text-primary font-bold text-lg">
-                R$ {pixPrice.toFixed(2).replace('.', ',')}
-              </p>
-              <span className="text-xs text-primary/80 font-medium">no Pix</span>
+
+            {/* PIX Price - Highlighted */}
+            <div className="flex items-center gap-2 bg-gradient-to-r from-primary/15 to-primary/5 rounded-lg px-2.5 py-2 border border-primary/20">
+              <div className="relative flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full bg-primary animate-ping absolute" />
+                <div className="w-2 h-2 rounded-full bg-primary relative" />
+              </div>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-primary font-bold text-sm md:text-base">
+                  R$ {pixPrice.toFixed(2).replace('.', ',')}
+                </span>
+                <span className="text-[10px] text-primary/70 font-medium">PIX</span>
+              </div>
             </div>
+
+            {/* Installments */}
             {installments && (
-              <p className="text-xs text-muted-foreground pt-1">
-                ou <span className="font-bold text-foreground">{installments.count}x</span> de{" "}
-                <span className="font-bold text-foreground">R$ {installments.value.toFixed(2).replace('.', ',')}</span>
+              <p className="text-[10px] text-muted-foreground">
+                ou {installments.count}x de R$ {installments.value.toFixed(2).replace('.', ',')}
               </p>
             )}
           </div>
 
-          {/* Buy button */}
+          {/* Buy Button */}
           <Button 
-            className="w-full mt-5 h-12 text-sm gap-2 bg-gradient-to-r from-primary to-cyan-glow hover:opacity-90 text-primary-foreground font-bold rounded-xl shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30" 
+            className="w-full mt-3 h-9 md:h-10 text-xs gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/30" 
             onClick={handleAddToCart}
           >
-            <ShoppingCart className="h-4 w-4" />
-            COMPRAR AGORA
+            <ShoppingCart className="h-3.5 w-3.5" />
+            COMPRAR
           </Button>
         </div>
       </div>
