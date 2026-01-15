@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 // Banner ofertas v3 atualizado
 import bannerOfertas50 from "@/assets/banner-ofertas-50-v3.jpg";
 import bannerFrete from "@/assets/banner-frete.jpg";
-import bannerMagil from "@/assets/banner-magil.jpg";
 import bannerVonixx2026 from "@/assets/banner-vonixx-2026.jpg";
 
 const slides = [
@@ -21,11 +20,6 @@ const slides = [
   },
   {
     id: 3,
-    image: bannerMagil,
-    href: "/categoria/limpadores-apc"
-  },
-  {
-    id: 4,
     image: bannerVonixx2026,
     href: "/busca?q=vonixx"
   }
