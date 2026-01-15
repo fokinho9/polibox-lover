@@ -113,6 +113,11 @@ const CheckoutPage = () => {
     return cleaned;
   };
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const validateCpf = (cpf: string): boolean => {
     const cleaned = cpf.replace(/\D/g, '');
     if (cleaned.length !== 11) return false;
@@ -132,6 +137,7 @@ const CheckoutPage = () => {
   };
 
   const isCpfValid = customerData.cpf.length === 0 || validateCpf(customerData.cpf);
+  const isEmailValid = customerData.email.length === 0 || validateEmail(customerData.email);
 
   const fetchAddressByCep = async (cepValue: string) => {
     const cleaned = cepValue.replace(/\D/g, '');
@@ -171,7 +177,7 @@ const CheckoutPage = () => {
     return 'Outro';
   };
 
-  const canProceedToStep2 = items.length > 0 && customerData.name && customerData.email && customerData.phone && customerData.cpf && isCpfValid;
+  const canProceedToStep2 = items.length > 0 && customerData.name && customerData.email && isEmailValid && customerData.phone && customerData.cpf && isCpfValid;
   const canProceedToStep3 = canProceedToStep2 && cep && customerData.address && customerData.number && customerData.neighborhood && customerData.city;
   const canFinishPayment = paymentMethod === 'pix' || (paymentMethod === 'card' && cardData.number && cardData.name && cardData.expiry && cardData.cvv);
 
@@ -401,7 +407,8 @@ const CheckoutPage = () => {
                         </div>
                         <div>
                           <Label htmlFor="email">E-mail *</Label>
-                          <Input id="email" type="email" placeholder="seu@email.com" value={customerData.email} onChange={(e) => setCustomerData({ ...customerData, email: e.target.value })} className="mt-1.5" />
+                          <Input id="email" type="email" placeholder="seu@email.com" value={customerData.email} onChange={(e) => setCustomerData({ ...customerData, email: e.target.value })} className={`mt-1.5 ${customerData.email && !isEmailValid ? 'border-destructive focus-visible:ring-destructive' : ''}`} />
+                          {customerData.email && !isEmailValid && <p className="text-xs text-destructive mt-1">E-mail inválido</p>}
                         </div>
                       </div>
                       <div className="grid sm:grid-cols-2 gap-4">
