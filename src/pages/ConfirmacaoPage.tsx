@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { 
-  Check, Clock, XCircle, Copy, QrCode, 
+  Check, Clock, XCircle, Copy, 
   ArrowLeft, ShieldCheck, Loader2, CreditCard
 } from "lucide-react";
 import Header from "@/components/Header";
@@ -167,18 +167,13 @@ const ConfirmacaoPage = () => {
                 <div className="text-center mb-6">
                   <h2 className="font-bold text-lg mb-4">Pague com PIX</h2>
                   
-                  {/* QR Code Placeholder - in production use a QR code library */}
-                  <div className="w-48 h-48 mx-auto bg-white rounded-xl flex items-center justify-center mb-4 p-4">
-                    <QrCode className="w-full h-full text-foreground" />
-                  </div>
-                  
                   <p className="text-sm text-muted-foreground mb-4">
-                    Ou copie o código abaixo e cole no app do seu banco
+                    Copie o código abaixo e cole no app do seu banco
                   </p>
                   
                   <div className="bg-secondary/50 rounded-xl p-4 mb-4">
                     <p className="text-xs font-mono break-all text-muted-foreground mb-3">
-                      {order.pix_qrcode.substring(0, 100)}...
+                      {order.pix_qrcode.substring(0, 80)}...
                     </p>
                     <Button 
                       onClick={handleCopyPix}
