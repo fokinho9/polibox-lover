@@ -149,7 +149,6 @@ const Footer = () => {
               <li><Link to="/privacidade" className="text-muted-foreground hover:text-primary transition-colors">Política de Privacidade</Link></li>
               <li><Link to="/termos" className="text-muted-foreground hover:text-primary transition-colors">Termos de Uso</Link></li>
               <li><a href="https://api.whatsapp.com/send?phone=5521996327544" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">Atendimento WhatsApp</a></li>
-              <li><Link to="/admin" className="text-primary hover:text-cyan-glow transition-colors font-medium">⚙️ Painel Admin</Link></li>
             </ul>
           </div>
         </div>

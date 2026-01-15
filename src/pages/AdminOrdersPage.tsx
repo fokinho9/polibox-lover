@@ -109,11 +109,24 @@ const AdminOrdersPage = () => {
 
   const handleWhatsApp = (order: Order) => {
     const phone = order.customer_phone.replace(/\D/g, '');
+    const itemsList = order.items?.map(item => `   • ${item.quantity}x ${item.name}`).join('\n') || '';
     const message = encodeURIComponent(
       `Olá ${order.customer_name}! 👋\n\n` +
-      `Referente ao seu pedido #${order.id.slice(0, 8).toUpperCase()}:\n` +
-      `📦 Total: ${formatPrice(Number(order.total))}\n\n` +
-      `Como podemos ajudar?`
+      `Somos da *Polibox* e estamos entrando em contato referente ao seu pedido:\n\n` +
+      `🧾 *Pedido #${order.id.slice(0, 8).toUpperCase()}*\n` +
+      `📅 Data: ${new Date(order.created_at).toLocaleDateString('pt-BR')}\n\n` +
+      `📦 *Itens do pedido:*\n${itemsList}\n\n` +
+      `💰 *Subtotal:* ${formatPrice(Number(order.subtotal))}\n` +
+      `🚚 *Frete:* ${Number(order.shipping_cost) === 0 ? 'Grátis' : formatPrice(Number(order.shipping_cost))}\n` +
+      (Number(order.discount) > 0 ? `🎁 *Desconto:* -${formatPrice(Number(order.discount))}\n` : '') +
+      `💵 *Total:* ${formatPrice(Number(order.total))}\n\n` +
+      `📍 *Endereço de entrega:*\n` +
+      `${order.shipping_address}, ${order.shipping_number}\n` +
+      `${order.shipping_neighborhood} - ${order.shipping_city}/${order.shipping_state}\n` +
+      `CEP: ${order.shipping_cep}\n\n` +
+      `💳 *Forma de pagamento:* ${order.payment_method === 'pix' ? 'PIX' : 'Cartão de Crédito'}\n` +
+      `📊 *Status:* ${order.payment_status === 'paid' ? '✅ Pago' : order.payment_status === 'pending' ? '⏳ Pendente' : order.payment_status === 'analyzing' ? '🔍 Em análise' : '❌ Falhou'}\n\n` +
+      `Como podemos ajudar você hoje? 😊`
     );
     window.open(`https://wa.me/55${phone}?text=${message}`, '_blank');
   };
