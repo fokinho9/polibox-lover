@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+// Banner ofertas v3 atualizado
 import bannerOfertas50 from "@/assets/banner-ofertas-50-v3.jpg";
 import bannerFrete from "@/assets/banner-frete.jpg";
 import bannerMagil from "@/assets/banner-magil.jpg";
