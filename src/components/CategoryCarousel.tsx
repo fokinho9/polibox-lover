@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -59,9 +58,8 @@ const CategoryCarousel = () => {
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
           >
             {slides.map((slide) => (
-              <Link
+              <div
                 key={slide.id}
-                to={slide.href}
                 className="w-full flex-shrink-0"
               >
                 <img
@@ -69,7 +67,7 @@ const CategoryCarousel = () => {
                   alt={`Categoria ${slide.id}`}
                   className="w-full h-auto object-contain"
                 />
-              </Link>
+              </div>
             ))}
           </div>
 
