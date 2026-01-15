@@ -8,6 +8,7 @@ import FloatingCart from "@/components/FloatingCart";
 import ScrollToTop from "@/components/ScrollToTop";
 import Index from "./pages/Index";
 import AdminPanel from "./pages/AdminPanel";
+import AdminOrdersPage from "./pages/AdminOrdersPage";
 import CategoryPage from "./pages/CategoryPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import CalculadoraPage from "./pages/CalculadoraPage";
@@ -39,6 +40,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/admin/pedidos" element={<AdminOrdersPage />} />
             <Route path="/categoria/:category" element={<CategoryPage />} />
             <Route path="/produto/:id" element={<ProductDetailPage />} />
             <Route path="/calculadora" element={<CalculadoraPage />} />

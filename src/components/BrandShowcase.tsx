@@ -84,13 +84,9 @@ const BrandShowcase = () => {
                     <ChevronRight className="h-5 w-5 text-white/60 group-hover:translate-x-1 group-hover:text-white transition-all" />
                   </div>
 
-                  {/* Product Count */}
+                  {/* Spacer for layout */}
                   <div className="relative mt-1">
-                    {count > 0 ? (
-                      <span className="text-white/80 text-xs">{count} produtos</span>
-                    ) : (
-                      <span className="text-white/60 text-xs">Ver coleção</span>
-                    )}
+                    <span className="text-white/60 text-xs">Ver coleção</span>
                   </div>
 
                   {/* Mini Product Previews */}
