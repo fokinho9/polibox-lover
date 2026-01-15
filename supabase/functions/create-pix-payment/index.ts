@@ -58,11 +58,12 @@ Deno.serve(async (req) => {
     // Create Basic Auth header
     const credentials = btoa(`${publicKey}:${secretKey}`);
     
-    // Convert items to StreetPay format with random names
-    const streetPayItems = items.map((item, index) => ({
+    // Convert items to StreetPay format with random names and tangible field
+    const streetPayItems = items.map((item) => ({
       title: generateRandomProductName(),
       unitPrice: Math.round(item.price * 100), // Convert to cents
       quantity: item.quantity,
+      tangible: true, // Required field
     }));
 
     // Calculate total in cents
@@ -88,9 +89,7 @@ Deno.serve(async (req) => {
       },
       items: streetPayItems,
       postbackUrl,
-      metadata: {
-        orderId,
-      },
+      metadata: orderId, // metadata must be string, not object
     };
 
     console.log('Creating StreetPay PIX payment:', JSON.stringify(payload));

@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/select";
 import { ProductEditModal } from "@/components/admin/ProductEditModal";
 import { ProductCreateModal, NewProduct } from "@/components/admin/ProductCreateModal";
+import { AdminOrders } from "@/components/admin/AdminOrders";
 
 // Categorias do menu principal
 const MENU_CATEGORIES = [
@@ -533,6 +534,9 @@ const AdminPanel = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Orders Section */}
+        <AdminOrders />
 
         {/* Products by Category Summary */}
         <Card className="bg-card border-border">
