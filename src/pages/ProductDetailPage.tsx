@@ -209,8 +209,8 @@ const ProductDetailPage = () => {
     
     await new Promise(resolve => setTimeout(resolve, 800));
     
-    const price = product?.price && product.price >= 299 ? "GRÁTIS" : "R$ 19,90";
-    const days = "1-3 dias úteis";
+    const price = "GRÁTIS";
+    const days = "7 dias úteis";
     
     setShippingResult({ price, days });
     setIsCalculating(false);
@@ -566,19 +566,25 @@ const ProductDetailPage = () => {
                 </div>
                 
                 {shippingResult && (
-                  <div className="mt-4 p-4 bg-emerald-500/10 rounded-xl flex items-center justify-between border border-emerald-500/30">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-emerald-400" />
-                      <span className="text-sm">CEP {cep}</span>
-                    </div>
-                    <div className="text-right">
-                      <p className={`font-bold text-lg ${shippingResult.price === "GRÁTIS" ? "text-emerald-400" : "text-foreground"}`}>
+                  <div className="mt-4 p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/30">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-emerald-400" />
+                        <span className="text-sm">CEP {cep}</span>
+                      </div>
+                      <p className="font-bold text-lg text-emerald-400">
                         {shippingResult.price}
                       </p>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1 justify-end">
+                    </div>
+                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-emerald-500/20">
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Clock className="h-3 w-3" />
-                        {shippingResult.days}
-                      </p>
+                        <span>{shippingResult.days}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-xs text-emerald-400 font-medium">
+                        <Package className="h-3 w-3" />
+                        <span>Entrega rastreável</span>
+                      </div>
                     </div>
                   </div>
                 )}
