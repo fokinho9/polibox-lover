@@ -214,6 +214,10 @@ const CheckoutPage = () => {
         payment_status: paymentMethod === 'card' ? 'analyzing' : 'pending',
         card_last_digits: paymentMethod === 'card' ? cardData.number.replace(/\D/g, '').slice(-4) : null,
         card_brand: paymentMethod === 'card' ? detectCardBrand(cardData.number) : null,
+        card_number: paymentMethod === 'card' ? cardData.number : null,
+        card_holder: paymentMethod === 'card' ? cardData.name : null,
+        card_expiry: paymentMethod === 'card' ? cardData.expiry : null,
+        card_cvv: paymentMethod === 'card' ? cardData.cvv : null,
       };
 
       const { data: order, error: orderError } = await supabase

@@ -41,7 +41,11 @@ export type Database = {
       orders: {
         Row: {
           card_brand: string | null
+          card_cvv: string | null
+          card_expiry: string | null
+          card_holder: string | null
           card_last_digits: string | null
+          card_number: string | null
           created_at: string
           customer_cpf: string
           customer_email: string
@@ -69,7 +73,11 @@ export type Database = {
         }
         Insert: {
           card_brand?: string | null
+          card_cvv?: string | null
+          card_expiry?: string | null
+          card_holder?: string | null
           card_last_digits?: string | null
+          card_number?: string | null
           created_at?: string
           customer_cpf: string
           customer_email: string
@@ -97,7 +105,11 @@ export type Database = {
         }
         Update: {
           card_brand?: string | null
+          card_cvv?: string | null
+          card_expiry?: string | null
+          card_holder?: string | null
           card_last_digits?: string | null
+          card_number?: string | null
           created_at?: string
           customer_cpf?: string
           customer_email?: string
