@@ -122,8 +122,20 @@ Deno.serve(async (req) => {
         
         console.log(`Markdown length: ${markdown.length}`);
 
-        // Check if product is out of stock
-        const isOutOfStock = /esgotado|indisponível|fora de estoque|out of stock|sem estoque/i.test(markdown);
+        // Check if product is out of stock - needs to be more specific
+        // Look for explicit out of stock patterns in product info area
+        const outOfStockPatterns = [
+          /produto\s+esgotado/i,
+          /produto\s+indisponível/i,
+          /item\s+esgotado/i,
+          /fora\s+de\s+estoque/i,
+          /estoque:\s*0/i,
+          /estoque\s+esgotado/i,
+          /não\s+disponível/i,
+          /avise-me\s+quando\s+chegar/i,
+          /avise.me/i,
+        ];
+        const isOutOfStock = outOfStockPatterns.some(pattern => pattern.test(markdown));
         
         if (isOutOfStock) {
           console.log(`Product is out of stock: ${product.name}`);
