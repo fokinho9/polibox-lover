@@ -13,12 +13,6 @@ const PromoSection = () => {
       <div className="container-main relative z-10">
         {/* Main Promo Banner */}
         <div className="text-center mb-10 md:mb-14">
-          {/* Timer Badge */}
-          <div className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-full mb-6 animate-pulse">
-            <Flame className="h-4 w-4 text-orange-500" />
-            <span className="text-orange-400 font-bold text-sm uppercase tracking-wider">Oferta por tempo limitado</span>
-            <Timer className="h-4 w-4 text-orange-500" />
-          </div>
           
           {/* Text Logo - Bolder */}
           <h2 className="font-display text-5xl md:text-6xl lg:text-7xl font-black text-foreground mb-4 tracking-tight">
