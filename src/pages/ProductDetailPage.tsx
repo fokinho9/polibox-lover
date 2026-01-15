@@ -486,53 +486,51 @@ const ProductDetailPage = () => {
               )}
 
               {/* Price Card - Premium */}
-              <div className="relative bg-gradient-to-br from-card via-card to-primary/5 rounded-3xl border border-border/50 p-6 md:p-8 space-y-4 overflow-hidden shadow-xl">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl" />
+              <div className="relative bg-gradient-to-br from-card via-card to-primary/5 rounded-2xl border border-border/50 p-4 md:p-5 space-y-3 overflow-hidden shadow-lg">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
                 
                 {product.old_price && (
-                  <div className="flex items-center gap-3 relative">
-                    <span className="text-muted-foreground line-through text-lg md:text-xl">
+                  <div className="flex items-center gap-2 relative">
+                    <span className="text-muted-foreground line-through text-base">
                       R$ {product.old_price.toFixed(2).replace('.', ',')}
                     </span>
                     {product.discount_percent && (
-                      <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white border-0 text-xs font-black animate-pulse">
-                        <Sparkles className="h-3 w-3 mr-1" />
+                      <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white border-0 text-[10px] font-black animate-pulse">
+                        <Sparkles className="h-2.5 w-2.5 mr-0.5" />
                         -{product.discount_percent}% OFF
                       </Badge>
                     )}
                   </div>
                 )}
                 
-                <div className="space-y-1 relative">
-                  <p className="text-sm md:text-base text-muted-foreground">Por apenas:</p>
-                  <p className="text-4xl md:text-5xl font-display font-black text-foreground">
+                <div className="space-y-0.5 relative">
+                  <p className="text-xs text-muted-foreground">Por apenas:</p>
+                  <p className="text-2xl md:text-3xl font-display font-black text-foreground">
                     R$ {product.price.toFixed(2).replace('.', ',')}
                   </p>
                 </div>
 
-                {/* PIX Price - Super Highlighted */}
-                <div className="relative flex items-center gap-4 bg-gradient-to-r from-emerald-500/20 via-primary/20 to-cyan-500/20 rounded-2xl p-4 md:p-5 border-2 border-primary/40 shadow-lg shadow-primary/20">
-                  <div className="absolute -top-3 left-4">
-                    <Badge className="bg-primary text-white border-0 text-xs font-black px-3 py-1 shadow-lg">
+                {/* PIX Price - Compact */}
+                <div className="relative flex items-center gap-3 bg-gradient-to-r from-emerald-500/20 via-primary/20 to-cyan-500/20 rounded-xl p-3 border border-primary/40 shadow-md shadow-primary/10">
+                  <div className="absolute -top-2 left-3">
+                    <Badge className="bg-primary text-white border-0 text-[10px] font-black px-2 py-0.5 shadow-md">
                       MELHOR PREÇO
                     </Badge>
                   </div>
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center shadow-lg shadow-primary/30">
-                    <Zap className="h-7 w-7 text-white" />
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center shadow-md shadow-primary/30">
+                    <Zap className="h-5 w-5 text-white" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-3xl md:text-4xl font-display font-black text-primary">
+                    <p className="text-xl md:text-2xl font-display font-black text-primary">
                       R$ {pixPrice.toFixed(2).replace('.', ',')}
                     </p>
-                    <p className="text-sm text-primary/80 font-semibold">à vista no PIX (5% desconto)</p>
+                    <p className="text-xs text-primary/80 font-medium">à vista no PIX (5% desconto)</p>
                   </div>
-                  <div className="text-right">
-                    <Badge className="bg-emerald-500 text-white border-0 text-lg font-black px-4 py-2">5% OFF</Badge>
-                  </div>
+                  <Badge className="bg-emerald-500 text-white border-0 text-xs font-black px-2 py-1">5% OFF</Badge>
                 </div>
 
-                <div className="flex items-center gap-2 text-sm text-muted-foreground relative">
-                  <CreditCard className="h-4 w-4 text-primary" />
+                <div className="flex items-center gap-2 text-xs text-muted-foreground relative">
+                  <CreditCard className="h-3.5 w-3.5 text-primary" />
                   <span>ou até <span className="font-bold text-foreground">10x</span> de{" "}
                   <span className="font-bold text-foreground">R$ {(product.price / 10).toFixed(2).replace('.', ',')}</span> sem juros</span>
                 </div>
