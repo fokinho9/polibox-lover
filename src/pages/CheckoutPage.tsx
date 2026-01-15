@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { 
-  ArrowLeft, ShieldCheck, Lock, Truck, CreditCard, Clock, 
-  Star, Check, Zap, Plus, Minus, Trash2, Gift, AlertCircle,
-  BadgeCheck, Flame, Timer, ChevronDown, ChevronUp
+  ArrowLeft, ShieldCheck, Lock, Truck, CreditCard, 
+  Star, Check, Zap, Plus, Minus, Trash2, Gift,
+  BadgeCheck, Flame, Timer, ArrowRight
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -16,12 +16,10 @@ import { useCart } from "@/contexts/CartContext";
 import { productsApi, Product } from "@/lib/api/products";
 
 const CheckoutPage = () => {
-  const navigate = useNavigate();
-  const { items, removeFromCart, updateQuantity, totalPrice, totalItems, clearCart } = useCart();
+  const { items, removeFromCart, updateQuantity, totalPrice, totalItems, addToCart } = useCart();
+  const [currentStep, setCurrentStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("pix");
   const [cep, setCep] = useState("");
-  const [shippingCalculated, setShippingCalculated] = useState(false);
-  const [showUpsell, setShowUpsell] = useState(true);
   const [customerData, setCustomerData] = useState({
     name: "",
     email: "",
@@ -35,14 +33,15 @@ const CheckoutPage = () => {
     state: ""
   });
 
-  // Fetch upsell products (kits and offers with discount)
-  const { data: upsellProducts = [] } = useQuery({
-    queryKey: ['upsell-products'],
+  // Fetch upsell products (kits and offers with discount) - only 1
+  const { data: upsellProduct } = useQuery({
+    queryKey: ['upsell-product'],
     queryFn: async () => {
       const allProducts = await productsApi.getAll();
-      return allProducts
+      const filtered = allProducts
         .filter(p => p.price > 0 && p.discount_percent && p.discount_percent >= 20)
-        .slice(0, 3);
+        .slice(0, 1);
+      return filtered[0] || null;
     },
   });
 
@@ -57,7 +56,7 @@ const CheckoutPage = () => {
   const hasFreeShipping = totalPrice >= freeShippingThreshold;
 
   const handleAddUpsell = (product: Product) => {
-    const cartProduct = {
+    addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
@@ -66,11 +65,11 @@ const CheckoutPage = () => {
       old_price: product.old_price,
       discount_percent: product.discount_percent,
       brand: product.brand,
-    };
-    // Add to cart using context
-    const { addToCart } = useCart();
-    addToCart(cartProduct as any, 1);
+    } as any, 1);
   };
+
+  const canProceedToStep2 = items.length > 0;
+  const canProceedToStep3 = customerData.name && customerData.email && customerData.phone && customerData.cpf && cep && customerData.address && customerData.number && customerData.neighborhood && customerData.city;
 
   if (items.length === 0) {
     return (
@@ -103,20 +102,35 @@ const CheckoutPage = () => {
       <div className="bg-card border-b border-border">
         <div className="container-main py-4">
           <div className="flex items-center justify-center gap-2 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">1</div>
-              <span className="hidden sm:inline text-primary font-medium">Carrinho</span>
-            </div>
-            <div className="w-12 h-0.5 bg-primary" />
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">2</div>
-              <span className="hidden sm:inline text-primary font-medium">Dados</span>
-            </div>
-            <div className="w-12 h-0.5 bg-border" />
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-secondary text-muted-foreground flex items-center justify-center font-bold">3</div>
-              <span className="hidden sm:inline text-muted-foreground">Pagamento</span>
-            </div>
+            <button 
+              onClick={() => setCurrentStep(1)}
+              className="flex items-center gap-2"
+            >
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold transition-colors ${currentStep >= 1 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
+                {currentStep > 1 ? <Check className="h-4 w-4" /> : '1'}
+              </div>
+              <span className={`hidden sm:inline font-medium ${currentStep >= 1 ? 'text-primary' : 'text-muted-foreground'}`}>Carrinho</span>
+            </button>
+            <div className={`w-12 h-0.5 ${currentStep >= 2 ? 'bg-primary' : 'bg-border'}`} />
+            <button 
+              onClick={() => canProceedToStep2 && setCurrentStep(2)}
+              className="flex items-center gap-2"
+              disabled={!canProceedToStep2}
+            >
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold transition-colors ${currentStep >= 2 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
+                {currentStep > 2 ? <Check className="h-4 w-4" /> : '2'}
+              </div>
+              <span className={`hidden sm:inline font-medium ${currentStep >= 2 ? 'text-primary' : 'text-muted-foreground'}`}>Dados</span>
+            </button>
+            <div className={`w-12 h-0.5 ${currentStep >= 3 ? 'bg-primary' : 'bg-border'}`} />
+            <button 
+              onClick={() => canProceedToStep3 && setCurrentStep(3)}
+              className="flex items-center gap-2"
+              disabled={!canProceedToStep3}
+            >
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold transition-colors ${currentStep >= 3 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>3</div>
+              <span className={`hidden sm:inline font-medium ${currentStep >= 3 ? 'text-primary' : 'text-muted-foreground'}`}>Pagamento</span>
+            </button>
           </div>
         </div>
       </div>
@@ -147,327 +161,374 @@ const CheckoutPage = () => {
           </Link>
 
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Left Column - Cart Items & Form */}
+            {/* Left Column - Steps */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Cart Items */}
-              <div className="bg-card rounded-2xl border border-border overflow-hidden">
-                <div className="p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
-                  <h2 className="font-display text-xl font-bold flex items-center gap-2">
-                    <Gift className="h-5 w-5 text-primary" />
-                    Seus Produtos ({totalItems})
-                  </h2>
-                </div>
-                
-                <div className="divide-y divide-border">
-                  {items.map((item) => (
-                    <div key={item.product.id} className="p-4 flex gap-4">
-                      <div className="w-20 h-20 rounded-xl overflow-hidden bg-secondary/30 flex-shrink-0">
-                        <img 
-                          src={item.product.image_url || '/placeholder.svg'} 
-                          alt={item.product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-sm line-clamp-2 mb-1">{item.product.name}</h3>
-                        {item.product.brand && (
-                          <span className="text-xs text-primary font-medium">{item.product.brand}</span>
-                        )}
-                        <div className="flex items-center gap-3 mt-2">
-                          <div className="flex items-center gap-1 bg-secondary/50 rounded-lg p-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7"
-                              onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                            >
-                              <Minus className="h-3 w-3" />
-                            </Button>
-                            <span className="w-8 text-center text-sm font-bold">{item.quantity}</span>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7"
-                              onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                            >
-                              <Plus className="h-3 w-3" />
-                            </Button>
+              {/* Step 1: Cart Items */}
+              {currentStep === 1 && (
+                <>
+                  <div className="bg-card rounded-2xl border border-border overflow-hidden">
+                    <div className="p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
+                      <h2 className="font-display text-xl font-bold flex items-center gap-2">
+                        <Gift className="h-5 w-5 text-primary" />
+                        Seus Produtos ({totalItems})
+                      </h2>
+                    </div>
+                    
+                    <div className="divide-y divide-border">
+                      {items.map((item) => (
+                        <div key={item.product.id} className="p-4 flex gap-4">
+                          <div className="w-20 h-20 rounded-xl overflow-hidden bg-secondary/30 flex-shrink-0">
+                            <img 
+                              src={item.product.image_url || '/placeholder.svg'} 
+                              alt={item.product.name}
+                              className="w-full h-full object-cover"
+                            />
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 text-destructive hover:bg-destructive/10"
-                            onClick={() => removeFromCart(item.product.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium text-sm line-clamp-2 mb-1">{item.product.name}</h3>
+                            {item.product.brand && (
+                              <span className="text-xs text-primary font-medium">{item.product.brand}</span>
+                            )}
+                            <div className="flex items-center gap-3 mt-2">
+                              <div className="flex items-center gap-1 bg-secondary/50 rounded-lg p-1">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7"
+                                  onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                                >
+                                  <Minus className="h-3 w-3" />
+                                </Button>
+                                <span className="w-8 text-center text-sm font-bold">{item.quantity}</span>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7"
+                                  onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                                >
+                                  <Plus className="h-3 w-3" />
+                                </Button>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 text-destructive hover:bg-destructive/10"
+                                onClick={() => removeFromCart(item.product.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-primary">{formatPrice(item.product.price * item.quantity)}</p>
+                            {item.quantity > 1 && (
+                              <p className="text-xs text-muted-foreground">{formatPrice(item.product.price)} cada</p>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-primary">{formatPrice(item.product.price * item.quantity)}</p>
-                        {item.quantity > 1 && (
-                          <p className="text-xs text-muted-foreground">{formatPrice(item.product.price)} cada</p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Upsell Section */}
-              {upsellProducts.length > 0 && showUpsell && (
-                <div className="bg-gradient-to-r from-destructive/10 via-card to-destructive/10 rounded-2xl border border-destructive/20 overflow-hidden">
-                  <div className="p-4 bg-destructive/10 border-b border-destructive/20 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center animate-pulse">
-                        <Flame className="h-5 w-5 text-destructive" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-destructive">OFERTA ESPECIAL!</h3>
-                        <p className="text-xs text-muted-foreground">Aproveite antes que acabe</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 text-destructive text-sm font-bold">
-                      <Timer className="h-4 w-4" />
-                      <span>15:00</span>
+                      ))}
                     </div>
                   </div>
-                  
-                  <div className="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {upsellProducts.map((product) => (
-                      <div key={product.id} className="bg-card rounded-xl p-3 border border-border hover:border-primary/30 transition-colors">
-                        <div className="relative mb-3">
-                          <img 
-                            src={product.image_url || '/placeholder.svg'} 
-                            alt={product.name}
-                            className="w-full aspect-square object-contain rounded-lg bg-secondary/20"
-                          />
-                          {product.discount_percent && (
-                            <span className="absolute top-2 left-2 px-2 py-1 bg-destructive text-white text-xs font-bold rounded-full">
-                              -{product.discount_percent}%
-                            </span>
-                          )}
-                        </div>
-                        <h4 className="text-xs font-medium line-clamp-2 mb-2">{product.name}</h4>
-                        <div className="flex items-center justify-between">
+
+                  {/* Upsell Section - Single Product */}
+                  {upsellProduct && (
+                    <div className="bg-gradient-to-r from-destructive/10 via-card to-destructive/10 rounded-2xl border border-destructive/20 overflow-hidden">
+                      <div className="p-4 bg-destructive/10 border-b border-destructive/20 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center animate-pulse">
+                            <Flame className="h-5 w-5 text-destructive" />
+                          </div>
                           <div>
-                            {product.old_price && (
-                              <p className="text-xs text-muted-foreground line-through">{formatPrice(product.old_price)}</p>
+                            <h3 className="font-bold text-destructive">OFERTA ESPECIAL!</h3>
+                            <p className="text-xs text-muted-foreground">Aproveite antes que acabe</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 text-destructive text-sm font-bold">
+                          <Timer className="h-4 w-4" />
+                          <span>15:00</span>
+                        </div>
+                      </div>
+                      
+                      <div className="p-4">
+                        <div className="flex gap-4 items-center bg-card rounded-xl p-4 border border-border">
+                          <div className="relative w-24 h-24 flex-shrink-0">
+                            <img 
+                              src={upsellProduct.image_url || '/placeholder.svg'} 
+                              alt={upsellProduct.name}
+                              className="w-full h-full object-contain rounded-lg bg-secondary/20"
+                            />
+                            {upsellProduct.discount_percent && (
+                              <span className="absolute -top-2 -left-2 px-2 py-1 bg-destructive text-white text-xs font-bold rounded-full">
+                                -{upsellProduct.discount_percent}%
+                              </span>
                             )}
-                            <p className="font-bold text-primary text-sm">{formatPrice(product.price)}</p>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium line-clamp-2 mb-2">{upsellProduct.name}</h4>
+                            <div className="flex items-center gap-2">
+                              {upsellProduct.old_price && (
+                                <p className="text-sm text-muted-foreground line-through">{formatPrice(upsellProduct.old_price)}</p>
+                              )}
+                              <p className="font-bold text-primary text-lg">{formatPrice(upsellProduct.price)}</p>
+                            </div>
                           </div>
                           <Button 
-                            size="sm" 
-                            variant="outline"
-                            className="h-8 text-xs border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                            onClick={() => {
-                              const cartProduct = {
-                                id: product.id,
-                                name: product.name,
-                                price: product.price,
-                                image_url: product.image_url,
-                                pix_price: product.pix_price,
-                                old_price: product.old_price,
-                                discount_percent: product.discount_percent,
-                                brand: product.brand,
-                              };
-                              // We need to use a different approach since we can't call hooks conditionally
-                              // The addToCart is already in the parent context
-                            }}
+                            className="bg-destructive hover:bg-destructive/90 text-white font-bold"
+                            onClick={() => handleAddUpsell(upsellProduct)}
                           >
-                            <Plus className="h-3 w-3 mr-1" />
+                            <Plus className="h-4 w-4 mr-1" />
                             Adicionar
                           </Button>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
+                    </div>
+                  )}
+
+                  {/* Continue Button */}
+                  <Button 
+                    size="lg" 
+                    className="w-full h-14 bg-gradient-to-r from-primary to-cyan-glow hover:opacity-90 text-primary-foreground font-bold text-lg rounded-xl"
+                    onClick={() => setCurrentStep(2)}
+                  >
+                    Continuar para Dados
+                    <ArrowRight className="h-5 w-5 ml-2" />
+                  </Button>
+                </>
               )}
 
-              {/* Customer Data Form */}
-              <div className="bg-card rounded-2xl border border-border overflow-hidden">
-                <div className="p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
-                  <h2 className="font-display text-xl font-bold flex items-center gap-2">
-                    <BadgeCheck className="h-5 w-5 text-primary" />
-                    Dados para Entrega
-                  </h2>
-                </div>
-                
-                <div className="p-6 space-y-4">
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="name">Nome completo</Label>
-                      <Input 
-                        id="name" 
-                        placeholder="Seu nome"
-                        value={customerData.name}
-                        onChange={(e) => setCustomerData({...customerData, name: e.target.value})}
-                        className="mt-1.5"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="email">E-mail</Label>
-                      <Input 
-                        id="email" 
-                        type="email"
-                        placeholder="seu@email.com"
-                        value={customerData.email}
-                        onChange={(e) => setCustomerData({...customerData, email: e.target.value})}
-                        className="mt-1.5"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="phone">Telefone (WhatsApp)</Label>
-                      <Input 
-                        id="phone" 
-                        placeholder="(00) 00000-0000"
-                        value={customerData.phone}
-                        onChange={(e) => setCustomerData({...customerData, phone: e.target.value})}
-                        className="mt-1.5"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="cpf">CPF</Label>
-                      <Input 
-                        id="cpf" 
-                        placeholder="000.000.000-00"
-                        value={customerData.cpf}
-                        onChange={(e) => setCustomerData({...customerData, cpf: e.target.value})}
-                        className="mt-1.5"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="border-t border-border pt-4 mt-4">
-                    <h3 className="font-semibold mb-4 flex items-center gap-2">
-                      <Truck className="h-4 w-4 text-primary" />
-                      Endereço de entrega
-                    </h3>
-                    
-                    <div className="grid sm:grid-cols-3 gap-4 mb-4">
-                      <div>
-                        <Label htmlFor="cep">CEP</Label>
-                        <Input 
-                          id="cep" 
-                          placeholder="00000-000"
-                          value={cep}
-                          onChange={(e) => setCep(e.target.value)}
-                          className="mt-1.5"
-                        />
-                      </div>
-                      <div className="sm:col-span-2">
-                        <Label htmlFor="address">Endereço</Label>
-                        <Input 
-                          id="address" 
-                          placeholder="Rua, Avenida..."
-                          value={customerData.address}
-                          onChange={(e) => setCustomerData({...customerData, address: e.target.value})}
-                          className="mt-1.5"
-                        />
-                      </div>
+              {/* Step 2: Customer Data Form */}
+              {currentStep === 2 && (
+                <>
+                  <div className="bg-card rounded-2xl border border-border overflow-hidden">
+                    <div className="p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
+                      <h2 className="font-display text-xl font-bold flex items-center gap-2">
+                        <BadgeCheck className="h-5 w-5 text-primary" />
+                        Dados para Entrega
+                      </h2>
                     </div>
                     
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                      <div>
-                        <Label htmlFor="number">Número</Label>
-                        <Input 
-                          id="number" 
-                          placeholder="Nº"
-                          value={customerData.number}
-                          onChange={(e) => setCustomerData({...customerData, number: e.target.value})}
-                          className="mt-1.5"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="complement">Complemento</Label>
-                        <Input 
-                          id="complement" 
-                          placeholder="Apto, Bloco..."
-                          value={customerData.complement}
-                          onChange={(e) => setCustomerData({...customerData, complement: e.target.value})}
-                          className="mt-1.5"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="neighborhood">Bairro</Label>
-                        <Input 
-                          id="neighborhood" 
-                          placeholder="Bairro"
-                          value={customerData.neighborhood}
-                          onChange={(e) => setCustomerData({...customerData, neighborhood: e.target.value})}
-                          className="mt-1.5"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="city">Cidade / UF</Label>
-                        <Input 
-                          id="city" 
-                          placeholder="Cidade - UF"
-                          value={customerData.city}
-                          onChange={(e) => setCustomerData({...customerData, city: e.target.value})}
-                          className="mt-1.5"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Payment Method */}
-              <div className="bg-card rounded-2xl border border-border overflow-hidden">
-                <div className="p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
-                  <h2 className="font-display text-xl font-bold flex items-center gap-2">
-                    <CreditCard className="h-5 w-5 text-primary" />
-                    Forma de Pagamento
-                  </h2>
-                </div>
-                
-                <div className="p-6">
-                  <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-3">
-                    <label className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'pix' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}>
-                      <RadioGroupItem value="pix" id="pix" />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold">PIX</span>
-                          <span className="px-2 py-0.5 bg-green-500/20 text-green-500 text-xs font-bold rounded-full">5% OFF</span>
+                    <div className="p-6 space-y-4">
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="name">Nome completo *</Label>
+                          <Input 
+                            id="name" 
+                            placeholder="Seu nome"
+                            value={customerData.name}
+                            onChange={(e) => setCustomerData({...customerData, name: e.target.value})}
+                            className="mt-1.5"
+                          />
                         </div>
-                        <p className="text-sm text-muted-foreground">Aprovação instantânea</p>
+                        <div>
+                          <Label htmlFor="email">E-mail *</Label>
+                          <Input 
+                            id="email" 
+                            type="email"
+                            placeholder="seu@email.com"
+                            value={customerData.email}
+                            onChange={(e) => setCustomerData({...customerData, email: e.target.value})}
+                            className="mt-1.5"
+                          />
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold text-primary text-lg">{formatPrice(pixTotal)}</p>
-                        <p className="text-xs text-green-500">Economize {formatPrice(pixDiscount)}</p>
+                      
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="phone">Telefone (WhatsApp) *</Label>
+                          <Input 
+                            id="phone" 
+                            placeholder="(00) 00000-0000"
+                            value={customerData.phone}
+                            onChange={(e) => setCustomerData({...customerData, phone: e.target.value})}
+                            className="mt-1.5"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="cpf">CPF *</Label>
+                          <Input 
+                            id="cpf" 
+                            placeholder="000.000.000-00"
+                            value={customerData.cpf}
+                            onChange={(e) => setCustomerData({...customerData, cpf: e.target.value})}
+                            className="mt-1.5"
+                          />
+                        </div>
                       </div>
-                    </label>
+
+                      <div className="border-t border-border pt-4 mt-4">
+                        <h3 className="font-semibold mb-4 flex items-center gap-2">
+                          <Truck className="h-4 w-4 text-primary" />
+                          Endereço de entrega
+                        </h3>
+                        
+                        <div className="grid sm:grid-cols-3 gap-4 mb-4">
+                          <div>
+                            <Label htmlFor="cep">CEP *</Label>
+                            <Input 
+                              id="cep" 
+                              placeholder="00000-000"
+                              value={cep}
+                              onChange={(e) => setCep(e.target.value)}
+                              className="mt-1.5"
+                            />
+                          </div>
+                          <div className="sm:col-span-2">
+                            <Label htmlFor="address">Endereço *</Label>
+                            <Input 
+                              id="address" 
+                              placeholder="Rua, Avenida..."
+                              value={customerData.address}
+                              onChange={(e) => setCustomerData({...customerData, address: e.target.value})}
+                              className="mt-1.5"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                          <div>
+                            <Label htmlFor="number">Número *</Label>
+                            <Input 
+                              id="number" 
+                              placeholder="Nº"
+                              value={customerData.number}
+                              onChange={(e) => setCustomerData({...customerData, number: e.target.value})}
+                              className="mt-1.5"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="complement">Complemento</Label>
+                            <Input 
+                              id="complement" 
+                              placeholder="Apto, Bloco..."
+                              value={customerData.complement}
+                              onChange={(e) => setCustomerData({...customerData, complement: e.target.value})}
+                              className="mt-1.5"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="neighborhood">Bairro *</Label>
+                            <Input 
+                              id="neighborhood" 
+                              placeholder="Bairro"
+                              value={customerData.neighborhood}
+                              onChange={(e) => setCustomerData({...customerData, neighborhood: e.target.value})}
+                              className="mt-1.5"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="city">Cidade / UF *</Label>
+                            <Input 
+                              id="city" 
+                              placeholder="Cidade - UF"
+                              value={customerData.city}
+                              onChange={(e) => setCustomerData({...customerData, city: e.target.value})}
+                              className="mt-1.5"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Navigation Buttons */}
+                  <div className="flex gap-4">
+                    <Button 
+                      variant="outline" 
+                      size="lg" 
+                      className="flex-1 h-14"
+                      onClick={() => setCurrentStep(1)}
+                    >
+                      <ArrowLeft className="h-5 w-5 mr-2" />
+                      Voltar
+                    </Button>
+                    <Button 
+                      size="lg" 
+                      className="flex-1 h-14 bg-gradient-to-r from-primary to-cyan-glow hover:opacity-90 text-primary-foreground font-bold text-lg rounded-xl"
+                      onClick={() => setCurrentStep(3)}
+                      disabled={!canProceedToStep3}
+                    >
+                      Continuar para Pagamento
+                      <ArrowRight className="h-5 w-5 ml-2" />
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {/* Step 3: Payment Method */}
+              {currentStep === 3 && (
+                <>
+                  <div className="bg-card rounded-2xl border border-border overflow-hidden">
+                    <div className="p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
+                      <h2 className="font-display text-xl font-bold flex items-center gap-2">
+                        <CreditCard className="h-5 w-5 text-primary" />
+                        Forma de Pagamento
+                      </h2>
+                    </div>
                     
-                    <label className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'card' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}>
-                      <RadioGroupItem value="card" id="card" />
-                      <div className="flex-1">
-                        <span className="font-bold">Cartão de Crédito</span>
-                        <p className="text-sm text-muted-foreground">Até 12x sem juros</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-lg">{formatPrice(totalPrice)}</p>
-                        <p className="text-xs text-muted-foreground">ou 12x de {formatPrice(totalPrice / 12)}</p>
-                      </div>
-                    </label>
-                    
-                    <label className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'boleto' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}>
-                      <RadioGroupItem value="boleto" id="boleto" />
-                      <div className="flex-1">
-                        <span className="font-bold">Boleto Bancário</span>
-                        <p className="text-sm text-muted-foreground">Vencimento em 3 dias úteis</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-lg">{formatPrice(totalPrice)}</p>
-                      </div>
-                    </label>
-                  </RadioGroup>
-                </div>
-              </div>
+                    <div className="p-6">
+                      <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-3">
+                        <label className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'pix' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}>
+                          <RadioGroupItem value="pix" id="pix" />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold">PIX</span>
+                              <span className="px-2 py-0.5 bg-green-500/20 text-green-500 text-xs font-bold rounded-full">5% OFF</span>
+                            </div>
+                            <p className="text-sm text-muted-foreground">Aprovação instantânea</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-primary text-lg">{formatPrice(pixTotal)}</p>
+                            <p className="text-xs text-green-500">Economize {formatPrice(pixDiscount)}</p>
+                          </div>
+                        </label>
+                        
+                        <label className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'card' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}>
+                          <RadioGroupItem value="card" id="card" />
+                          <div className="flex-1">
+                            <span className="font-bold">Cartão de Crédito</span>
+                            <p className="text-sm text-muted-foreground">Até 12x sem juros</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-lg">{formatPrice(totalPrice)}</p>
+                            <p className="text-xs text-muted-foreground">ou 12x de {formatPrice(totalPrice / 12)}</p>
+                          </div>
+                        </label>
+                        
+                        <label className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'boleto' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}>
+                          <RadioGroupItem value="boleto" id="boleto" />
+                          <div className="flex-1">
+                            <span className="font-bold">Boleto Bancário</span>
+                            <p className="text-sm text-muted-foreground">Vencimento em 3 dias úteis</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-lg">{formatPrice(totalPrice)}</p>
+                          </div>
+                        </label>
+                      </RadioGroup>
+                    </div>
+                  </div>
+
+                  {/* Navigation Buttons */}
+                  <div className="flex gap-4">
+                    <Button 
+                      variant="outline" 
+                      size="lg" 
+                      className="flex-1 h-14"
+                      onClick={() => setCurrentStep(2)}
+                    >
+                      <ArrowLeft className="h-5 w-5 mr-2" />
+                      Voltar
+                    </Button>
+                    <Button 
+                      size="lg" 
+                      className="flex-1 h-14 bg-gradient-to-r from-primary to-cyan-glow hover:opacity-90 text-primary-foreground font-bold text-lg rounded-xl shadow-lg shadow-primary/30"
+                    >
+                      <Lock className="h-5 w-5 mr-2" />
+                      FINALIZAR COMPRA
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Right Column - Order Summary */}
@@ -517,16 +578,6 @@ const CheckoutPage = () => {
                         </p>
                       )}
                     </div>
-                  </div>
-                  
-                  <div className="p-4 pt-0">
-                    <Button 
-                      size="lg" 
-                      className="w-full h-14 bg-gradient-to-r from-primary to-cyan-glow hover:opacity-90 text-primary-foreground font-bold text-lg rounded-xl shadow-lg shadow-primary/30"
-                    >
-                      <Lock className="h-5 w-5 mr-2" />
-                      FINALIZAR COMPRA
-                    </Button>
                   </div>
                 </div>
 
