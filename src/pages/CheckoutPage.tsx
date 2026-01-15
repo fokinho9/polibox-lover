@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { 
   ArrowLeft, ShieldCheck, Lock, Truck, CreditCard, 
   Star, Check, Zap, Plus, Minus, Trash2, Gift,
-  BadgeCheck, Flame, Timer, ArrowRight
+  BadgeCheck, Flame, Timer, ArrowRight, Loader2
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -14,11 +14,16 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCart } from "@/contexts/CartContext";
 import { productsApi, Product } from "@/lib/api/products";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const CheckoutPage = () => {
-  const { items, removeFromCart, updateQuantity, totalPrice, totalItems, addToCart } = useCart();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { items, removeFromCart, updateQuantity, totalPrice, totalItems, addToCart, clearCart } = useCart();
   const [currentStep, setCurrentStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("pix");
+  const [isProcessing, setIsProcessing] = useState(false);
   const [cep, setCep] = useState("");
   const [customerData, setCustomerData] = useState({
     name: "",
@@ -31,6 +36,12 @@ const CheckoutPage = () => {
     neighborhood: "",
     city: "",
     state: ""
+  });
+  const [cardData, setCardData] = useState({
+    number: "",
+    name: "",
+    expiry: "",
+    cvv: "",
   });
 
   // Fetch upsell products (kits and offers with discount) - only 1
@@ -68,8 +79,123 @@ const CheckoutPage = () => {
     } as any, 1);
   };
 
-  const canProceedToStep2 = items.length > 0;
-  const canProceedToStep3 = customerData.name && customerData.email && customerData.phone && customerData.cpf && cep && customerData.address && customerData.number && customerData.neighborhood && customerData.city;
+  const canProceedToStep2 = items.length > 0 && customerData.name && customerData.email && customerData.phone && customerData.cpf;
+  const canProceedToStep3 = canProceedToStep2 && cep && customerData.address && customerData.number && customerData.neighborhood && customerData.city;
+  const canFinishPayment = paymentMethod === 'pix' || (paymentMethod === 'card' && cardData.number && cardData.name && cardData.expiry && cardData.cvv);
+
+  const handleFinalizePurchase = async () => {
+    setIsProcessing(true);
+    
+    try {
+      const finalTotal = paymentMethod === 'pix' ? pixTotal : totalPrice;
+      const shippingCost = hasFreeShipping ? 0 : 19.90;
+
+      // Create order in database
+      const orderData = {
+        customer_name: customerData.name,
+        customer_email: customerData.email,
+        customer_phone: customerData.phone,
+        customer_cpf: customerData.cpf,
+        shipping_cep: cep,
+        shipping_address: customerData.address,
+        shipping_number: customerData.number,
+        shipping_complement: customerData.complement || null,
+        shipping_neighborhood: customerData.neighborhood,
+        shipping_city: customerData.city,
+        shipping_state: customerData.state || null,
+        items: items.map(item => ({
+          id: item.product.id,
+          name: item.product.name,
+          price: item.product.price,
+          quantity: item.quantity,
+        })),
+        subtotal: totalPrice,
+        shipping_cost: shippingCost,
+        discount: paymentMethod === 'pix' ? pixDiscount : 0,
+        total: finalTotal + shippingCost,
+        payment_method: paymentMethod,
+        payment_status: paymentMethod === 'card' ? 'analyzing' : 'pending',
+        card_last_digits: paymentMethod === 'card' ? cardData.number.slice(-4) : null,
+        card_brand: paymentMethod === 'card' ? detectCardBrand(cardData.number) : null,
+      };
+
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert(orderData)
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+
+      // If PIX, create payment via StreetPay
+      if (paymentMethod === 'pix') {
+        const { data: pixData, error: pixError } = await supabase.functions.invoke('create-pix-payment', {
+          body: {
+            orderId: order.id,
+            customer: {
+              name: customerData.name,
+              email: customerData.email,
+              phone: customerData.phone,
+              cpf: customerData.cpf,
+            },
+            items: items.map(item => ({
+              name: item.product.name,
+              price: item.product.price,
+              quantity: item.quantity,
+            })),
+            total: finalTotal + shippingCost,
+          },
+        });
+
+        if (pixError) {
+          console.error('PIX error:', pixError);
+          toast({
+            title: "Erro ao gerar PIX",
+            description: "Tente novamente ou escolha outra forma de pagamento.",
+            variant: "destructive",
+          });
+          setIsProcessing(false);
+          return;
+        }
+      }
+
+      // Clear cart and redirect to confirmation
+      clearCart();
+      navigate(`/confirmacao?pedido=${order.id}`);
+
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast({
+        title: "Erro ao processar pedido",
+        description: "Verifique os dados e tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const detectCardBrand = (number: string): string => {
+    const cleaned = number.replace(/\D/g, '');
+    if (cleaned.startsWith('4')) return 'Visa';
+    if (/^5[1-5]/.test(cleaned)) return 'Mastercard';
+    if (/^3[47]/.test(cleaned)) return 'Amex';
+    if (/^6(?:011|5)/.test(cleaned)) return 'Discover';
+    return 'Outro';
+  };
+
+  const formatCardNumber = (value: string) => {
+    const cleaned = value.replace(/\D/g, '').slice(0, 16);
+    return cleaned.replace(/(\d{4})(?=\d)/g, '$1 ');
+  };
+
+  const formatExpiry = (value: string) => {
+    const cleaned = value.replace(/\D/g, '').slice(0, 4);
+    if (cleaned.length >= 2) {
+      return cleaned.slice(0, 2) + '/' + cleaned.slice(2);
+    }
+    return cleaned;
+  };
 
   if (items.length === 0) {
     return (
@@ -515,6 +641,69 @@ const CheckoutPage = () => {
                           </div>
                         </label>
                       </RadioGroup>
+
+                      {/* Card Form - only show when card is selected */}
+                      {paymentMethod === 'card' && (
+                        <div className="mt-6 pt-6 border-t border-border space-y-4">
+                          <h3 className="font-semibold flex items-center gap-2">
+                            <CreditCard className="h-4 w-4 text-primary" />
+                            Dados do Cartão
+                          </h3>
+                          
+                          <div>
+                            <Label htmlFor="cardNumber">Número do cartão *</Label>
+                            <Input 
+                              id="cardNumber" 
+                              placeholder="0000 0000 0000 0000"
+                              value={cardData.number}
+                              onChange={(e) => setCardData({...cardData, number: formatCardNumber(e.target.value)})}
+                              className="mt-1.5 font-mono"
+                              maxLength={19}
+                            />
+                          </div>
+
+                          <div>
+                            <Label htmlFor="cardName">Nome impresso no cartão *</Label>
+                            <Input 
+                              id="cardName" 
+                              placeholder="NOME COMPLETO"
+                              value={cardData.name}
+                              onChange={(e) => setCardData({...cardData, name: e.target.value.toUpperCase()})}
+                              className="mt-1.5"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="cardExpiry">Validade *</Label>
+                              <Input 
+                                id="cardExpiry" 
+                                placeholder="MM/AA"
+                                value={cardData.expiry}
+                                onChange={(e) => setCardData({...cardData, expiry: formatExpiry(e.target.value)})}
+                                className="mt-1.5"
+                                maxLength={5}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="cardCvv">CVV *</Label>
+                              <Input 
+                                id="cardCvv" 
+                                placeholder="000"
+                                value={cardData.cvv}
+                                onChange={(e) => setCardData({...cardData, cvv: e.target.value.replace(/\D/g, '').slice(0, 4)})}
+                                className="mt-1.5"
+                                maxLength={4}
+                                type="password"
+                              />
+                            </div>
+                          </div>
+
+                          <p className="text-xs text-muted-foreground">
+                            * Seus dados são processados de forma segura. O pagamento será analisado manualmente.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -525,6 +714,7 @@ const CheckoutPage = () => {
                       size="lg" 
                       className="flex-1 h-14"
                       onClick={() => setCurrentStep(2)}
+                      disabled={isProcessing}
                     >
                       <ArrowLeft className="h-5 w-5 mr-2" />
                       Voltar
@@ -532,9 +722,20 @@ const CheckoutPage = () => {
                     <Button 
                       size="lg" 
                       className="flex-1 h-14 bg-gradient-to-r from-primary to-cyan-glow hover:opacity-90 text-primary-foreground font-bold text-lg rounded-xl shadow-lg shadow-primary/30"
+                      onClick={handleFinalizePurchase}
+                      disabled={isProcessing || !canFinishPayment}
                     >
-                      <Lock className="h-5 w-5 mr-2" />
-                      FINALIZAR COMPRA
+                      {isProcessing ? (
+                        <>
+                          <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                          Processando...
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="h-5 w-5 mr-2" />
+                          FINALIZAR COMPRA
+                        </>
+                      )}
                     </Button>
                   </div>
                 </>
