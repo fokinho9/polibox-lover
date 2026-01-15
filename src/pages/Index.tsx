@@ -6,6 +6,7 @@ import PromoSection from "@/components/PromoSection";
 import OfferBanners from "@/components/OfferBanners";
 import ProductGrid from "@/components/ProductGrid";
 import BrandShowcase from "@/components/BrandShowcase";
+import CategoryCarousel from "@/components/CategoryCarousel";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
@@ -20,6 +21,7 @@ const Index = () => {
       <OfferBanners />
       <ProductGrid />
       <BrandShowcase />
+      <CategoryCarousel />
       <Footer />
       <WhatsAppButton />
     </div>
