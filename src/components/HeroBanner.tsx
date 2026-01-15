@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import bannerVonixx from "@/assets/banner-vonixx.jpg";
-import bannerKitsOferta from "@/assets/banner-kits-oferta.jpg";
-import bannerCerasOferta from "@/assets/banner-ceras-oferta.jpg";
+import bannerFrete from "@/assets/banner-frete.jpg";
+import bannerMagil from "@/assets/banner-magil.jpg";
 import bannerCerasSelantes from "@/assets/banner-ceras-selantes.jpg";
 
 const slides = [
@@ -15,13 +15,13 @@ const slides = [
   },
   {
     id: 2,
-    image: bannerKitsOferta,
-    href: "/categoria/kits"
+    image: bannerFrete,
+    href: "/frete-envio"
   },
   {
     id: 3,
-    image: bannerCerasOferta,
-    href: "/categoria/ceras-selantes"
+    image: bannerMagil,
+    href: "/categoria/limpadores-apc"
   },
   {
     id: 4,
