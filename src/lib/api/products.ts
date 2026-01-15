@@ -54,13 +54,13 @@ export const productsApi = {
   },
 
   async getByCategory(category: string): Promise<Product[]> {
-    // Handle brand categories
+    // Handle brand categories - search in both brand field AND product name
     if (category.startsWith('marca-')) {
       const brandName = category.replace('marca-', '').toUpperCase();
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .ilike('brand', `%${brandName}%`)
+        .or(`brand.ilike.%${brandName}%,name.ilike.%${brandName}%`)
         .gt('price', 0)
         .order('price', { ascending: true });
 
@@ -96,7 +96,7 @@ export const productsApi = {
     const { data, error } = await supabase
       .from('products')
       .select('*')
-      .ilike('brand', `%${brand}%`)
+      .or(`brand.ilike.%${brand}%,name.ilike.%${brand}%`)
       .gt('price', 0)
       .order('price', { ascending: true });
 
