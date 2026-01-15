@@ -22,7 +22,8 @@ import {
   Plus,
   Wrench,
   AlertTriangle,
-  FileText
+  FileText,
+  ShoppingCart
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -34,7 +35,6 @@ import {
 } from "@/components/ui/select";
 import { ProductEditModal } from "@/components/admin/ProductEditModal";
 import { ProductCreateModal, NewProduct } from "@/components/admin/ProductCreateModal";
-import { AdminOrders } from "@/components/admin/AdminOrders";
 
 // Categorias do menu principal
 const MENU_CATEGORIES = [
@@ -616,8 +616,13 @@ const AdminPanel = () => {
           </CardContent>
         </Card>
 
-        {/* Orders Section */}
-        <AdminOrders />
+        {/* Link to Orders Page */}
+        <Link to="/admin/pedidos">
+          <Button className="w-full bg-primary hover:bg-cyan-glow text-lg py-6">
+            <ShoppingCart className="h-5 w-5 mr-2" />
+            Ver Pedidos
+          </Button>
+        </Link>
 
         {/* Products by Category Summary */}
         <Card className="bg-card border-border">
