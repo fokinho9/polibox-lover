@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 // Banner ofertas v3 atualizado
 import bannerOfertas50 from "@/assets/banner-ofertas-50-v3.jpg";
-import bannerFrete from "@/assets/banner-frete.jpg";
+import bannerMagilUltra from "@/assets/banner-magil-ultra.jpg";
 import bannerVonixx2026 from "@/assets/banner-vonixx-2026.jpg";
 
 const slides = [
@@ -15,8 +15,8 @@ const slides = [
   },
   {
     id: 2,
-    image: bannerFrete,
-    href: "/frete-envio"
+    image: bannerMagilUltra,
+    href: "/buscar?q=magil"
   },
   {
     id: 3,
