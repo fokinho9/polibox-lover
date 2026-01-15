@@ -301,21 +301,21 @@ const CheckoutPage = () => {
       <div className="bg-card border-b border-border">
         <div className="container-main py-4">
           <div className="flex items-center justify-center gap-2 text-sm">
-            <button onClick={() => setCurrentStep(1)} className="flex items-center gap-2">
+            <button onClick={() => { setCurrentStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="flex items-center gap-2">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold transition-colors ${currentStep >= 1 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
                 {currentStep > 1 ? <Check className="h-4 w-4" /> : '1'}
               </div>
               <span className={`hidden sm:inline font-medium ${currentStep >= 1 ? 'text-primary' : 'text-muted-foreground'}`}>Carrinho</span>
             </button>
             <div className={`w-12 h-0.5 ${currentStep >= 2 ? 'bg-primary' : 'bg-border'}`} />
-            <button onClick={() => canProceedToStep2 && setCurrentStep(2)} className="flex items-center gap-2" disabled={!canProceedToStep2}>
+            <button onClick={() => { if (canProceedToStep2) { setCurrentStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }); }}} className="flex items-center gap-2" disabled={!canProceedToStep2}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold transition-colors ${currentStep >= 2 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
                 {currentStep > 2 ? <Check className="h-4 w-4" /> : '2'}
               </div>
               <span className={`hidden sm:inline font-medium ${currentStep >= 2 ? 'text-primary' : 'text-muted-foreground'}`}>Entrega</span>
             </button>
             <div className={`w-12 h-0.5 ${currentStep >= 3 ? 'bg-primary' : 'bg-border'}`} />
-            <button onClick={() => canProceedToStep3 && setCurrentStep(3)} className="flex items-center gap-2" disabled={!canProceedToStep3}>
+            <button onClick={() => { if (canProceedToStep3) { setCurrentStep(3); window.scrollTo({ top: 0, behavior: 'smooth' }); }}} className="flex items-center gap-2" disabled={!canProceedToStep3}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold transition-colors ${currentStep >= 3 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>3</div>
               <span className={`hidden sm:inline font-medium ${currentStep >= 3 ? 'text-primary' : 'text-muted-foreground'}`}>Pagamento</span>
             </button>
