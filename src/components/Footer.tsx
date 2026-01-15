@@ -5,42 +5,62 @@ const Footer = () => {
   return (
     <footer className="bg-card border-t border-border">
       {/* Benefits bar */}
-      <div className="bg-gradient-to-r from-primary via-cyan-glow to-primary py-5">
-        <div className="container-main grid grid-cols-1 md:grid-cols-4 gap-4 text-primary-foreground">
-          <div className="flex items-center justify-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-              <Truck className="h-5 w-5" />
-            </div>
-            <div>
-              <span className="font-bold">Frete Grátis</span>
-              <p className="text-xs opacity-80">Acima de R$ 299</p>
-            </div>
-          </div>
-          <div className="flex items-center justify-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-              <Sparkles className="h-5 w-5" />
-            </div>
-            <div>
-              <span className="font-bold">5% OFF no Pix</span>
-              <p className="text-xs opacity-80">Desconto à vista</p>
-            </div>
-          </div>
-          <div className="flex items-center justify-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-              <Shield className="h-5 w-5" />
-            </div>
-            <div>
-              <span className="font-bold">Compra Segura</span>
-              <p className="text-xs opacity-80">Dados protegidos</p>
+      <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 py-6 border-b border-primary/20">
+        {/* Background glow effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
+        <div className="absolute top-0 left-1/4 w-64 h-32 bg-primary/10 blur-3xl rounded-full" />
+        <div className="absolute top-0 right-1/4 w-64 h-32 bg-cyan-500/10 blur-3xl rounded-full" />
+        
+        <div className="container-main relative grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          {/* Frete Grátis */}
+          <div className="group relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
+                <Truck className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <span className="font-bold text-white text-sm">Frete Grátis</span>
+                <p className="text-xs text-emerald-400 font-medium">Para todo Brasil</p>
+              </div>
             </div>
           </div>
-          <div className="flex items-center justify-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-              <CreditCard className="h-5 w-5" />
+          
+          {/* 5% OFF Pix */}
+          <div className="group relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-cyan-500 flex items-center justify-center shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform">
+                <Sparkles className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <span className="font-bold text-white text-sm">5% OFF no Pix</span>
+                <p className="text-xs text-primary font-medium">Desconto à vista</p>
+              </div>
             </div>
-            <div>
-              <span className="font-bold">Parcelamento</span>
-              <p className="text-xs opacity-80">Até 12x sem juros</p>
+          </div>
+          
+          {/* Compra Segura */}
+          <div className="group relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/30 group-hover:scale-110 transition-transform">
+                <Shield className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <span className="font-bold text-white text-sm">Compra Segura</span>
+                <p className="text-xs text-violet-400 font-medium">Dados protegidos</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Parcelamento */}
+          <div className="group relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform">
+                <CreditCard className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <span className="font-bold text-white text-sm">Parcelamento</span>
+                <p className="text-xs text-amber-400 font-medium">Até 12x sem juros</p>
+              </div>
             </div>
           </div>
         </div>
