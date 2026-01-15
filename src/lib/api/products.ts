@@ -219,4 +219,22 @@ export const productsApi = {
 
     return data;
   },
+
+  async syncDescriptions(limit: number = 10, force: boolean = false): Promise<{ 
+    success: boolean; 
+    processed?: number; 
+    updated?: number; 
+    errors?: string[]; 
+    error?: string 
+  }> {
+    const { data, error } = await supabase.functions.invoke('sync-descriptions', {
+      body: { limit, force },
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return data;
+  },
 };
