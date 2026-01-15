@@ -22,18 +22,23 @@ const BrandShowcase = () => {
     queryFn: productsApi.getAll,
   });
 
+  // Search in brand OR name for more matches
   const getBrandProducts = (brandName: string): Product[] => {
     return allProducts
-      .filter(p => p.brand?.toLowerCase().includes(brandName.toLowerCase()) && p.price > 0)
-      .slice(0, 4);
+      .filter(p => {
+        const matchesBrand = p.brand?.toLowerCase().includes(brandName.toLowerCase());
+        const matchesName = p.name?.toLowerCase().includes(brandName.toLowerCase());
+        return (matchesBrand || matchesName) && p.price > 0;
+      })
+      .slice(0, 3);
   };
 
   const getBrandCount = (brandName: string): number => {
-    return allProducts.filter(p => p.brand?.toLowerCase().includes(brandName.toLowerCase()) && p.price > 0).length;
-  };
-
-  const formatPrice = (price: number) => {
-    return price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    return allProducts.filter(p => {
+      const matchesBrand = p.brand?.toLowerCase().includes(brandName.toLowerCase());
+      const matchesName = p.name?.toLowerCase().includes(brandName.toLowerCase());
+      return (matchesBrand || matchesName) && p.price > 0;
+    }).length;
   };
 
   return (
@@ -53,88 +58,67 @@ const BrandShowcase = () => {
           </p>
         </div>
 
-        {/* Brands with Products */}
-        <div className="space-y-8">
+        {/* Brands Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
           {brands.map((brand, index) => {
             const brandProducts = getBrandProducts(brand.name);
             const count = getBrandCount(brand.name);
             
-            if (count === 0) return null;
-            
             return (
-              <div key={index} className="bg-card/50 rounded-2xl border border-border/50 overflow-hidden">
-                {/* Brand Header */}
-                <Link 
-                  to={`/categoria/${brand.slug}`}
-                  className={`block bg-gradient-to-r ${brand.color} p-4 md:p-5 group`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="font-display text-2xl md:text-3xl font-black text-white tracking-tight">
-                        {brand.name}
-                      </span>
-                      <span className="px-2.5 py-0.5 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-semibold">
-                        {count} produtos
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-white/80 group-hover:text-white transition-colors">
-                      <span className="text-sm font-medium hidden sm:inline">Ver todos</span>
-                      <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                    </div>
+              <Link
+                key={index}
+                to={`/categoria/${brand.slug}`}
+                className="group"
+              >
+                <div className={`relative bg-gradient-to-br ${brand.color} rounded-xl p-4 md:p-5 h-40 md:h-44 flex flex-col cursor-pointer transition-all duration-300 overflow-hidden hover:shadow-xl hover:scale-[1.02]`}>
+                  {/* Background Pattern */}
+                  <div className="absolute inset-0 opacity-10">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-white rounded-full -translate-y-1/2 translate-x-1/2" />
                   </div>
-                </Link>
+                  
+                  {/* Brand Name */}
+                  <div className="relative flex items-start justify-between">
+                    <span className="font-display text-xl md:text-2xl font-black text-white tracking-tight">
+                      {brand.name}
+                    </span>
+                    <ChevronRight className="h-5 w-5 text-white/60 group-hover:translate-x-1 group-hover:text-white transition-all" />
+                  </div>
 
-                {/* Products Grid */}
-                <div className="p-4 md:p-5">
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
-                    {brandProducts.map((product) => (
-                      <Link
-                        key={product.id}
-                        to={`/produto/${product.id}`}
-                        className="group/product"
-                      >
-                        <div className="bg-secondary/30 rounded-xl overflow-hidden border border-border/30 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/5">
-                          {/* Product Image */}
-                          <div className="aspect-square relative overflow-hidden bg-background/50">
-                            <img 
-                              src={product.image_url || '/placeholder.svg'} 
-                              alt={product.name}
-                              className="w-full h-full object-contain p-2 group-hover/product:scale-105 transition-transform duration-300"
-                            />
-                            {product.discount_percent && product.discount_percent > 0 && (
-                              <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded">
-                                -{product.discount_percent}%
-                              </span>
-                            )}
-                          </div>
-                          
-                          {/* Product Info */}
-                          <div className="p-2.5">
-                            <h4 className="text-xs font-medium text-foreground line-clamp-2 leading-tight mb-2 min-h-[2rem]">
-                              {product.name}
-                            </h4>
-                            <div className="flex items-center justify-between">
-                              <div>
-                                {product.old_price && product.old_price > product.price && (
-                                  <span className="text-[10px] text-muted-foreground line-through block">
-                                    {formatPrice(product.old_price)}
-                                  </span>
-                                )}
-                                <span className="text-sm font-bold text-primary">
-                                  {formatPrice(product.price)}
-                                </span>
-                              </div>
-                              <div className="p-1.5 rounded-full bg-primary/10 text-primary opacity-0 group-hover/product:opacity-100 transition-opacity">
-                                <ShoppingBag className="h-3 w-3" />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
+                  {/* Product Count */}
+                  <div className="relative mt-1">
+                    {count > 0 ? (
+                      <span className="text-white/80 text-xs">{count} produtos</span>
+                    ) : (
+                      <span className="text-white/60 text-xs">Ver coleção</span>
+                    )}
                   </div>
+
+                  {/* Mini Product Previews */}
+                  {brandProducts.length > 0 && (
+                    <div className="absolute bottom-3 right-3 flex -space-x-2">
+                      {brandProducts.slice(0, 3).map((product) => (
+                        <div 
+                          key={product.id} 
+                          className="w-10 h-10 rounded-lg bg-white/20 backdrop-blur-sm overflow-hidden border border-white/30 shadow-lg"
+                        >
+                          <img 
+                            src={product.image_url || '/placeholder.svg'} 
+                            alt=""
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Icon when no products */}
+                  {brandProducts.length === 0 && (
+                    <div className="absolute bottom-3 right-3">
+                      <ShoppingBag className="h-8 w-8 text-white/30" />
+                    </div>
+                  )}
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
