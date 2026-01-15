@@ -54,11 +54,71 @@ export const productsApi = {
   },
 
   async getByCategory(category: string): Promise<Product[]> {
+    // Handle brand categories
+    if (category.startsWith('marca-')) {
+      const brandName = category.replace('marca-', '').toUpperCase();
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .ilike('brand', `%${brandName}%`)
+        .gt('price', 0)
+        .order('price', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    }
+
+    // Handle "ofertas" category - get cheapest products with discounts
+    if (category === 'ofertas') {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .gt('price', 0)
+        .not('discount_percent', 'is', null)
+        .order('price', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    }
+
+    // Regular category query
     const { data, error } = await supabase
       .from('products')
       .select('*')
       .eq('category', category)
       .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getByBrand(brand: string): Promise<Product[]> {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .ilike('brand', `%${brand}%`)
+      .gt('price', 0)
+      .order('price', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async searchProducts(query: string): Promise<Product[]> {
+    // Split query into words for better matching
+    const words = query.trim().toLowerCase().split(/\s+/).filter(w => w.length > 1);
+    
+    if (words.length === 0) return [];
+
+    // Build search pattern
+    const searchPattern = words.join('%');
+    
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .or(`name.ilike.%${searchPattern}%,description.ilike.%${searchPattern}%,brand.ilike.%${query}%,category.ilike.%${query}%`)
+      .gt('price', 0)
+      .order('name');
 
     if (error) throw error;
     return data || [];
@@ -100,13 +160,12 @@ export const productsApi = {
     const { error } = await supabase
       .from('products')
       .delete()
-      .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+      .neq('id', '00000000-0000-0000-0000-000000000000');
 
     if (error) throw error;
   },
 
   async scrapeUrl(url: string): Promise<{ success: boolean; products_found?: number; error?: string }> {
-    // Create a scrape job
     const { data: job, error: jobError } = await supabase
       .from('scrape_jobs')
       .insert({ url, status: 'pending' })
@@ -115,7 +174,6 @@ export const productsApi = {
 
     if (jobError) throw jobError;
 
-    // Call edge function to scrape
     const { data, error } = await supabase.functions.invoke('scrape-products', {
       body: { url, job_id: job.id },
     });

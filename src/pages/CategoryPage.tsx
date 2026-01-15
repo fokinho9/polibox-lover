@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Flame, TrendingDown } from "lucide-react";
 import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -58,7 +58,9 @@ const CategoryPage = () => {
     queryFn: () => category ? productsApi.getByCategory(category) : productsApi.getAll(),
   });
 
-  const title = category ? categoryTitles[category] || category : "Todos os Produtos";
+  const title = category ? categoryTitles[category] || category.replace('marca-', '').toUpperCase() : "Todos os Produtos";
+  const isOfertasPage = category === 'ofertas';
+  const isBrandPage = category?.startsWith('marca-');
 
   // Pagination logic
   const totalPages = Math.ceil(products.length / PRODUCTS_PER_PAGE);
@@ -110,9 +112,23 @@ const CategoryPage = () => {
           </div>
 
           {/* Title */}
-          <h1 className="font-display text-3xl md:text-4xl text-foreground mb-8">
-            {title}
-          </h1>
+          <div className="mb-8">
+            <h1 className="font-display text-3xl md:text-4xl text-foreground flex items-center gap-3">
+              {isOfertasPage && <Flame className="h-8 w-8 text-destructive" />}
+              {isBrandPage && <TrendingDown className="h-8 w-8 text-primary" />}
+              {title}
+            </h1>
+            {isOfertasPage && (
+              <p className="text-muted-foreground mt-2">
+                Produtos ordenados do mais barato ao mais caro
+              </p>
+            )}
+            {isBrandPage && (
+              <p className="text-muted-foreground mt-2">
+                Todos os produtos da marca {title}
+              </p>
+            )}
+          </div>
 
           {/* Products Grid */}
           {isLoading ? (
