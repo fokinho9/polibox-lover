@@ -1,11 +1,12 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { 
   ArrowLeft, ShoppingCart, Truck, Shield, Zap, Star, Check, 
   Package, MapPin, Award, RefreshCw, Clock, ChevronDown, ChevronUp,
   ThumbsUp, MessageSquare, ChevronLeft, ChevronRight, Flame, Heart,
-  BadgeCheck, Sparkles, Gift, CreditCard
+  BadgeCheck, Sparkles, Gift, CreditCard, Users, Eye, TrendingUp,
+  Timer, ShieldCheck, RotateCcw
 } from "lucide-react";
 import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
@@ -162,8 +163,19 @@ const ProductDetailPage = () => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [reviewPage, setReviewPage] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [viewersNow, setViewersNow] = useState(0);
+  const [recentBuyers, setRecentBuyers] = useState(0);
   const { addToCart } = useCart();
   const { toast } = useToast();
+
+  // Social proof - random viewers and buyers
+  useEffect(() => {
+    if (id) {
+      const seed = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      setViewersNow(12 + (seed % 28));
+      setRecentBuyers(45 + (seed % 120));
+    }
+  }, [id]);
 
   const { data: product, isLoading } = useQuery({
     queryKey: ['product', id],
@@ -274,10 +286,22 @@ const ProductDetailPage = () => {
       <Header />
       <Navigation />
       
+      {/* Urgency Banner */}
+      {product.discount_percent && product.discount_percent >= 20 && (
+        <div className="bg-gradient-to-r from-red-600 via-orange-500 to-red-600 text-white py-2.5 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M0%200h20v20H0z%22%20fill%3D%22%23fff%22%20fill-opacity%3D%22.03%22%2F%3E%3C%2Fsvg%3E')] animate-pulse" />
+          <div className="container-main flex items-center justify-center gap-3 text-sm font-bold relative">
+            <Flame className="h-5 w-5 animate-pulse" />
+            <span>🔥 OFERTA RELÂMPAGO: {product.discount_percent}% OFF por tempo limitado!</span>
+            <Timer className="h-5 w-5" />
+          </div>
+        </div>
+      )}
+      
       <main className="py-4 md:py-8 pb-32">
         <div className="container-main">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 md:gap-4 mb-6 md:mb-8 overflow-x-auto scrollbar-hide">
+          <div className="flex items-center gap-2 md:gap-4 mb-4 overflow-x-auto scrollbar-hide">
             <Link to={product.category ? `/categoria/${product.category}` : "/"}>
               <Button variant="ghost" size="sm" className="gap-1 md:gap-2 hover:text-primary px-2 md:px-3 rounded-full">
                 <ArrowLeft className="h-4 w-4" />
@@ -298,22 +322,52 @@ const ProductDetailPage = () => {
             </nav>
           </div>
 
-          <div className="grid lg:grid-cols-[500px_1fr] xl:grid-cols-[550px_1fr] gap-8 lg:gap-12">
-            {/* Product Images - Premium Gallery */}
+          {/* Social Proof Bar */}
+          <div className="flex flex-wrap items-center gap-3 md:gap-6 mb-6 p-3 bg-gradient-to-r from-primary/10 via-card to-emerald-500/10 rounded-2xl border border-primary/20">
+            <div className="flex items-center gap-2 text-sm">
+              <div className="relative">
+                <Eye className="h-4 w-4 text-primary" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+              </div>
+              <span className="text-muted-foreground"><span className="font-bold text-foreground">{viewersNow}</span> vendo agora</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Users className="h-4 w-4 text-emerald-400" />
+              <span className="text-muted-foreground"><span className="font-bold text-foreground">{recentBuyers}</span> compraram esta semana</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <TrendingUp className="h-4 w-4 text-orange-400" />
+              <span className="text-orange-400 font-semibold">🔥 Mais vendido</span>
+            </div>
+          </div>
+
+          <div className="grid lg:grid-cols-[520px_1fr] xl:grid-cols-[580px_1fr] gap-8 lg:gap-12">
+            {/* Product Images */}
             <div className="space-y-4">
-              <div className="relative aspect-square max-w-[450px] md:max-w-none lg:max-w-[500px] xl:max-w-[550px] mx-auto bg-gradient-to-br from-card via-card to-secondary/30 rounded-3xl overflow-hidden border border-border/50 shadow-2xl shadow-black/20 group">
-                {/* Badges */}
-                <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
-                  {product.discount_percent && (
-                    <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white border-0 text-xs font-bold px-3 py-1.5 shadow-lg">
-                      <Flame className="h-3 w-3 mr-1" />
-                      -{product.discount_percent}% OFF
+              <div className="relative aspect-square max-w-[480px] md:max-w-none lg:max-w-[520px] xl:max-w-[580px] mx-auto bg-gradient-to-br from-card via-card to-secondary/30 rounded-3xl overflow-hidden border border-border/50 shadow-2xl shadow-black/20 group">
+                {/* Discount Banner - Eye-catching */}
+                {product.discount_percent && (
+                  <div className="absolute top-0 left-0 right-0 z-10">
+                    <div className="bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 text-white py-2 px-4 flex items-center justify-center gap-2 text-sm font-black shadow-lg">
+                      <Flame className="h-4 w-4 animate-pulse" />
+                      <span className="tracking-wide">ECONOMIZE {product.discount_percent}% AGORA</span>
+                      <Sparkles className="h-4 w-4" />
+                    </div>
+                  </div>
+                )}
+                
+                {/* Side Badges */}
+                <div className="absolute top-14 left-3 z-10 flex flex-col gap-2">
+                  {product.express_delivery && (
+                    <Badge className="bg-gradient-to-r from-primary to-cyan-400 text-white border-0 text-xs font-bold px-3 py-1.5 shadow-lg animate-pulse">
+                      <Zap className="h-3 w-3 mr-1" />
+                      ENTREGA EXPRESS
                     </Badge>
                   )}
-                  {product.express_delivery && (
-                    <Badge className="bg-gradient-to-r from-primary to-cyan-400 text-white border-0 text-xs font-bold px-3 py-1.5 shadow-lg">
-                      <Zap className="h-3 w-3 mr-1" />
-                      EXPRESS
+                  {isFreeShipping && (
+                    <Badge className="bg-gradient-to-r from-emerald-500 to-green-400 text-white border-0 text-xs font-bold px-3 py-1.5 shadow-lg">
+                      <Truck className="h-3 w-3 mr-1" />
+                      FRETE GRÁTIS
                     </Badge>
                   )}
                 </div>
@@ -321,7 +375,7 @@ const ProductDetailPage = () => {
                 {/* Favorite Button */}
                 <button 
                   onClick={() => setIsFavorite(!isFavorite)}
-                  className="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center transition-all hover:scale-110 hover:bg-white/20"
+                  className="absolute top-14 right-3 z-10 w-11 h-11 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center transition-all hover:scale-110 hover:bg-white/20"
                 >
                   <Heart className={`h-5 w-5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-white/70'}`} />
                 </button>
@@ -329,14 +383,21 @@ const ProductDetailPage = () => {
                 <img
                   src={allImages[selectedImage] || "/placeholder.svg"}
                   alt={product.name}
-                  className="w-full h-full object-contain p-6 md:p-8 transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-full object-contain p-6 md:p-10 pt-16 transition-transform duration-700 group-hover:scale-105"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = "/placeholder.svg";
                   }}
                 />
                 
-                {/* Subtle glow effect */}
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/5 via-transparent to-transparent pointer-events-none" />
+                {/* Bottom Urgency Strip */}
+                {product.discount_percent && product.discount_percent >= 15 && (
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent py-4 px-4">
+                    <div className="flex items-center justify-center gap-2 text-white text-sm font-semibold">
+                      <Timer className="h-4 w-4 text-yellow-400 animate-pulse" />
+                      <span>Restam poucas unidades neste preço!</span>
+                    </div>
+                  </div>
+                )}
               </div>
               
               {/* Thumbnails */}
@@ -361,9 +422,23 @@ const ProductDetailPage = () => {
                   ))}
                 </div>
               )}
+
+              {/* Mini Social Proof under image */}
+              <div className="flex items-center justify-center gap-4 py-3 px-4 bg-card/50 rounded-xl border border-border/30">
+                <div className="flex -space-x-2">
+                  {['👨', '👩', '👨‍🦱', '👩‍🦰', '🧑'].map((emoji, i) => (
+                    <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-cyan-500/20 border-2 border-card flex items-center justify-center text-sm">
+                      {emoji}
+                    </div>
+                  ))}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-bold text-foreground">{recentBuyers}+ clientes</span> satisfeitos
+                </p>
+              </div>
             </div>
 
-            {/* Product Info - Premium Layout */}
+            {/* Product Info */}
             <div className="space-y-5 md:space-y-6">
               {/* Brand and Rating */}
               <div className="flex flex-wrap items-center gap-3">
@@ -390,10 +465,29 @@ const ProductDetailPage = () => {
                 {product.name}
               </h1>
 
+              {/* MEGA Discount Banner */}
+              {product.discount_percent && product.discount_percent >= 15 && (
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 p-1">
+                  <div className="bg-gradient-to-r from-red-900/90 via-orange-900/90 to-yellow-900/90 rounded-xl p-4 md:p-5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-14 h-14 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center">
+                          <span className="text-3xl font-black text-white">{product.discount_percent}%</span>
+                        </div>
+                        <div>
+                          <p className="text-white font-black text-lg md:text-xl tracking-wide">DESCONTO IMPERDÍVEL</p>
+                          <p className="text-white/80 text-sm">Economize R$ {product.old_price ? (product.old_price - product.price).toFixed(2).replace('.', ',') : '0,00'}</p>
+                        </div>
+                      </div>
+                      <Flame className="h-10 w-10 text-yellow-400 animate-pulse" />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Price Card - Premium */}
               <div className="relative bg-gradient-to-br from-card via-card to-primary/5 rounded-3xl border border-border/50 p-6 md:p-8 space-y-4 overflow-hidden shadow-xl">
-                {/* Background decoration */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
+                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl" />
                 
                 {product.old_price && (
                   <div className="flex items-center gap-3 relative">
@@ -401,9 +495,9 @@ const ProductDetailPage = () => {
                       R$ {product.old_price.toFixed(2).replace('.', ',')}
                     </span>
                     {product.discount_percent && (
-                      <Badge className="bg-gradient-to-r from-red-500/20 to-orange-500/20 text-red-400 border-red-500/30 text-xs font-bold">
+                      <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white border-0 text-xs font-black animate-pulse">
                         <Sparkles className="h-3 w-3 mr-1" />
-                        ECONOMIA R$ {(product.old_price - product.price).toFixed(2).replace('.', ',')}
+                        -{product.discount_percent}% OFF
                       </Badge>
                     )}
                   </div>
@@ -411,23 +505,30 @@ const ProductDetailPage = () => {
                 
                 <div className="space-y-1 relative">
                   <p className="text-sm md:text-base text-muted-foreground">Por apenas:</p>
-                  <p className="text-4xl md:text-5xl font-display font-bold text-foreground">
+                  <p className="text-4xl md:text-5xl font-display font-black text-foreground">
                     R$ {product.price.toFixed(2).replace('.', ',')}
                   </p>
                 </div>
 
-                {/* PIX Price - Highlighted */}
-                <div className="relative flex items-center gap-4 bg-gradient-to-r from-primary/20 via-primary/10 to-cyan-500/10 rounded-2xl p-4 md:p-5 border border-primary/30 shadow-lg shadow-primary/10">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center shadow-lg">
-                    <Zap className="h-6 w-6 text-white" />
+                {/* PIX Price - Super Highlighted */}
+                <div className="relative flex items-center gap-4 bg-gradient-to-r from-emerald-500/20 via-primary/20 to-cyan-500/20 rounded-2xl p-4 md:p-5 border-2 border-primary/40 shadow-lg shadow-primary/20">
+                  <div className="absolute -top-3 left-4">
+                    <Badge className="bg-primary text-white border-0 text-xs font-black px-3 py-1 shadow-lg">
+                      MELHOR PREÇO
+                    </Badge>
+                  </div>
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center shadow-lg shadow-primary/30">
+                    <Zap className="h-7 w-7 text-white" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-2xl md:text-3xl font-display font-bold text-primary">
+                    <p className="text-3xl md:text-4xl font-display font-black text-primary">
                       R$ {pixPrice.toFixed(2).replace('.', ',')}
                     </p>
-                    <p className="text-sm text-primary/80">à vista no PIX (5% desconto)</p>
+                    <p className="text-sm text-primary/80 font-semibold">à vista no PIX (5% desconto)</p>
                   </div>
-                  <Badge className="bg-primary text-white border-0 text-sm font-bold px-3 py-1.5">5% OFF</Badge>
+                  <div className="text-right">
+                    <Badge className="bg-emerald-500 text-white border-0 text-lg font-black px-4 py-2">5% OFF</Badge>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-muted-foreground relative">
@@ -437,16 +538,16 @@ const ProductDetailPage = () => {
                 </div>
               </div>
 
-              {/* Shipping Calculator - Compact */}
+              {/* Shipping Calculator */}
               <div className="bg-card/80 backdrop-blur-sm rounded-2xl border border-border/50 p-5 shadow-lg">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Truck className="h-5 w-5 text-primary" />
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                    <Truck className="h-5 w-5 text-emerald-400" />
                   </div>
                   <div className="flex-1">
                     <span className="font-semibold text-sm md:text-base">Calcular Frete</span>
                     {isFreeShipping && (
-                      <p className="text-xs text-emerald-400 font-semibold">✓ Este produto tem FRETE GRÁTIS!</p>
+                      <p className="text-xs text-emerald-400 font-bold">🎉 FRETE GRÁTIS para este produto!</p>
                     )}
                   </div>
                 </div>
@@ -467,9 +568,9 @@ const ProductDetailPage = () => {
                 </div>
                 
                 {shippingResult && (
-                  <div className="mt-4 p-4 bg-secondary/50 rounded-xl flex items-center justify-between border border-border/30">
+                  <div className="mt-4 p-4 bg-emerald-500/10 rounded-xl flex items-center justify-between border border-emerald-500/30">
                     <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-primary" />
+                      <MapPin className="h-4 w-4 text-emerald-400" />
                       <span className="text-sm">CEP {cep}</span>
                     </div>
                     <div className="text-right">
@@ -504,37 +605,65 @@ const ProductDetailPage = () => {
 
                 <Button 
                   onClick={handleBuyNow}
-                  className="w-full h-16 md:h-20 text-lg md:text-xl bg-gradient-to-r from-primary via-cyan-500 to-primary bg-[length:200%_auto] hover:bg-right transition-all duration-500 text-white font-display tracking-wide relative overflow-hidden rounded-2xl shadow-xl shadow-primary/30 gap-3"
+                  className="w-full h-18 md:h-20 text-xl md:text-2xl bg-gradient-to-r from-emerald-500 via-primary to-cyan-500 bg-[length:200%_auto] hover:bg-right transition-all duration-500 text-white font-display font-black tracking-wide relative overflow-hidden rounded-2xl shadow-2xl shadow-primary/40 gap-3"
                 >
-                  <ShoppingCart className="h-6 w-6 md:h-7 md:w-7" />
+                  <ShoppingCart className="h-7 w-7 md:h-8 md:w-8" />
                   COMPRAR AGORA
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-shimmer" />
                 </Button>
+                
+                {/* Urgency text */}
+                <p className="text-center text-sm text-orange-400 font-semibold animate-pulse">
+                  ⚡ {viewersNow} pessoas estão vendo este produto agora!
+                </p>
               </div>
 
-              {/* Trust Badges - Premium Grid */}
+              {/* Trust Badges - Enhanced */}
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { icon: Truck, title: "Frete Grátis", subtitle: "Acima de R$299", color: "emerald" },
-                  { icon: Shield, title: "Compra Segura", subtitle: "100% Protegido", color: "primary" },
-                  { icon: Award, title: "Produto Original", subtitle: "Garantia Total", color: "yellow" },
-                  { icon: Gift, title: "Embalagem Premium", subtitle: "Proteção Extra", color: "primary" },
+                  { icon: ShieldCheck, title: "Compra 100% Segura", subtitle: "Site protegido SSL", color: "emerald" },
+                  { icon: RotateCcw, title: "Devolução Grátis", subtitle: "7 dias garantidos", color: "primary" },
+                  { icon: Award, title: "Produto Original", subtitle: "Garantia de fábrica", color: "yellow" },
+                  { icon: Truck, title: "Entrega Garantida", subtitle: "Rastreio completo", color: "primary" },
                 ].map((badge, index) => (
-                  <div key={index} className="flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-br from-card to-secondary/30 border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg">
-                    <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${badge.color === 'emerald' ? 'from-emerald-500/20 to-emerald-600/10' : badge.color === 'yellow' ? 'from-yellow-500/20 to-yellow-600/10' : 'from-primary/20 to-cyan-500/10'} flex items-center justify-center flex-shrink-0`}>
-                      <badge.icon className={`h-5 w-5 ${badge.color === 'emerald' ? 'text-emerald-400' : badge.color === 'yellow' ? 'text-yellow-400' : 'text-primary'}`} />
+                  <div key={index} className="flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-br from-card to-secondary/30 border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg group">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${badge.color === 'emerald' ? 'from-emerald-500/20 to-emerald-600/10' : badge.color === 'yellow' ? 'from-yellow-500/20 to-yellow-600/10' : 'from-primary/20 to-cyan-500/10'} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                      <badge.icon className={`h-6 w-6 ${badge.color === 'emerald' ? 'text-emerald-400' : badge.color === 'yellow' ? 'text-yellow-400' : 'text-primary'}`} />
                     </div>
                     <div className="min-w-0">
-                      <p className="font-semibold text-sm truncate">{badge.title}</p>
+                      <p className="font-bold text-sm truncate">{badge.title}</p>
                       <p className="text-xs text-muted-foreground">{badge.subtitle}</p>
                     </div>
                   </div>
                 ))}
               </div>
+
+              {/* Featured Review - Social Proof */}
+              {reviews.length > 0 && (
+                <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/5 rounded-2xl border border-yellow-500/20 p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Star className="h-5 w-5 text-yellow-400 fill-current" />
+                    <span className="font-bold text-sm">Avaliação em destaque</span>
+                  </div>
+                  <p className="text-muted-foreground text-sm italic mb-3">"{reviews[0].comment}"</p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center text-white text-xs font-bold">
+                        {reviews[0].author.charAt(0)}
+                      </div>
+                      <span className="text-sm font-medium">{reviews[0].author}</span>
+                    </div>
+                    <Badge variant="outline" className="text-xs border-emerald-500/30 text-emerald-400 bg-emerald-500/10">
+                      <Check className="h-3 w-3 mr-1" />
+                      Compra verificada
+                    </Badge>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Tabs Section - Premium */}
+          {/* Tabs Section */}
           <div className="mt-12 md:mt-16">
             <Tabs defaultValue="description" className="w-full">
               <TabsList className="w-full justify-start bg-card/50 border border-border/50 rounded-2xl p-1.5 gap-1 h-auto">
@@ -590,7 +719,7 @@ const ProductDetailPage = () => {
                   <div className="flex flex-col md:flex-row gap-6 md:gap-10 mb-8 pb-8 border-b border-border/50">
                     <div className="flex items-center gap-6">
                       <div className="text-center">
-                        <p className="text-5xl md:text-6xl font-display font-bold bg-gradient-to-r from-primary to-cyan-400 bg-clip-text text-transparent">{averageRating}</p>
+                        <p className="text-5xl md:text-6xl font-display font-black bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">{averageRating}</p>
                         <div className="flex items-center justify-center gap-1 mt-2">
                           {[...Array(5)].map((_, i) => (
                             <Star key={i} className={`h-5 w-5 ${i < Math.floor(parseFloat(averageRating)) ? 'text-yellow-400 fill-current' : 'text-muted-foreground/30'}`} />
