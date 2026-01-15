@@ -38,6 +38,8 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const { limit = 10 } = await req.json().catch(() => ({}));
+
     const firecrawlApiKey = Deno.env.get('FIRECRAWL_API_KEY');
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
@@ -58,12 +60,13 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get products without price
+    // Get products without price (fetch a bit more to account for duplicate source_url)
     const { data: products, error: fetchError } = await supabase
       .from('products')
       .select('id, name, source_url')
       .eq('price', 0)
-      .not('source_url', 'is', null);
+      .not('source_url', 'is', null)
+      .limit(Math.max(50, limit * 5));
 
     if (fetchError) {
       console.error('Error fetching products:', fetchError);
@@ -85,9 +88,11 @@ Deno.serve(async (req) => {
       }
     }
 
-    console.log(`Processing ${uniqueProducts.size} unique URLs`);
+    console.log(`Processing ${Math.min(uniqueProducts.size, limit)} unique URLs (limit ${limit})`);
 
-    for (const [sourceUrl, product] of uniqueProducts) {
+    const uniqueEntries = Array.from(uniqueProducts.entries()).slice(0, limit);
+
+    for (const [sourceUrl, product] of uniqueEntries) {
       try {
         console.log(`Scraping: ${sourceUrl}`);
         
@@ -258,15 +263,19 @@ Deno.serve(async (req) => {
     }
 
     const successCount = results.filter(r => r.status === 'success').length;
+    const fixed = successCount;
+    const outOfStockCount = results.filter(r => r.status === 'marked_as_esgotado').length;
     const failCount = results.filter(r => r.status !== 'success').length;
 
     return new Response(
       JSON.stringify({ 
-        success: true, 
+        success: true,
         processed: results.length,
+        fixed,
+        outOfStockCount,
         successCount,
         failCount,
-        results 
+        results,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

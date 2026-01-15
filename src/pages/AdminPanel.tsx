@@ -244,7 +244,7 @@ const AdminPanel = () => {
   const handleFixPrices = async () => {
     setIsFixingPrices(true);
     try {
-      const result = await productsApi.fixProductPrices();
+      const result = await productsApi.fixProductPrices(10);
       if (result.success) {
         toast({
           title: "Preços Corrigidos",
@@ -272,7 +272,7 @@ const AdminPanel = () => {
   const handleSyncDescriptions = async () => {
     setIsSyncingDescriptions(true);
     try {
-      const result = await productsApi.syncDescriptions(20, false);
+      const result = await productsApi.syncDescriptions(5, false);
       if (result.success) {
         toast({
           title: "Descrições Sincronizadas",
