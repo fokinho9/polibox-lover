@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import bannerVonixx from "@/assets/banner-vonixx.jpg";
+import bannerOfertas50 from "@/assets/banner-ofertas-50.jpg";
 import bannerFrete from "@/assets/banner-frete.jpg";
 import bannerMagil from "@/assets/banner-magil.jpg";
 import bannerCerasSelantes from "@/assets/banner-ceras-selantes.jpg";
@@ -10,7 +10,7 @@ import bannerCerasSelantes from "@/assets/banner-ceras-selantes.jpg";
 const slides = [
   {
     id: 1,
-    image: bannerVonixx,
+    image: bannerOfertas50,
     href: "/categoria/kits"
   },
   {
