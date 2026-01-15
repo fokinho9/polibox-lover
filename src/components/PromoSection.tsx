@@ -1,12 +1,12 @@
 import { Zap, Truck, CreditCard, ShieldCheck, Timer, Sparkles, Flame } from "lucide-react";
-
 const PromoSection = () => {
-  return (
-    <section className="py-10 md:py-16 bg-gradient-to-b from-background via-card/30 to-background relative overflow-hidden">
+  return <section className="py-10 md:py-16 bg-gradient-to-b from-background via-card/30 to-background relative overflow-hidden">
       {/* Animated Background Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[100px] animate-pulse" style={{
+        animationDelay: '1s'
+      }} />
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
       </div>
       
@@ -26,34 +26,36 @@ const PromoSection = () => {
           </h2>
           
           {/* Benefits Pills */}
-          <div className="flex flex-wrap items-center justify-center gap-3 md:gap-5">
-            <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500/20 to-orange-500/10 rounded-full border border-orange-500/30">
-              <Sparkles className="h-4 w-4 text-orange-400" />
-              <span className="font-bold text-orange-400">Até 60% OFF</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/20 to-cyan-500/10 rounded-full border border-primary/30">
-              <Zap className="h-4 w-4 text-primary" />
-              <span className="font-bold text-primary">+5% OFF no PIX</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500/20 to-emerald-500/10 rounded-full border border-emerald-500/30">
-              <Truck className="h-4 w-4 text-emerald-400" />
-              <span className="font-bold text-emerald-400">Frete GRÁTIS*</span>
-            </div>
-          </div>
+          
         </div>
 
         {/* Benefits Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
-          {[
-            { icon: Truck, title: "Frete Grátis", subtitle: "Acima de R$299", color: "emerald", gradient: "from-emerald-500/20 to-emerald-600/10" },
-            { icon: Zap, title: "5% OFF no PIX", subtitle: "Desconto exclusivo", color: "primary", gradient: "from-primary/20 to-cyan-500/10" },
-            { icon: CreditCard, title: "12x sem Juros", subtitle: "Em todos os cartões", color: "primary", gradient: "from-primary/20 to-cyan-500/10" },
-            { icon: ShieldCheck, title: "Compra Segura", subtitle: "100% protegido", color: "primary", gradient: "from-primary/20 to-cyan-500/10" },
-          ].map((benefit, index) => (
-            <div 
-              key={index}
-              className={`group relative flex flex-col items-center p-5 md:p-6 bg-gradient-to-br ${benefit.gradient} backdrop-blur-sm rounded-2xl border border-white/5 hover:border-primary/30 transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-primary/10`}
-            >
+          {[{
+          icon: Truck,
+          title: "Frete Grátis",
+          subtitle: "Acima de R$299",
+          color: "emerald",
+          gradient: "from-emerald-500/20 to-emerald-600/10"
+        }, {
+          icon: Zap,
+          title: "5% OFF no PIX",
+          subtitle: "Desconto exclusivo",
+          color: "primary",
+          gradient: "from-primary/20 to-cyan-500/10"
+        }, {
+          icon: CreditCard,
+          title: "12x sem Juros",
+          subtitle: "Em todos os cartões",
+          color: "primary",
+          gradient: "from-primary/20 to-cyan-500/10"
+        }, {
+          icon: ShieldCheck,
+          title: "Compra Segura",
+          subtitle: "100% protegido",
+          color: "primary",
+          gradient: "from-primary/20 to-cyan-500/10"
+        }].map((benefit, index) => <div key={index} className={`group relative flex flex-col items-center p-5 md:p-6 bg-gradient-to-br ${benefit.gradient} backdrop-blur-sm rounded-2xl border border-white/5 hover:border-primary/30 transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-primary/10`}>
               {/* Glow effect on hover */}
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-transparent transition-all duration-500" />
               
@@ -62,12 +64,9 @@ const PromoSection = () => {
               </div>
               <span className="relative font-bold text-foreground text-center text-sm md:text-base">{benefit.title}</span>
               <span className="relative text-xs md:text-sm text-muted-foreground text-center mt-1">{benefit.subtitle}</span>
-            </div>
-          ))}
+            </div>)}
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default PromoSection;
