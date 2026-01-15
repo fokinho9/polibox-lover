@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import kitsImage from "@/assets/kits-banner.jpg";
-import cerasImage from "@/assets/ceras-banner.jpg";
+import cerasImage from "@/assets/offer-banner-bg.jpg";
 const banners = [{
   id: 1,
   title: "KITS COMPLETOS",
