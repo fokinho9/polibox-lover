@@ -1,5 +1,4 @@
 import { Zap, Truck, CreditCard, ShieldCheck, Timer, Sparkles, Flame } from "lucide-react";
-import megaPromoLogo from "@/assets/mega-promocao-logo.png";
 
 const PromoSection = () => {
   return (
@@ -21,14 +20,10 @@ const PromoSection = () => {
             <Timer className="h-4 w-4 text-orange-500" />
           </div>
           
-          {/* Logo Image */}
-          <div className="flex justify-center mb-6">
-            <img 
-              src={megaPromoLogo} 
-              alt="MEGA PROMOÇÃO" 
-              className="h-24 md:h-32 lg:h-40 w-auto object-contain drop-shadow-[0_0_30px_rgba(34,211,238,0.4)]"
-            />
-          </div>
+          {/* Text Logo - Bolder */}
+          <h2 className="font-display text-5xl md:text-6xl lg:text-7xl font-black text-foreground mb-4 tracking-tight">
+            MEGA <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-cyan-400 to-primary drop-shadow-[0_0_30px_rgba(34,211,238,0.5)]">PROMOÇÃO</span>
+          </h2>
           
           {/* Benefits Pills */}
           <div className="flex flex-wrap items-center justify-center gap-3 md:gap-5">
