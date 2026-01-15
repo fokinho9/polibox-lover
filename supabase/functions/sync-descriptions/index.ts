@@ -114,7 +114,7 @@ Deno.serve(async (req) => {
     
     // Only get products without descriptions unless force is true
     if (!force) {
-      query = query.or('description.is.null,description.eq.');
+      query = query.or('description.is.null,description.eq.""');
     }
 
     const { data: products, error: fetchError } = await query;
