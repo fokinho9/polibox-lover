@@ -285,7 +285,7 @@ const ProductDetailPage = () => {
   const basePrice = applyDiscount(product.price);
   const displayPrice = basePrice * quizMultiplier;
   const allImages = [product.image_url, ...(product.additional_images || [])].filter(Boolean);
-  const isFreeShipping = basePrice >= 299;
+  const isFreeShipping = true; // Always free shipping
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-card/20">
