@@ -15,10 +15,11 @@ import ScrollToTopButton from "@/components/ScrollToTopButton";
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      <Navigation />
+      <div className="sticky top-0 z-50">
+        <Header />
+        <Navigation />
+      </div>
       <CategoryTags />
-      <HeroBanner />
       <PromoSection />
       <OfferBanners />
       <ProductGrid />
