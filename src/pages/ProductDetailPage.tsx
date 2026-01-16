@@ -20,6 +20,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCart } from "@/contexts/CartContext";
+import { useQuiz } from "@/contexts/QuizContext";
 import { useToast } from "@/hooks/use-toast";
 
 // 100+ unique comments pool
@@ -167,6 +168,7 @@ const ProductDetailPage = () => {
   const [viewersNow, setViewersNow] = useState(0);
   const [recentBuyers, setRecentBuyers] = useState(0);
   const { addToCart } = useCart();
+  const { hasCompletedQuiz, discountPercent, timeRemaining } = useQuiz();
   const { toast } = useToast();
 
   // Social proof - random viewers and buyers
@@ -278,7 +280,11 @@ const ProductDetailPage = () => {
     );
   }
 
-  const pixPrice = product.pix_price || product.price * 0.95;
+  const quizMultiplier = hasCompletedQuiz ? (100 - discountPercent) / 100 : 1;
+  const basePixPrice = product.pix_price || product.price * 0.95;
+  const pixPrice = basePixPrice * quizMultiplier;
+  const displayPrice = product.price * quizMultiplier;
+  const displayOldPrice = product.old_price ? product.old_price * quizMultiplier : null;
   const allImages = [product.image_url, ...(product.additional_images || [])].filter(Boolean);
   const isFreeShipping = product.price >= 299;
 
@@ -295,6 +301,24 @@ const ProductDetailPage = () => {
             <Flame className="h-5 w-5 animate-pulse" />
             <span>🔥 OFERTA RELÂMPAGO: {product.discount_percent}% OFF por tempo limitado!</span>
             <Timer className="h-5 w-5" />
+          </div>
+        </div>
+      )}
+
+      {/* Quiz Discount Banner */}
+      {hasCompletedQuiz && (
+        <div className="bg-gradient-to-r from-primary via-cyan-500 to-primary text-white py-3 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M0%200h20v20H0z%22%20fill%3D%22%23fff%22%20fill-opacity%3D%22.05%22%2F%3E%3C%2Fsvg%3E')]" />
+          <div className="container-main flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 relative">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 animate-pulse" />
+              <span className="font-bold text-sm sm:text-base">🎉 DESCONTO EXCLUSIVO DE {discountPercent}% APLICADO!</span>
+              <Sparkles className="h-5 w-5 animate-pulse" />
+            </div>
+            <div className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5">
+              <Clock className="h-4 w-4" />
+              <span className="font-mono font-bold text-sm">{timeRemaining}</span>
+            </div>
           </div>
         </div>
       )}
@@ -490,15 +514,29 @@ const ProductDetailPage = () => {
               <div className="relative bg-gradient-to-br from-card via-card to-primary/5 rounded-2xl border border-border/50 p-4 md:p-5 space-y-3 overflow-hidden shadow-lg">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
                 
-                {product.old_price && (
-                  <div className="flex items-center gap-2 relative">
+                {/* Quiz Discount Applied Message */}
+                {hasCompletedQuiz && (
+                  <div className="relative p-3 bg-gradient-to-r from-primary/20 to-cyan-500/10 border border-primary/30 rounded-xl mb-2">
+                    <div className="flex items-center gap-2 text-sm text-primary font-bold">
+                      <Sparkles className="h-4 w-4 animate-pulse" />
+                      <span>DESCONTO EXCLUSIVO DE {discountPercent}% APLICADO!</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-primary/80 mt-1">
+                      <Clock className="h-3 w-3" />
+                      <span>Expira em: <span className="font-mono font-bold">{timeRemaining}</span></span>
+                    </div>
+                  </div>
+                )}
+
+                {(product.old_price || hasCompletedQuiz) && (
+                  <div className="flex items-center gap-2 relative flex-wrap">
                     <span className="text-muted-foreground line-through text-base">
-                      R$ {product.old_price.toFixed(2).replace('.', ',')}
+                      R$ {(hasCompletedQuiz ? product.price : product.old_price)?.toFixed(2).replace('.', ',')}
                     </span>
-                    {product.discount_percent && (
+                    {(product.discount_percent || hasCompletedQuiz) && (
                       <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white border-0 text-[10px] font-black animate-pulse">
                         <Sparkles className="h-2.5 w-2.5 mr-0.5" />
-                        -{product.discount_percent}% OFF
+                        -{hasCompletedQuiz ? discountPercent : product.discount_percent}% OFF
                       </Badge>
                     )}
                   </div>
@@ -507,7 +545,7 @@ const ProductDetailPage = () => {
                 <div className="space-y-0.5 relative">
                   <p className="text-xs text-muted-foreground">Por apenas:</p>
                   <p className="text-2xl md:text-3xl font-display font-black text-foreground">
-                    R$ {product.price.toFixed(2).replace('.', ',')}
+                    R$ {displayPrice.toFixed(2).replace('.', ',')}
                   </p>
                 </div>
 
@@ -525,15 +563,15 @@ const ProductDetailPage = () => {
                     <p className="text-xl md:text-2xl font-display font-black text-primary">
                       R$ {pixPrice.toFixed(2).replace('.', ',')}
                     </p>
-                    <p className="text-xs text-primary/80 font-medium">à vista no PIX (5% desconto)</p>
+                    <p className="text-xs text-primary/80 font-medium">à vista no PIX {hasCompletedQuiz ? `(${discountPercent}% + 5% desconto)` : '(5% desconto)'}</p>
                   </div>
-                  <Badge className="bg-emerald-500 text-white border-0 text-xs font-black px-2 py-1">5% OFF</Badge>
+                  <Badge className="bg-emerald-500 text-white border-0 text-xs font-black px-2 py-1">{hasCompletedQuiz ? `${discountPercent + 5}% OFF` : '5% OFF'}</Badge>
                 </div>
 
                 <div className="flex items-center gap-2 text-xs text-muted-foreground relative">
                   <CreditCard className="h-3.5 w-3.5 text-primary" />
                   <span>ou até <span className="font-bold text-foreground">10x</span> de{" "}
-                  <span className="font-bold text-foreground">R$ {(product.price / 10).toFixed(2).replace('.', ',')}</span> sem juros</span>
+                  <span className="font-bold text-foreground">R$ {(displayPrice / 10).toFixed(2).replace('.', ',')}</span> sem juros</span>
                 </div>
               </div>
 

@@ -11,7 +11,7 @@ interface QuizContextType {
 
 const QuizContext = createContext<QuizContextType | undefined>(undefined);
 
-const DISCOUNT_DURATION_HOURS = 24;
+const DISCOUNT_DURATION_MINUTES = 10;
 
 const formatTimeRemaining = (ms: number): string => {
   if (ms <= 0) return "00:00:00";
@@ -64,7 +64,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   }, [discountExpiresAt]);
 
   const completeQuiz = () => {
-    const expiryDate = new Date(Date.now() + DISCOUNT_DURATION_HOURS * 60 * 60 * 1000);
+    const expiryDate = new Date(Date.now() + DISCOUNT_DURATION_MINUTES * 60 * 1000);
     setHasCompletedQuiz(true);
     setDiscountExpiresAt(expiryDate);
     localStorage.setItem("quiz_completed", "true");
