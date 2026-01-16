@@ -5,10 +5,9 @@ import { Button } from "@/components/ui/button";
 interface FloatingBuyButtonProps {
   onBuy: () => void;
   price: number;
-  pixPrice: number;
 }
 
-const FloatingBuyButton = ({ onBuy, price, pixPrice }: FloatingBuyButtonProps) => {
+const FloatingBuyButton = ({ onBuy, price }: FloatingBuyButtonProps) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -32,9 +31,8 @@ const FloatingBuyButton = ({ onBuy, price, pixPrice }: FloatingBuyButtonProps) =
               <p className="text-xs text-muted-foreground">Por apenas</p>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-display font-bold text-primary">
-                  R$ {pixPrice.toFixed(2).replace('.', ',')}
+                  R$ {price.toFixed(2).replace('.', ',')}
                 </span>
-                <span className="text-xs text-primary/80">no PIX</span>
               </div>
             </div>
             <Button 

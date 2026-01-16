@@ -57,8 +57,8 @@ const QuizModal = ({ open, onOpenChange }: QuizModalProps) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md bg-card border-primary/30">
+    <Dialog open={open} onOpenChange={handleClose} modal={false}>
+      <DialogContent className="sm:max-w-md bg-card/95 backdrop-blur-md border-primary/30 shadow-2xl shadow-primary/20" overlayBlur>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-primary font-display text-2xl">
             <Gift className="h-6 w-6" />

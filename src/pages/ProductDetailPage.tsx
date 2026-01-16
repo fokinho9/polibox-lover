@@ -281,10 +281,7 @@ const ProductDetailPage = () => {
   }
 
   const quizMultiplier = hasCompletedQuiz ? (100 - discountPercent) / 100 : 1;
-  const basePixPrice = product.pix_price || product.price * 0.95;
-  const pixPrice = basePixPrice * quizMultiplier;
   const displayPrice = product.price * quizMultiplier;
-  const displayOldPrice = product.old_price ? product.old_price * quizMultiplier : null;
   const allImages = [product.image_url, ...(product.additional_images || [])].filter(Boolean);
   const isFreeShipping = product.price >= 299;
 
@@ -547,25 +544,6 @@ const ProductDetailPage = () => {
                   <p className="text-2xl md:text-3xl font-display font-black text-foreground">
                     R$ {displayPrice.toFixed(2).replace('.', ',')}
                   </p>
-                </div>
-
-                {/* PIX Price - Compact */}
-                <div className="relative flex items-center gap-3 bg-gradient-to-r from-emerald-500/20 via-primary/20 to-cyan-500/20 rounded-xl p-3 border border-primary/40 shadow-md shadow-primary/10">
-                  <div className="absolute -top-2 left-3">
-                    <Badge className="bg-primary text-white border-0 text-[10px] font-black px-2 py-0.5 shadow-md">
-                      MELHOR PREÇO
-                    </Badge>
-                  </div>
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center shadow-md shadow-primary/30">
-                    <Zap className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xl md:text-2xl font-display font-black text-primary">
-                      R$ {pixPrice.toFixed(2).replace('.', ',')}
-                    </p>
-                    <p className="text-xs text-primary/80 font-medium">à vista no PIX {hasCompletedQuiz ? `(${discountPercent}% + 5% desconto)` : '(5% desconto)'}</p>
-                  </div>
-                  <Badge className="bg-emerald-500 text-white border-0 text-xs font-black px-2 py-1">{hasCompletedQuiz ? `${discountPercent + 5}% OFF` : '5% OFF'}</Badge>
                 </div>
 
                 <div className="flex items-center gap-2 text-xs text-muted-foreground relative">
@@ -879,7 +857,7 @@ const ProductDetailPage = () => {
         </div>
       </main>
 
-      <FloatingBuyButton onBuy={handleBuyNow} price={product.price} pixPrice={pixPrice} />
+      <FloatingBuyButton onBuy={handleBuyNow} price={displayPrice} />
       <WhatsAppButton />
       <Footer />
     </div>
