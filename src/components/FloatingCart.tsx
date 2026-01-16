@@ -2,6 +2,7 @@ import { ShoppingCart, X, Trash2, Plus, Minus, Check, ArrowLeft } from "lucide-r
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { Link } from "react-router-dom";
+import { applyDiscount } from "@/lib/utils";
 
 const FloatingCart = () => {
   const { items, removeFromCart, updateQuantity, totalPrice, totalItems, isCartOpen, setIsCartOpen, lastAddedProduct } = useCart();
@@ -111,7 +112,7 @@ const FloatingCart = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-sm line-clamp-2 mb-2">{item.product.name}</h3>
-                    <p className="text-primary font-bold text-lg">{formatPrice(item.product.price)}</p>
+                    <p className="text-primary font-bold text-lg">{formatPrice(applyDiscount(item.product.price))}</p>
                     <div className="flex items-center gap-3 mt-3">
                       <div className="flex items-center gap-1 bg-secondary/50 rounded-xl p-1">
                         <Button
