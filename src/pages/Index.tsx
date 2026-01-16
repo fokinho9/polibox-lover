@@ -10,6 +10,7 @@ import CategoryCarousel from "@/components/CategoryCarousel";
 import MoreProducts from "@/components/MoreProducts";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import ScrollToTopButton from "@/components/ScrollToTopButton";
 
 const Index = () => {
   return (
@@ -26,6 +27,7 @@ const Index = () => {
       <MoreProducts />
       <Footer />
       <WhatsAppButton />
+      <ScrollToTopButton />
     </div>
   );
 };
