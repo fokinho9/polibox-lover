@@ -1,4 +1,4 @@
-import { ShoppingCart, Zap, Flame, Sparkles } from "lucide-react";
+import { ShoppingCart, Zap, Flame, Sparkles, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
@@ -31,7 +31,7 @@ const ProductCard = ({
   brand,
 }: ProductCardProps) => {
   const { addToCart } = useCart();
-  const { hasCompletedQuiz, discountPercent } = useQuiz();
+  const { hasCompletedQuiz, discountPercent, timeRemaining } = useQuiz();
   const { toast } = useToast();
 
   // Apply quiz discount
@@ -126,6 +126,20 @@ const ProductCard = ({
 
         {/* Content */}
         <div className="flex flex-col flex-1 p-3 md:p-4">
+          {/* Quiz Discount Message with Countdown */}
+          {hasCompletedQuiz && (
+            <div className="mb-2 p-2 bg-gradient-to-r from-primary/20 to-cyan-glow/10 border border-primary/30 rounded-lg">
+              <div className="flex items-center gap-1.5 text-[10px] text-primary font-bold">
+                <Sparkles className="h-3 w-3" />
+                <span>DESCONTO EXCLUSIVO APLICADO!</span>
+              </div>
+              <div className="flex items-center gap-1 text-[9px] text-primary/80 mt-0.5">
+                <Clock className="h-2.5 w-2.5" />
+                <span>Expira em: {timeRemaining}</span>
+              </div>
+            </div>
+          )}
+
           {/* Brand */}
           {brand && (
             <span className="text-[10px] text-primary font-bold uppercase tracking-widest mb-1">
