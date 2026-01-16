@@ -324,38 +324,38 @@ const CheckoutPage = () => {
       
       {/* Progress bar */}
       <div className="bg-card border-b border-border">
-        <div className="container-main py-4">
-          <div className="flex items-center justify-center gap-2 text-sm">
-            <button onClick={() => { setCurrentStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold transition-colors ${currentStep >= 1 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
-                {currentStep > 1 ? <Check className="h-4 w-4" /> : '1'}
+        <div className="container-main py-2 md:py-4">
+          <div className="flex items-center justify-center gap-1 md:gap-2 text-sm">
+            <button onClick={() => { setCurrentStep(1); }} className="flex items-center gap-1 md:gap-2">
+              <div className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center font-bold text-xs md:text-sm transition-colors ${currentStep >= 1 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
+                {currentStep > 1 ? <Check className="h-3 w-3 md:h-4 md:w-4" /> : '1'}
               </div>
-              <span className={`hidden sm:inline font-medium ${currentStep >= 1 ? 'text-primary' : 'text-muted-foreground'}`}>Carrinho</span>
+              <span className={`hidden sm:inline text-sm font-medium ${currentStep >= 1 ? 'text-primary' : 'text-muted-foreground'}`}>Carrinho</span>
             </button>
-            <div className={`w-12 h-0.5 ${currentStep >= 2 ? 'bg-primary' : 'bg-border'}`} />
-            <button onClick={() => { if (canProceedToStep2) { setCurrentStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }); }}} className="flex items-center gap-2" disabled={!canProceedToStep2}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold transition-colors ${currentStep >= 2 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
-                {currentStep > 2 ? <Check className="h-4 w-4" /> : '2'}
+            <div className={`w-6 md:w-12 h-0.5 ${currentStep >= 2 ? 'bg-primary' : 'bg-border'}`} />
+            <button onClick={() => { if (canProceedToStep2) { setCurrentStep(2); }}} className="flex items-center gap-1 md:gap-2" disabled={!canProceedToStep2}>
+              <div className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center font-bold text-xs md:text-sm transition-colors ${currentStep >= 2 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
+                {currentStep > 2 ? <Check className="h-3 w-3 md:h-4 md:w-4" /> : '2'}
               </div>
-              <span className={`hidden sm:inline font-medium ${currentStep >= 2 ? 'text-primary' : 'text-muted-foreground'}`}>Entrega</span>
+              <span className={`hidden sm:inline text-sm font-medium ${currentStep >= 2 ? 'text-primary' : 'text-muted-foreground'}`}>Entrega</span>
             </button>
-            <div className={`w-12 h-0.5 ${currentStep >= 3 ? 'bg-primary' : 'bg-border'}`} />
-            <button onClick={() => { if (canProceedToStep3) { setCurrentStep(3); window.scrollTo({ top: 0, behavior: 'smooth' }); }}} className="flex items-center gap-2" disabled={!canProceedToStep3}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold transition-colors ${currentStep >= 3 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>3</div>
-              <span className={`hidden sm:inline font-medium ${currentStep >= 3 ? 'text-primary' : 'text-muted-foreground'}`}>Pagamento</span>
+            <div className={`w-6 md:w-12 h-0.5 ${currentStep >= 3 ? 'bg-primary' : 'bg-border'}`} />
+            <button onClick={() => { if (canProceedToStep3) { setCurrentStep(3); }}} className="flex items-center gap-1 md:gap-2" disabled={!canProceedToStep3}>
+              <div className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center font-bold text-xs md:text-sm transition-colors ${currentStep >= 3 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>3</div>
+              <span className={`hidden sm:inline text-sm font-medium ${currentStep >= 3 ? 'text-primary' : 'text-muted-foreground'}`}>Pagamento</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Free shipping progress */}
+      {/* Free shipping progress - hidden on mobile */}
       {!hasFreeShipping && (
-        <div className="bg-gradient-to-r from-primary/20 to-cyan-glow/20 border-b border-primary/20">
-          <div className="container-main py-3">
-            <div className="flex items-center justify-center gap-3 text-sm">
-              <Truck className="h-5 w-5 text-primary" />
+        <div className="hidden sm:block bg-gradient-to-r from-primary/20 to-cyan-glow/20 border-b border-primary/20">
+          <div className="container-main py-2">
+            <div className="flex items-center justify-center gap-2 text-xs md:text-sm">
+              <Truck className="h-4 w-4 text-primary" />
               <span>Faltam <strong className="text-primary">{formatPrice(remainingForFreeShipping)}</strong> para FRETE GRÁTIS!</span>
-              <div className="w-32 h-2 bg-secondary rounded-full overflow-hidden">
+              <div className="w-24 h-1.5 bg-secondary rounded-full overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-primary to-cyan-glow transition-all" style={{ width: `${Math.min(100, (totalPrice / freeShippingThreshold) * 100)}%` }} />
               </div>
             </div>
@@ -363,136 +363,133 @@ const CheckoutPage = () => {
         </div>
       )}
 
-      <main className="py-8">
-        <div className="container-main">
-          <Link to="/" className="inline-flex items-center gap-2 text-primary hover:underline mb-6">
+      <main className="py-4 md:py-8">
+        <div className="container-main px-3 md:px-4">
+          <Link to="/" className="inline-flex items-center gap-1.5 text-primary hover:underline mb-4 text-sm">
             <ArrowLeft className="h-4 w-4" />
-            Continuar comprando
+            Voltar
           </Link>
 
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Left Column - Steps */}
-            <div className="lg:col-span-2 space-y-6">
+          <div className="grid lg:grid-cols-3 gap-4 md:gap-8">
+            <div className="lg:col-span-2 space-y-4 md:space-y-6">
               {/* Step 1: Cart + Personal Data */}
               {currentStep === 1 && (
                 <>
-                  <div className="bg-card rounded-2xl border border-border overflow-hidden">
-                    <div className="p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
-                      <h2 className="font-display text-xl font-bold flex items-center gap-2">
-                        <Gift className="h-5 w-5 text-primary" />
+                  <div className="bg-card rounded-xl md:rounded-2xl border border-border overflow-hidden">
+                    <div className="p-3 md:p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
+                      <h2 className="font-display text-base md:text-xl font-bold flex items-center gap-2">
+                        <Gift className="h-4 w-4 md:h-5 md:w-5 text-primary" />
                         Seus Produtos ({totalItems})
                       </h2>
                     </div>
                     <div className="divide-y divide-border">
                       {items.map((item) => (
-                        <div key={item.product.id} className="p-4 flex gap-4">
-                          <div className="w-20 h-20 rounded-xl overflow-hidden bg-secondary/30 flex-shrink-0">
+                        <div key={item.product.id} className="p-3 md:p-4 flex gap-3">
+                          <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg md:rounded-xl overflow-hidden bg-secondary/30 flex-shrink-0">
                             <img src={item.product.image_url || '/placeholder.svg'} alt={item.product.name} className="w-full h-full object-cover" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-medium text-sm line-clamp-2 mb-1">{item.product.name}</h3>
-                            {item.product.brand && <span className="text-xs text-primary font-medium">{item.product.brand}</span>}
-                            <div className="flex items-center gap-3 mt-2">
-                              <div className="flex items-center gap-1 bg-secondary/50 rounded-lg p-1">
-                                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => updateQuantity(item.product.id, item.quantity - 1)}>
+                            <h3 className="font-medium text-xs md:text-sm line-clamp-2 mb-0.5">{item.product.name}</h3>
+                            {item.product.brand && <span className="text-[10px] md:text-xs text-primary font-medium">{item.product.brand}</span>}
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <div className="flex items-center gap-0.5 bg-secondary/50 rounded-md p-0.5">
+                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.product.id, item.quantity - 1)}>
                                   <Minus className="h-3 w-3" />
                                 </Button>
-                                <span className="w-8 text-center text-sm font-bold">{item.quantity}</span>
-                                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => updateQuantity(item.product.id, item.quantity + 1)}>
+                                <span className="w-6 text-center text-xs font-bold">{item.quantity}</span>
+                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.product.id, item.quantity + 1)}>
                                   <Plus className="h-3 w-3" />
                                 </Button>
                               </div>
-                              <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10" onClick={() => removeFromCart(item.product.id)}>
-                                <Trash2 className="h-4 w-4" />
+                              <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive hover:bg-destructive/10" onClick={() => removeFromCart(item.product.id)}>
+                                <Trash2 className="h-3 w-3" />
                               </Button>
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="font-bold text-primary">{formatPrice(item.product.price * item.quantity)}</p>
-                            {item.quantity > 1 && <p className="text-xs text-muted-foreground">{formatPrice(item.product.price)} cada</p>}
+                            <p className="font-bold text-primary text-sm md:text-base">{formatPrice(item.product.price * item.quantity)}</p>
+                            {item.quantity > 1 && <p className="text-[10px] md:text-xs text-muted-foreground">{formatPrice(item.product.price)} un.</p>}
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Personal Data */}
-                  <div className="bg-card rounded-2xl border border-border overflow-hidden">
-                    <div className="p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
-                      <h2 className="font-display text-xl font-bold flex items-center gap-2">
-                        <BadgeCheck className="h-5 w-5 text-primary" />
+                  <div className="bg-card rounded-xl md:rounded-2xl border border-border overflow-hidden">
+                    <div className="p-3 md:p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
+                      <h2 className="font-display text-base md:text-xl font-bold flex items-center gap-2">
+                        <BadgeCheck className="h-4 w-4 md:h-5 md:w-5 text-primary" />
                         Seus Dados
                       </h2>
                     </div>
-                    <div className="p-6 space-y-4">
-                      <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="p-3 md:p-6 space-y-3 md:space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                          <Label htmlFor="name">Nome completo *</Label>
-                          <Input id="name" placeholder="Seu nome" value={customerData.name} onChange={(e) => setCustomerData({ ...customerData, name: e.target.value })} className="mt-1.5" />
+                          <Label htmlFor="name" className="text-xs md:text-sm">Nome completo *</Label>
+                          <Input id="name" placeholder="Seu nome" value={customerData.name} onChange={(e) => setCustomerData({ ...customerData, name: e.target.value })} className="mt-1 h-9 md:h-10 text-sm" />
                         </div>
                         <div>
-                          <Label htmlFor="email">E-mail *</Label>
-                          <Input id="email" type="email" placeholder="seu@email.com" value={customerData.email} onChange={(e) => setCustomerData({ ...customerData, email: e.target.value })} className={`mt-1.5 ${customerData.email && !isEmailValid ? 'border-destructive focus-visible:ring-destructive' : ''}`} />
-                          {customerData.email && !isEmailValid && <p className="text-xs text-destructive mt-1">E-mail inválido</p>}
+                          <Label htmlFor="email" className="text-xs md:text-sm">E-mail *</Label>
+                          <Input id="email" type="email" placeholder="seu@email.com" value={customerData.email} onChange={(e) => setCustomerData({ ...customerData, email: e.target.value })} className={`mt-1 h-9 md:h-10 text-sm ${customerData.email && !isEmailValid ? 'border-destructive focus-visible:ring-destructive' : ''}`} />
+                          {customerData.email && !isEmailValid && <p className="text-[10px] text-destructive mt-0.5">E-mail inválido</p>}
                         </div>
                       </div>
-                      <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <Label htmlFor="phone">Telefone (WhatsApp) *</Label>
-                          <Input id="phone" placeholder="(00) 00000-0000" value={customerData.phone} onChange={(e) => setCustomerData({ ...customerData, phone: formatPhone(e.target.value) })} className="mt-1.5" maxLength={15} />
+                          <Label htmlFor="phone" className="text-xs md:text-sm">WhatsApp *</Label>
+                          <Input id="phone" placeholder="(00) 00000-0000" value={customerData.phone} onChange={(e) => setCustomerData({ ...customerData, phone: formatPhone(e.target.value) })} className="mt-1 h-9 md:h-10 text-sm" maxLength={15} />
                         </div>
                         <div>
-                          <Label htmlFor="cpf">CPF *</Label>
-                          <Input id="cpf" placeholder="000.000.000-00" value={customerData.cpf} onChange={(e) => setCustomerData({ ...customerData, cpf: formatCpf(e.target.value) })} className={`mt-1.5 ${customerData.cpf && !isCpfValid ? 'border-destructive focus-visible:ring-destructive' : ''}`} maxLength={14} />
-                          {customerData.cpf && !isCpfValid && <p className="text-xs text-destructive mt-1">CPF inválido</p>}
+                          <Label htmlFor="cpf" className="text-xs md:text-sm">CPF *</Label>
+                          <Input id="cpf" placeholder="000.000.000-00" value={customerData.cpf} onChange={(e) => setCustomerData({ ...customerData, cpf: formatCpf(e.target.value) })} className={`mt-1 h-9 md:h-10 text-sm ${customerData.cpf && !isCpfValid ? 'border-destructive focus-visible:ring-destructive' : ''}`} maxLength={14} />
+                          {customerData.cpf && !isCpfValid && <p className="text-[10px] text-destructive mt-0.5">CPF inválido</p>}
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Upsell */}
+                  {/* Upsell - Hidden on mobile */}
                   {upsellProduct && (
-                    <div className="bg-gradient-to-r from-destructive/10 via-card to-destructive/10 rounded-2xl border border-destructive/20 overflow-hidden">
-                      <div className="p-4 bg-destructive/10 border-b border-destructive/20 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center animate-pulse">
-                            <Flame className="h-5 w-5 text-destructive" />
+                    <div className="hidden md:block bg-gradient-to-r from-destructive/10 via-card to-destructive/10 rounded-xl border border-destructive/20 overflow-hidden">
+                      <div className="p-3 bg-destructive/10 border-b border-destructive/20 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-destructive/20 flex items-center justify-center animate-pulse">
+                            <Flame className="h-4 w-4 text-destructive" />
                           </div>
                           <div>
-                            <h3 className="font-bold text-destructive">OFERTA ESPECIAL!</h3>
-                            <p className="text-xs text-muted-foreground">Aproveite antes que acabe</p>
+                            <h3 className="font-bold text-destructive text-sm">OFERTA ESPECIAL!</h3>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 text-destructive text-sm font-bold">
-                          <Timer className="h-4 w-4" />
+                        <div className="flex items-center gap-1 text-destructive text-xs font-bold">
+                          <Timer className="h-3 w-3" />
                           <span>15:00</span>
                         </div>
                       </div>
-                      <div className="p-4">
-                        <div className="flex gap-4 items-center bg-card rounded-xl p-4 border border-border">
-                          <div className="relative w-24 h-24 flex-shrink-0">
-                            <img src={upsellProduct.image_url || '/placeholder.svg'} alt={upsellProduct.name} className="w-full h-full object-contain rounded-lg bg-secondary/20" />
-                            {upsellProduct.discount_percent && <span className="absolute -top-2 -left-2 px-2 py-1 bg-destructive text-white text-xs font-bold rounded-full">-{upsellProduct.discount_percent}%</span>}
+                      <div className="p-3">
+                        <div className="flex gap-3 items-center bg-card rounded-lg p-3 border border-border">
+                          <div className="relative w-16 h-16 flex-shrink-0">
+                            <img src={upsellProduct.image_url || '/placeholder.svg'} alt={upsellProduct.name} className="w-full h-full object-contain rounded-md bg-secondary/20" />
+                            {upsellProduct.discount_percent && <span className="absolute -top-1 -left-1 px-1.5 py-0.5 bg-destructive text-white text-[10px] font-bold rounded-full">-{upsellProduct.discount_percent}%</span>}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-medium line-clamp-2 mb-2">{upsellProduct.name}</h4>
+                            <h4 className="font-medium text-sm line-clamp-2 mb-1">{upsellProduct.name}</h4>
                             <div className="flex items-center gap-2">
-                              {upsellProduct.old_price && <p className="text-sm text-muted-foreground line-through">{formatPrice(upsellProduct.old_price)}</p>}
-                              <p className="font-bold text-primary text-lg">{formatPrice(upsellProduct.price)}</p>
+                              {upsellProduct.old_price && <p className="text-xs text-muted-foreground line-through">{formatPrice(upsellProduct.old_price)}</p>}
+                              <p className="font-bold text-primary">{formatPrice(upsellProduct.price)}</p>
                             </div>
                           </div>
-                          <Button className="bg-destructive hover:bg-destructive/90 text-white font-bold" onClick={() => handleAddUpsell(upsellProduct)}>
-                            <Plus className="h-4 w-4 mr-1" />
-                            Adicionar
+                          <Button size="sm" className="bg-destructive hover:bg-destructive/90 text-white font-bold" onClick={() => handleAddUpsell(upsellProduct)}>
+                            <Plus className="h-3 w-3 mr-1" />
+                            Add
                           </Button>
                         </div>
                       </div>
                     </div>
                   )}
 
-                  <Button size="lg" className="w-full h-14 bg-gradient-to-r from-primary to-cyan-glow hover:opacity-90 text-primary-foreground font-bold text-lg rounded-xl" onClick={() => setCurrentStep(2)} disabled={!canProceedToStep2}>
-                    Continuar para Entrega
-                    <ArrowRight className="h-5 w-5 ml-2" />
+                  <Button size="lg" className="w-full h-12 md:h-14 bg-gradient-to-r from-primary to-cyan-glow hover:opacity-90 text-primary-foreground font-bold text-base md:text-lg rounded-xl" onClick={() => setCurrentStep(2)} disabled={!canProceedToStep2}>
+                    Continuar
+                    <ArrowRight className="h-4 w-4 md:h-5 md:w-5 ml-2" />
                   </Button>
                 </>
               )}
@@ -500,53 +497,54 @@ const CheckoutPage = () => {
               {/* Step 2: Shipping */}
               {currentStep === 2 && (
                 <>
-                  <div className="bg-card rounded-2xl border border-border overflow-hidden">
-                    <div className="p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
-                      <h2 className="font-display text-xl font-bold flex items-center gap-2">
-                        <Truck className="h-5 w-5 text-primary" />
+                  <div className="bg-card rounded-xl md:rounded-2xl border border-border overflow-hidden">
+                    <div className="p-3 md:p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
+                      <h2 className="font-display text-base md:text-xl font-bold flex items-center gap-2">
+                        <Truck className="h-4 w-4 md:h-5 md:w-5 text-primary" />
                         Endereço de Entrega
                       </h2>
                     </div>
-                    <div className="p-6 space-y-4">
-                      <div className="grid sm:grid-cols-3 gap-4">
+                    <div className="p-3 md:p-6 space-y-3">
+                      <div className="grid grid-cols-3 gap-2 md:gap-4">
                         <div>
-                          <Label htmlFor="cep">CEP *</Label>
-                          <Input id="cep" placeholder="00000-000" value={cep} onChange={(e) => handleCepChange(e.target.value)} className="mt-1.5" maxLength={9} />
+                          <Label htmlFor="cep" className="text-xs md:text-sm">CEP *</Label>
+                          <Input id="cep" placeholder="00000-000" value={cep} onChange={(e) => handleCepChange(e.target.value)} className="mt-1 h-9 md:h-10 text-sm" maxLength={9} />
                         </div>
-                        <div className="sm:col-span-2">
-                          <Label htmlFor="address">Endereço *</Label>
-                          <Input id="address" placeholder="Rua, Avenida..." value={customerData.address} onChange={(e) => setCustomerData({...customerData, address: e.target.value})} className="mt-1.5" />
+                        <div className="col-span-2">
+                          <Label htmlFor="address" className="text-xs md:text-sm">Endereço *</Label>
+                          <Input id="address" placeholder="Rua, Avenida..." value={customerData.address} onChange={(e) => setCustomerData({...customerData, address: e.target.value})} className="mt-1 h-9 md:h-10 text-sm" />
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                      <div className="grid grid-cols-2 gap-2 md:gap-4">
                         <div>
-                          <Label htmlFor="number">Número *</Label>
-                          <Input id="number" placeholder="Nº" value={customerData.number} onChange={(e) => setCustomerData({...customerData, number: e.target.value})} className="mt-1.5" />
+                          <Label htmlFor="number" className="text-xs md:text-sm">Número *</Label>
+                          <Input id="number" placeholder="Nº" value={customerData.number} onChange={(e) => setCustomerData({...customerData, number: e.target.value})} className="mt-1 h-9 md:h-10 text-sm" />
                         </div>
                         <div>
-                          <Label htmlFor="complement">Complemento</Label>
-                          <Input id="complement" placeholder="Apto, Bloco..." value={customerData.complement} onChange={(e) => setCustomerData({...customerData, complement: e.target.value})} className="mt-1.5" />
+                          <Label htmlFor="complement" className="text-xs md:text-sm">Complemento</Label>
+                          <Input id="complement" placeholder="Apto..." value={customerData.complement} onChange={(e) => setCustomerData({...customerData, complement: e.target.value})} className="mt-1 h-9 md:h-10 text-sm" />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 md:gap-4">
+                        <div>
+                          <Label htmlFor="neighborhood" className="text-xs md:text-sm">Bairro *</Label>
+                          <Input id="neighborhood" placeholder="Bairro" value={customerData.neighborhood} onChange={(e) => setCustomerData({...customerData, neighborhood: e.target.value})} className="mt-1 h-9 md:h-10 text-sm" />
                         </div>
                         <div>
-                          <Label htmlFor="neighborhood">Bairro *</Label>
-                          <Input id="neighborhood" placeholder="Bairro" value={customerData.neighborhood} onChange={(e) => setCustomerData({...customerData, neighborhood: e.target.value})} className="mt-1.5" />
-                        </div>
-                        <div>
-                          <Label htmlFor="city">Cidade / UF *</Label>
-                          <Input id="city" placeholder="Cidade - UF" value={customerData.city} onChange={(e) => setCustomerData({...customerData, city: e.target.value})} className="mt-1.5" />
+                          <Label htmlFor="city" className="text-xs md:text-sm">Cidade/UF *</Label>
+                          <Input id="city" placeholder="Cidade - UF" value={customerData.city} onChange={(e) => setCustomerData({...customerData, city: e.target.value})} className="mt-1 h-9 md:h-10 text-sm" />
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex gap-4">
-                    <Button variant="outline" size="lg" className="flex-1 h-14" onClick={() => setCurrentStep(1)}>
-                      <ArrowLeft className="h-5 w-5 mr-2" />
-                      Voltar
+                  <div className="flex gap-2 md:gap-4">
+                    <Button variant="outline" size="lg" className="h-11 md:h-14 px-4" onClick={() => setCurrentStep(1)}>
+                      <ArrowLeft className="h-4 w-4" />
                     </Button>
-                    <Button size="lg" className="flex-1 h-14 bg-gradient-to-r from-primary to-cyan-glow hover:opacity-90 text-primary-foreground font-bold text-lg rounded-xl" onClick={() => setCurrentStep(3)} disabled={!canProceedToStep3}>
-                      Continuar para Pagamento
-                      <ArrowRight className="h-5 w-5 ml-2" />
+                    <Button size="lg" className="flex-1 h-11 md:h-14 bg-gradient-to-r from-primary to-cyan-glow hover:opacity-90 text-primary-foreground font-bold text-sm md:text-lg rounded-xl" onClick={() => setCurrentStep(3)} disabled={!canProceedToStep3}>
+                      Continuar
+                      <ArrowRight className="h-4 w-4 md:h-5 md:w-5 ml-2" />
                     </Button>
                   </div>
                 </>
@@ -557,116 +555,113 @@ const CheckoutPage = () => {
                 <>
                   {/* Card Declined Message */}
                   {cardDeclined && (
-                    <div className="bg-destructive/10 border-2 border-destructive rounded-2xl p-6 text-center space-y-4">
-                      <div className="w-16 h-16 mx-auto rounded-full bg-destructive/20 flex items-center justify-center">
-                        <XCircle className="h-10 w-10 text-destructive" />
+                    <div className="bg-destructive/10 border-2 border-destructive rounded-xl p-4 md:p-6 text-center space-y-3">
+                      <div className="w-12 h-12 md:w-16 md:h-16 mx-auto rounded-full bg-destructive/20 flex items-center justify-center">
+                        <XCircle className="h-7 w-7 md:h-10 md:w-10 text-destructive" />
                       </div>
                       <div>
-                        <h3 className="font-display text-xl font-bold text-destructive mb-2">Pagamento Recusado</h3>
-                        <p className="text-muted-foreground text-sm">
-                          Infelizmente seu cartão foi recusado pela operadora. 
-                          Isso pode acontecer por diversos motivos como limite, bloqueio ou dados incorretos.
+                        <h3 className="font-display text-lg md:text-xl font-bold text-destructive mb-1">Pagamento Recusado</h3>
+                        <p className="text-muted-foreground text-xs md:text-sm">
+                          Seu cartão foi recusado. Tente novamente ou pague com PIX.
                         </p>
                       </div>
-                      <div className="pt-4 border-t border-destructive/20">
-                        <p className="text-sm font-medium mb-3">Pague com PIX e ganhe 5% de desconto!</p>
+                      <div className="pt-3 border-t border-destructive/20">
+                        <p className="text-xs md:text-sm font-medium mb-2">Pague com PIX e ganhe 5% OFF!</p>
                         <Button 
                           size="lg" 
-                          className="w-full h-14 bg-green-600 hover:bg-green-700 text-white font-bold text-lg rounded-xl"
+                          className="w-full h-11 md:h-14 bg-green-600 hover:bg-green-700 text-white font-bold text-sm md:text-lg rounded-xl"
                           onClick={handlePayWithPix}
                         >
-                          <Zap className="h-5 w-5 mr-2" />
-                          PAGAR COM PIX - {formatPrice(pixTotal)}
+                          <Zap className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                          PIX - {formatPrice(pixTotal)}
                         </Button>
-                        <p className="text-xs text-green-500 mt-2">Você economiza {formatPrice(pixDiscount)} pagando no PIX!</p>
+                        <p className="text-[10px] md:text-xs text-green-500 mt-1">Economize {formatPrice(pixDiscount)}!</p>
                       </div>
                     </div>
                   )}
 
                   {!cardDeclined && (
                     <>
-                      <div className="bg-card rounded-2xl border border-border overflow-hidden">
-                        <div className="p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
-                          <h2 className="font-display text-xl font-bold flex items-center gap-2">
-                            <CreditCard className="h-5 w-5 text-primary" />
-                            Forma de Pagamento
+                      <div className="bg-card rounded-xl md:rounded-2xl border border-border overflow-hidden">
+                        <div className="p-3 md:p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
+                          <h2 className="font-display text-base md:text-xl font-bold flex items-center gap-2">
+                            <CreditCard className="h-4 w-4 md:h-5 md:w-5 text-primary" />
+                            Pagamento
                           </h2>
                         </div>
-                        <div className="p-4 md:p-6">
-                          <RadioGroup value={paymentMethod} onValueChange={(v) => { setPaymentMethod(v); setCardDeclined(false); }} className="space-y-3">
-                            <label className={`flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'pix' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}>
-                              <RadioGroupItem value="pix" id="pix" className="mt-1 sm:mt-0" />
+                        <div className="p-3 md:p-6">
+                          <RadioGroup value={paymentMethod} onValueChange={(v) => { setPaymentMethod(v); setCardDeclined(false); }} className="space-y-2 md:space-y-3">
+                            <label className={`flex items-center gap-3 p-3 md:p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'pix' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}>
+                              <RadioGroupItem value="pix" id="pix" />
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="font-bold">PIX</span>
-                                  <span className="px-2 py-0.5 bg-green-500/20 text-green-500 text-xs font-bold rounded-full">5% OFF</span>
+                                  <span className="font-bold text-sm md:text-base">PIX</span>
+                                  <span className="px-1.5 py-0.5 bg-green-500/20 text-green-500 text-[10px] md:text-xs font-bold rounded-full">5% OFF</span>
                                 </div>
-                                <p className="text-sm text-muted-foreground">Aprovação instantânea</p>
+                                <p className="text-xs text-muted-foreground">Aprovação instantânea</p>
                               </div>
-                              <div className="text-left sm:text-right">
-                                <p className="font-bold text-primary text-lg">{formatPrice(pixTotal)}</p>
-                                <p className="text-xs text-green-500">Economize {formatPrice(pixDiscount)}</p>
+                              <div className="text-right">
+                                <p className="font-bold text-primary text-sm md:text-lg">{formatPrice(pixTotal)}</p>
+                                <p className="text-[10px] md:text-xs text-green-500">-{formatPrice(pixDiscount)}</p>
                               </div>
                             </label>
                             
-                            <label className={`flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'card' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}>
-                              <RadioGroupItem value="card" id="card" className="mt-1 sm:mt-0" />
+                            <label className={`flex items-center gap-3 p-3 md:p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'card' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}>
+                              <RadioGroupItem value="card" id="card" />
                               <div className="flex-1">
-                                <span className="font-bold">Cartão de Crédito</span>
-                                <p className="text-sm text-muted-foreground">Até 12x sem juros</p>
+                                <span className="font-bold text-sm md:text-base">Cartão</span>
+                                <p className="text-xs text-muted-foreground">Até 12x s/juros</p>
                               </div>
-                              <div className="text-left sm:text-right">
-                                <p className="font-bold text-lg">{formatPrice(totalPrice)}</p>
-                                <p className="text-xs text-muted-foreground">ou 12x de {formatPrice(totalPrice / 12)}</p>
+                              <div className="text-right">
+                                <p className="font-bold text-sm md:text-lg">{formatPrice(totalPrice)}</p>
+                                <p className="text-[10px] md:text-xs text-muted-foreground">12x {formatPrice(totalPrice / 12)}</p>
                               </div>
                             </label>
                           </RadioGroup>
 
                           {paymentMethod === 'card' && (
-                            <div className="mt-6 pt-6 border-t border-border space-y-4">
-                              <h3 className="font-semibold flex items-center gap-2">
+                            <div className="mt-4 pt-4 border-t border-border space-y-3">
+                              <h3 className="font-semibold flex items-center gap-2 text-sm">
                                 <CreditCard className="h-4 w-4 text-primary" />
                                 Dados do Cartão
                               </h3>
                               <div>
-                                <Label htmlFor="cardNumber">Número do cartão *</Label>
-                                <Input id="cardNumber" placeholder="0000 0000 0000 0000" value={cardData.number} onChange={(e) => setCardData({...cardData, number: formatCardNumber(e.target.value)})} className="mt-1.5 font-mono text-base" maxLength={19} />
+                                <Label htmlFor="cardNumber" className="text-xs md:text-sm">Número *</Label>
+                                <Input id="cardNumber" placeholder="0000 0000 0000 0000" value={cardData.number} onChange={(e) => setCardData({...cardData, number: formatCardNumber(e.target.value)})} className="mt-1 h-9 md:h-10 font-mono text-sm" maxLength={19} />
                               </div>
                               <div>
-                                <Label htmlFor="cardName">Nome impresso no cartão *</Label>
-                                <Input id="cardName" placeholder="NOME COMPLETO" value={cardData.name} onChange={(e) => setCardData({...cardData, name: e.target.value.toUpperCase()})} className="mt-1.5 text-base" />
+                                <Label htmlFor="cardName" className="text-xs md:text-sm">Nome no cartão *</Label>
+                                <Input id="cardName" placeholder="NOME COMPLETO" value={cardData.name} onChange={(e) => setCardData({...cardData, name: e.target.value.toUpperCase()})} className="mt-1 h-9 md:h-10 text-sm" />
                               </div>
-                              <div className="grid grid-cols-2 gap-3">
+                              <div className="grid grid-cols-2 gap-2">
                                 <div>
-                                  <Label htmlFor="cardExpiry">Validade *</Label>
-                                  <Input id="cardExpiry" placeholder="MM/AA" value={cardData.expiry} onChange={(e) => setCardData({...cardData, expiry: formatExpiry(e.target.value)})} className="mt-1.5 text-base" maxLength={5} />
+                                  <Label htmlFor="cardExpiry" className="text-xs md:text-sm">Validade *</Label>
+                                  <Input id="cardExpiry" placeholder="MM/AA" value={cardData.expiry} onChange={(e) => setCardData({...cardData, expiry: formatExpiry(e.target.value)})} className="mt-1 h-9 md:h-10 text-sm" maxLength={5} />
                                 </div>
                                 <div>
-                                  <Label htmlFor="cardCvv">CVV *</Label>
-                                  <Input id="cardCvv" placeholder="000" value={cardData.cvv} onChange={(e) => setCardData({...cardData, cvv: e.target.value.replace(/\D/g, '').slice(0, 4)})} className="mt-1.5 text-base" maxLength={4} type="password" />
+                                  <Label htmlFor="cardCvv" className="text-xs md:text-sm">CVV *</Label>
+                                  <Input id="cardCvv" placeholder="000" value={cardData.cvv} onChange={(e) => setCardData({...cardData, cvv: e.target.value.replace(/\D/g, '').slice(0, 4)})} className="mt-1 h-9 md:h-10 text-sm" maxLength={4} type="password" />
                                 </div>
                               </div>
-                              <p className="text-xs text-muted-foreground">* Seus dados são processados de forma segura.</p>
                             </div>
                           )}
                         </div>
                       </div>
 
-                      <div className="flex flex-col sm:flex-row gap-3">
-                        <Button variant="outline" size="lg" className="h-14 sm:flex-1" onClick={() => setCurrentStep(2)} disabled={isProcessing}>
-                          <ArrowLeft className="h-5 w-5 mr-2" />
-                          Voltar
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="lg" className="h-11 md:h-14 px-4" onClick={() => setCurrentStep(2)} disabled={isProcessing}>
+                          <ArrowLeft className="h-4 w-4" />
                         </Button>
-                        <Button size="lg" className="h-14 sm:flex-1 bg-gradient-to-r from-primary to-cyan-glow hover:opacity-90 text-primary-foreground font-bold text-lg rounded-xl shadow-lg shadow-primary/30" onClick={handleFinalizePurchase} disabled={isProcessing || !canFinishPayment}>
+                        <Button size="lg" className="flex-1 h-11 md:h-14 bg-gradient-to-r from-primary to-cyan-glow hover:opacity-90 text-primary-foreground font-bold text-sm md:text-lg rounded-xl shadow-lg shadow-primary/30" onClick={handleFinalizePurchase} disabled={isProcessing || !canFinishPayment}>
                           {isProcessing ? (
                             <>
-                              <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                              <Loader2 className="h-4 w-4 md:h-5 md:w-5 mr-2 animate-spin" />
                               Processando...
                             </>
                           ) : (
                             <>
-                              <Lock className="h-5 w-5 mr-2" />
-                              FINALIZAR COMPRA
+                              <Lock className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                              FINALIZAR
                             </>
                           )}
                         </Button>
@@ -677,90 +672,87 @@ const CheckoutPage = () => {
               )}
             </div>
 
-            {/* Right Column - Order Summary */}
-            <div className="lg:col-span-1">
-              <div className="sticky top-24 space-y-4">
-                <div className="bg-card rounded-2xl border border-border overflow-hidden">
-                  <div className="p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
-                    <h2 className="font-display text-lg font-bold">Resumo do Pedido</h2>
+            {/* Right Column - Order Summary - Hidden on mobile, shown at bottom */}
+            <div className="lg:col-span-1 order-first lg:order-last">
+              <div className="lg:sticky lg:top-24 space-y-3 md:space-y-4">
+                {/* Order Summary - Compact on mobile */}
+                <div className="bg-card rounded-xl md:rounded-2xl border border-border overflow-hidden">
+                  <div className="p-3 md:p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
+                    <h2 className="font-display text-sm md:text-lg font-bold">Resumo</h2>
                   </div>
-                  <div className="p-4 space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Subtotal ({totalItems} itens)</span>
+                  <div className="p-3 md:p-4 space-y-2">
+                    <div className="flex justify-between text-xs md:text-sm">
+                      <span className="text-muted-foreground">Subtotal ({totalItems})</span>
                       <span>{formatPrice(totalPrice)}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs md:text-sm">
                       <span className="text-muted-foreground">Frete</span>
                       {hasFreeShipping ? <span className="text-green-500 font-bold">GRÁTIS</span> : <span>R$ 19,90</span>}
                     </div>
                     {paymentMethod === 'pix' && (
-                      <div className="flex justify-between text-sm text-green-500">
-                        <span className="flex items-center gap-1"><Zap className="h-4 w-4" />Desconto PIX (5%)</span>
+                      <div className="flex justify-between text-xs md:text-sm text-green-500">
+                        <span className="flex items-center gap-1"><Zap className="h-3 w-3" />PIX -5%</span>
                         <span>-{formatPrice(pixDiscount)}</span>
                       </div>
                     )}
-                    <div className="border-t border-border pt-3 mt-3">
-                      <div className="flex justify-between font-bold text-xl">
+                    <div className="border-t border-border pt-2 mt-2">
+                      <div className="flex justify-between font-bold text-base md:text-xl">
                         <span>Total</span>
                         <span className="text-primary">{formatPrice(paymentMethod === 'pix' ? pixTotal : totalPrice)}</span>
                       </div>
                       {paymentMethod !== 'pix' && (
-                        <p className="text-xs text-muted-foreground mt-1">ou <span className="text-primary font-bold">{formatPrice(pixTotal)}</span> no PIX</p>
+                        <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5">ou <span className="text-primary font-bold">{formatPrice(pixTotal)}</span> no PIX</p>
                       )}
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-card rounded-2xl border border-border p-4 space-y-4">
-                  <h3 className="font-bold text-center text-sm text-muted-foreground uppercase tracking-wide">Compra 100% Segura</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="flex flex-col items-center gap-2 p-3 bg-secondary/30 rounded-xl">
-                      <ShieldCheck className="h-8 w-8 text-green-500" />
-                      <span className="text-xs text-center font-medium">Site Seguro</span>
+                {/* Security badges - Hidden on mobile */}
+                <div className="hidden lg:block bg-card rounded-xl border border-border p-3 space-y-3">
+                  <h3 className="font-bold text-center text-xs text-muted-foreground uppercase">Compra 100% Segura</h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="flex flex-col items-center gap-1.5 p-2 bg-secondary/30 rounded-lg">
+                      <ShieldCheck className="h-6 w-6 text-green-500" />
+                      <span className="text-[10px] text-center font-medium">Site Seguro</span>
                     </div>
-                    <div className="flex flex-col items-center gap-2 p-3 bg-secondary/30 rounded-xl">
-                      <Lock className="h-8 w-8 text-primary" />
-                      <span className="text-xs text-center font-medium">SSL 256-bit</span>
+                    <div className="flex flex-col items-center gap-1.5 p-2 bg-secondary/30 rounded-lg">
+                      <Lock className="h-6 w-6 text-primary" />
+                      <span className="text-[10px] text-center font-medium">SSL 256-bit</span>
                     </div>
-                    <div className="flex flex-col items-center gap-2 p-3 bg-secondary/30 rounded-xl">
-                      <Truck className="h-8 w-8 text-primary" />
-                      <span className="text-xs text-center font-medium">Entrega Garantida</span>
+                    <div className="flex flex-col items-center gap-1.5 p-2 bg-secondary/30 rounded-lg">
+                      <Truck className="h-6 w-6 text-primary" />
+                      <span className="text-[10px] text-center font-medium">Entrega Garantida</span>
                     </div>
-                    <div className="flex flex-col items-center gap-2 p-3 bg-secondary/30 rounded-xl">
-                      <BadgeCheck className="h-8 w-8 text-primary" />
-                      <span className="text-xs text-center font-medium">Produtos Originais</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-card rounded-2xl border border-border p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="flex text-yellow-500">{[1,2,3,4,5].map(i => <Star key={i} className="h-4 w-4 fill-current" />)}</div>
-                    <span className="font-bold text-sm">4.9/5</span>
-                    <span className="text-xs text-muted-foreground">(2.847 avaliações)</span>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="p-3 bg-secondary/30 rounded-xl">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="flex text-yellow-500">{[1,2,3,4,5].map(i => <Star key={i} className="h-3 w-3 fill-current" />)}</div>
-                        <span className="text-xs font-medium">Carlos M.</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">"Entrega super rápida! Produtos originais e bem embalados."</p>
-                    </div>
-                    <div className="p-3 bg-secondary/30 rounded-xl">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="flex text-yellow-500">{[1,2,3,4,5].map(i => <Star key={i} className="h-3 w-3 fill-current" />)}</div>
-                        <span className="text-xs font-medium">Ana P.</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">"Melhor loja de produtos automotivos! Recomendo muito."</p>
+                    <div className="flex flex-col items-center gap-1.5 p-2 bg-secondary/30 rounded-lg">
+                      <BadgeCheck className="h-6 w-6 text-primary" />
+                      <span className="text-[10px] text-center font-medium">Originais</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2 justify-center">
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border rounded-full text-xs"><Check className="h-3 w-3 text-green-500" />7 dias para troca</div>
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border rounded-full text-xs"><Check className="h-3 w-3 text-green-500" />Nota Fiscal</div>
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border rounded-full text-xs"><Check className="h-3 w-3 text-green-500" />Suporte WhatsApp</div>
+                {/* Reviews - Hidden on mobile */}
+                <div className="hidden lg:block bg-card rounded-xl border border-border p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="flex text-yellow-500">{[1,2,3,4,5].map(i => <Star key={i} className="h-3 w-3 fill-current" />)}</div>
+                    <span className="font-bold text-xs">4.9/5</span>
+                    <span className="text-[10px] text-muted-foreground">(2.847)</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="p-2 bg-secondary/30 rounded-lg">
+                      <div className="flex items-center gap-1 mb-0.5">
+                        <div className="flex text-yellow-500">{[1,2,3,4,5].map(i => <Star key={i} className="h-2 w-2 fill-current" />)}</div>
+                        <span className="text-[10px] font-medium">Carlos M.</span>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground">"Entrega rápida! Produtos originais."</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mobile trust badges */}
+                <div className="flex lg:hidden flex-wrap gap-1.5 justify-center">
+                  <div className="flex items-center gap-1 px-2 py-1 bg-card border border-border rounded-full text-[10px]"><Check className="h-2.5 w-2.5 text-green-500" />7 dias troca</div>
+                  <div className="flex items-center gap-1 px-2 py-1 bg-card border border-border rounded-full text-[10px]"><Check className="h-2.5 w-2.5 text-green-500" />Nota Fiscal</div>
+                  <div className="flex items-center gap-1 px-2 py-1 bg-card border border-border rounded-full text-[10px]"><Check className="h-2.5 w-2.5 text-green-500" />Suporte</div>
                 </div>
               </div>
             </div>
