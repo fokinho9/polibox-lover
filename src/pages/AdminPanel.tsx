@@ -25,7 +25,9 @@ import {
   FileText,
   ShoppingCart,
   Image,
-  Filter
+  Filter,
+  Square,
+  CheckSquare
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -92,6 +94,8 @@ const AdminPanel = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [filterBy, setFilterBy] = useState<'all' | 'with-description' | 'without-description' | 'with-image' | 'without-image'>('all');
+  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
+  const [isDeletingBulk, setIsDeletingBulk] = useState(false);
   const productsPerPage = 50;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -231,6 +235,77 @@ const AdminPanel = () => {
         title: "Erro",
         description: "Falha ao excluir produto.",
         variant: "destructive",
+      });
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedProducts.size === 0) return;
+    
+    const confirmDelete = window.confirm(`Tem certeza que deseja excluir ${selectedProducts.size} produtos?`);
+    if (!confirmDelete) return;
+    
+    setIsDeletingBulk(true);
+    let deletedCount = 0;
+    let errorCount = 0;
+    
+    try {
+      for (const productId of selectedProducts) {
+        try {
+          await productsApi.delete(productId);
+          deletedCount++;
+        } catch (error) {
+          errorCount++;
+          console.error(`Failed to delete product ${productId}:`, error);
+        }
+      }
+      
+      toast({
+        title: "Exclusão em lote concluída",
+        description: `${deletedCount} produtos excluídos${errorCount > 0 ? `, ${errorCount} erros` : ''}.`,
+      });
+      
+      setSelectedProducts(new Set());
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha na exclusão em lote.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeletingBulk(false);
+    }
+  };
+
+  const toggleProductSelection = (productId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    setSelectedProducts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(productId)) {
+        newSet.delete(productId);
+      } else {
+        newSet.add(productId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSelectAll = (paginatedProducts: Product[]) => {
+    const allSelected = paginatedProducts.every(p => selectedProducts.has(p.id));
+    if (allSelected) {
+      // Deselect all on current page
+      setSelectedProducts(prev => {
+        const newSet = new Set(prev);
+        paginatedProducts.forEach(p => newSet.delete(p.id));
+        return newSet;
+      });
+    } else {
+      // Select all on current page
+      setSelectedProducts(prev => {
+        const newSet = new Set(prev);
+        paginatedProducts.forEach(p => newSet.add(p.id));
+        return newSet;
       });
     }
   };
@@ -780,13 +855,46 @@ const AdminPanel = () => {
                   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
                   const paginatedProducts = filteredProducts.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage);
                   
+                  const allOnPageSelected = paginatedProducts.length > 0 && paginatedProducts.every(p => selectedProducts.has(p.id));
+                  
                   return (
                     <>
-                      <div className="flex justify-between items-center mb-4">
-                        <p className="text-sm text-muted-foreground">
-                          Página {currentPage} de {totalPages} 
-                          ({filteredProducts.length} produtos{filterBy !== 'all' ? ` - Filtro: ${filterBy === 'with-description' ? 'Com Descrição' : filterBy === 'without-description' ? 'Sem Descrição' : filterBy}` : ''})
-                        </p>
+                      <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
+                        <div className="flex items-center gap-3">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => toggleSelectAll(paginatedProducts)}
+                            className="flex items-center gap-2"
+                          >
+                            {allOnPageSelected ? (
+                              <CheckSquare className="h-4 w-4 text-primary" />
+                            ) : (
+                              <Square className="h-4 w-4" />
+                            )}
+                            {allOnPageSelected ? 'Desmarcar tudo' : 'Selecionar página'}
+                          </Button>
+                          {selectedProducts.size > 0 && (
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={handleBulkDelete}
+                              disabled={isDeletingBulk}
+                              className="flex items-center gap-2"
+                            >
+                              {isDeletingBulk ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
+                              Excluir ({selectedProducts.size})
+                            </Button>
+                          )}
+                          <p className="text-sm text-muted-foreground">
+                            Página {currentPage} de {totalPages} 
+                            ({filteredProducts.length} produtos{filterBy !== 'all' ? ` - Filtro: ${filterBy === 'with-description' ? 'Com Descrição' : filterBy === 'without-description' ? 'Sem Descrição' : filterBy}` : ''})
+                          </p>
+                        </div>
                         <div className="flex gap-2">
                           <Button
                             variant="outline"
@@ -808,61 +916,75 @@ const AdminPanel = () => {
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         {paginatedProducts.map((product: Product) => (
-                    <div 
-                      key={product.id} 
-                      className={`p-4 rounded-lg border cursor-pointer transition-all group ${
-                        product.price === 0 
-                          ? 'bg-red-500/10 border-red-500/50 hover:border-red-500' 
-                          : 'bg-secondary/30 border-border hover:border-primary/50'
-                      }`}
-                      onClick={() => setEditingProduct(product)}
-                    >
-                      <div className="relative">
-                        {product.image_url && (
-                          <img 
-                            src={product.image_url} 
-                            alt={product.name}
-                            className="w-full h-32 object-contain mb-3 rounded"
-                          />
-                        )}
-                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <div className="bg-primary rounded-full p-1.5">
-                            <Pencil className="h-3 w-3 text-white" />
-                          </div>
-                        </div>
-                        {product.price === 0 && (
-                          <Badge className="absolute top-2 left-2 bg-red-500">
-                            SEM PREÇO
-                          </Badge>
-                        )}
-                        {product.description && product.description.length > 10 && (
-                          <Badge className="absolute top-2 left-2 bg-green-500" style={{ left: product.price === 0 ? '90px' : '8px' }}>
-                            DESCRIÇÃO
-                          </Badge>
-                        )}
-                      </div>
-                      <h3 className="text-sm font-medium text-foreground line-clamp-2 mb-2">
-                        {product.name}
-                      </h3>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className={`font-bold ${product.price === 0 ? 'text-red-500' : 'text-primary'}`}>
-                            R$ {product.price?.toFixed(2).replace('.', ',')}
-                          </span>
-                          {product.pix_price && product.pix_price > 0 && (
-                            <p className="text-xs text-green-500">
-                              PIX: R$ {product.pix_price.toFixed(2).replace('.', ',')}
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex gap-1 flex-wrap justify-end">
-                          <Badge variant="outline" className="text-xs">
-                            {product.category}
-                          </Badge>
-                          {product.discount_percent && product.discount_percent > 0 && (
-                            <Badge className="bg-yellow-500 text-black text-xs">
-                              -{product.discount_percent}%
-                            </Badge>
+                          <div 
+                            key={product.id} 
+                            className={`p-4 rounded-lg border cursor-pointer transition-all group relative ${
+                              selectedProducts.has(product.id)
+                                ? 'ring-2 ring-primary border-primary bg-primary/10'
+                                : product.price === 0 
+                                  ? 'bg-red-500/10 border-red-500/50 hover:border-red-500' 
+                                  : 'bg-secondary/30 border-border hover:border-primary/50'
+                            }`}
+                            onClick={() => setEditingProduct(product)}
+                          >
+                            {/* Checkbox */}
+                            <div 
+                              className="absolute top-2 left-2 z-10"
+                              onClick={(e) => toggleProductSelection(product.id, e)}
+                            >
+                              {selectedProducts.has(product.id) ? (
+                                <CheckSquare className="h-5 w-5 text-primary cursor-pointer" />
+                              ) : (
+                                <Square className="h-5 w-5 text-muted-foreground hover:text-primary cursor-pointer" />
+                              )}
+                            </div>
+                            
+                            <div className="relative">
+                              {product.image_url && (
+                                <img 
+                                  src={product.image_url} 
+                                  alt={product.name}
+                                  className="w-full h-32 object-contain mb-3 rounded"
+                                />
+                              )}
+                              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="bg-primary rounded-full p-1.5">
+                                  <Pencil className="h-3 w-3 text-white" />
+                                </div>
+                              </div>
+                              {product.price === 0 && (
+                                <Badge className="absolute top-2 left-6 bg-red-500">
+                                  SEM PREÇO
+                                </Badge>
+                              )}
+                              {product.description && product.description.length > 10 && (
+                                <Badge className="absolute top-2 bg-green-500" style={{ left: product.price === 0 ? '110px' : '28px' }}>
+                                  DESCRIÇÃO
+                                </Badge>
+                              )}
+                            </div>
+                            <h3 className="text-sm font-medium text-foreground line-clamp-2 mb-2">
+                              {product.name}
+                            </h3>
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <span className={`font-bold ${product.price === 0 ? 'text-red-500' : 'text-primary'}`}>
+                                  R$ {product.price?.toFixed(2).replace('.', ',')}
+                                </span>
+                                {product.pix_price && product.pix_price > 0 && (
+                                  <p className="text-xs text-green-500">
+                                    PIX: R$ {product.pix_price.toFixed(2).replace('.', ',')}
+                                  </p>
+                                )}
+                              </div>
+                              <div className="flex gap-1 flex-wrap justify-end">
+                                <Badge variant="outline" className="text-xs">
+                                  {product.category}
+                                </Badge>
+                                {product.discount_percent && product.discount_percent > 0 && (
+                                  <Badge className="bg-yellow-500 text-black text-xs">
+                                    -{product.discount_percent}%
+                                  </Badge>
                           )}
                         </div>
                       </div>
