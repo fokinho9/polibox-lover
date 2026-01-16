@@ -72,7 +72,7 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Logo and about */}
           <div className="col-span-2 lg:col-span-1">
-            <img src={logoPolicar} alt="Policar" className="h-14 w-auto mb-4" />
+            <img src={logoPolicar} alt="Policar" className="h-10 md:h-12 w-auto mb-4" />
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">
               Sua loja especializada em produtos para estética automotiva. 
               Qualidade e preço justo para profissionais e entusiastas.
