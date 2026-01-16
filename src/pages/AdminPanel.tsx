@@ -24,7 +24,8 @@ import {
   AlertTriangle,
   FileText,
   ShoppingCart,
-  Image
+  Image,
+  Filter
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -85,6 +86,7 @@ const AdminPanel = () => {
   const [isCreatingProduct, setIsCreatingProduct] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [filterBy, setFilterBy] = useState<'all' | 'with-description' | 'without-description' | 'with-image' | 'without-image'>('all');
   const productsPerPage = 50;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -473,6 +475,34 @@ const AdminPanel = () => {
             <Image className="h-4 w-4 mr-2" />
             {productsWithImage} com imagem
           </Badge>
+          
+          {/* Filter Buttons */}
+          <div className="flex gap-2 ml-auto">
+            <Button
+              variant={filterBy === 'all' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => { setFilterBy('all'); setCurrentPage(1); }}
+            >
+              <Filter className="h-4 w-4 mr-1" />
+              Todos
+            </Button>
+            <Button
+              variant={filterBy === 'with-description' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => { setFilterBy('with-description'); setCurrentPage(1); }}
+              className={filterBy === 'with-description' ? 'bg-green-600 hover:bg-green-700' : 'border-green-500 text-green-500 hover:bg-green-500/10'}
+            >
+              Com Descrição
+            </Button>
+            <Button
+              variant={filterBy === 'without-description' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => { setFilterBy('without-description'); setCurrentPage(1); }}
+              className={filterBy === 'without-description' ? 'bg-orange-600 hover:bg-orange-700' : 'border-orange-500 text-orange-500 hover:bg-orange-500/10'}
+            >
+              Sem Descrição
+            </Button>
+          </div>
         </div>
 
         {/* CSV Import Section */}
@@ -732,34 +762,47 @@ const AdminPanel = () => {
               </p>
             ) : (
               <>
-                <div className="flex justify-between items-center mb-4">
-                  <p className="text-sm text-muted-foreground">
-                    Página {currentPage} de {Math.ceil(products.length / productsPerPage)} 
-                    ({products.length} produtos)
-                  </p>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                      disabled={currentPage === 1}
-                    >
-                      Anterior
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentPage(p => Math.min(Math.ceil(products.length / productsPerPage), p + 1))}
-                      disabled={currentPage >= Math.ceil(products.length / productsPerPage)}
-                    >
-                      Próximo
-                    </Button>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {products
-                    .slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)
-                    .map((product: Product) => (
+                {(() => {
+                  // Apply filter
+                  const filteredProducts = products.filter((p: Product) => {
+                    if (filterBy === 'with-description') return p.description && p.description.length > 10;
+                    if (filterBy === 'without-description') return !p.description || p.description.length <= 10;
+                    if (filterBy === 'with-image') return p.image_url && p.image_url.length > 0;
+                    if (filterBy === 'without-image') return !p.image_url || p.image_url.length === 0;
+                    return true;
+                  });
+                  
+                  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+                  const paginatedProducts = filteredProducts.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage);
+                  
+                  return (
+                    <>
+                      <div className="flex justify-between items-center mb-4">
+                        <p className="text-sm text-muted-foreground">
+                          Página {currentPage} de {totalPages} 
+                          ({filteredProducts.length} produtos{filterBy !== 'all' ? ` - Filtro: ${filterBy === 'with-description' ? 'Com Descrição' : filterBy === 'without-description' ? 'Sem Descrição' : filterBy}` : ''})
+                        </p>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            disabled={currentPage === 1}
+                          >
+                            Anterior
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                            disabled={currentPage >= totalPages}
+                          >
+                            Próximo
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {paginatedProducts.map((product: Product) => (
                     <div 
                       key={product.id} 
                       className={`p-4 rounded-lg border cursor-pointer transition-all group ${
@@ -819,27 +862,30 @@ const AdminPanel = () => {
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-                <div className="flex justify-center gap-2 mt-4">
-                  {Array.from({ length: Math.min(10, Math.ceil(products.length / productsPerPage)) }, (_, i) => {
-                    const pageNum = i + 1;
-                    return (
-                      <Button
-                        key={pageNum}
-                        variant={currentPage === pageNum ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setCurrentPage(pageNum)}
-                        className="w-10"
-                      >
-                        {pageNum}
-                      </Button>
-                    );
-                  })}
-                  {Math.ceil(products.length / productsPerPage) > 10 && (
-                    <span className="text-muted-foreground px-2">...</span>
-                  )}
-                </div>
+                        ))}
+                      </div>
+                      <div className="flex justify-center gap-2 mt-4">
+                        {Array.from({ length: Math.min(10, totalPages) }, (_, i) => {
+                          const pageNum = i + 1;
+                          return (
+                            <Button
+                              key={pageNum}
+                              variant={currentPage === pageNum ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setCurrentPage(pageNum)}
+                              className="w-10"
+                            >
+                              {pageNum}
+                            </Button>
+                          );
+                        })}
+                        {totalPages > 10 && (
+                          <span className="text-muted-foreground px-2">...</span>
+                        )}
+                      </div>
+                    </>
+                  );
+                })()}
               </>
             )}
           </CardContent>
