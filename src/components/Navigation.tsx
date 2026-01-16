@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, Percent, Droplet, Car, Sparkles, Calculator, Search, Paintbrush, Settings, Package } from "lucide-react";
+import { Menu, Percent, Droplet, Car, Sparkles, Calculator, Search, Paintbrush, Settings, Package, Bike, Trophy, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import { productsApi, Product } from "@/lib/api/products";
+
 const navItems = [
   { icon: Percent, label: "OFERTAS", href: "/categoria/ofertas", highlight: true, sublabel: "-40%" },
   { icon: Droplet, label: "LAVAGEM", href: "/categoria/lavagem" },
@@ -22,7 +23,13 @@ const navItems = [
   { icon: Settings, label: "EQUIPAMENTOS", href: "/categoria/equipamentos" },
 ];
 
-const calculatorItem = { icon: Calculator, label: "CALCULADORA DE DILUIÇÃO", href: "/calculadora" };
+const extraItems = [
+  { icon: Calculator, label: "CALCULADORA DE DILUIÇÃO", href: "/calculadora", badge: "NOVO" },
+  { icon: Bike, label: "MOTOS", href: "/categoria/motos" },
+  { icon: Trophy, label: "MAIS VENDIDOS", href: "/categoria/mais-vendidos" },
+  { icon: Circle, label: "PNEU PRETINHO", href: "/categoria/pneu-pretinho" },
+  { icon: Droplet, label: "LIMPADORES APC", href: "/categoria/limpadores-apc" },
+];
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -127,19 +134,24 @@ const Navigation = () => {
                   </Link>
                 ))}
                 
-                {/* Separator and Calculator */}
+                {/* Separator and Extra Items */}
                 <Separator className="my-2 bg-border" />
-                <Link
-                  to={calculatorItem.href}
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors bg-gradient-to-r from-primary/20 to-cyan-glow/20 hover:from-primary/30 hover:to-cyan-glow/30 text-primary border border-primary/30"
-                >
-                  <calculatorItem.icon className="h-5 w-5" />
-                  <span className="font-medium">{calculatorItem.label}</span>
-                  <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded font-bold ml-auto">
-                    NOVO
-                  </span>
-                </Link>
+                {extraItems.map((item, index) => (
+                  <Link
+                    key={`extra-${index}`}
+                    to={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors bg-gradient-to-r from-primary/20 to-cyan-glow/20 hover:from-primary/30 hover:to-cyan-glow/30 text-primary border border-primary/30"
+                  >
+                    <item.icon className="h-5 w-5" />
+                    <span className="font-medium">{item.label}</span>
+                    {item.badge && (
+                      <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded font-bold ml-auto">
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                ))}
               </div>
             </SheetContent>
           </Sheet>
