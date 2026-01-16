@@ -14,51 +14,56 @@ interface Product {
 }
 
 function extractDescription(markdown: string): string | null {
-  // Remove navigation and header sections
-  let content = markdown;
+  // Primary pattern: Look for "## Descrição Geral" section (Polibox format)
+  const descricaoGeralMatch = markdown.match(/##\s*Descrição Geral\s*\n([\s\S]*?)(?=\n##\s|\n\* \* \*\s*\n##|\n---\s*\n##|$)/i);
   
-  // Look for product description sections
+  if (descricaoGeralMatch && descricaoGeralMatch[1]) {
+    const desc = cleanDescription(descricaoGeralMatch[1]);
+    if (desc.length > 50) {
+      return desc;
+    }
+  }
+  
+  // Secondary patterns for other sites
   const descriptionPatterns = [
-    /(?:Descrição|DESCRIÇÃO|Sobre o produto|SOBRE O PRODUTO)[:\s]*\n*([\s\S]*?)(?=\n(?:Características|CARACTERÍSTICAS|Especificações|ESPECIFICAÇÕES|Avaliações|AVALIAÇÕES|Produtos relacionados|PRODUTOS RELACIONADOS|Compartilhar|COMPARTILHAR|\*\*\*|---|$))/i,
-    /(?:Detalhes|DETALHES)[:\s]*\n*([\s\S]*?)(?=\n(?:Características|Especificações|Avaliações|$))/i,
+    /##\s*(?:Descrição|Sobre o produto)\s*\n([\s\S]*?)(?=\n##\s|$)/i,
+    /(?:Descrição|DESCRIÇÃO)[:\s]*\n+([\s\S]*?)(?=\n(?:##|Características|Especificações|Avaliações|Itens Inclusos|\* \* \*|$))/i,
   ];
   
   for (const pattern of descriptionPatterns) {
-    const match = content.match(pattern);
+    const match = markdown.match(pattern);
     if (match && match[1]) {
-      const desc = match[1]
-        .replace(/\n{3,}/g, '\n\n')
-        .replace(/\[.*?\]\(.*?\)/g, '') // Remove markdown links
-        .replace(/!\[.*?\]\(.*?\)/g, '') // Remove images
-        .replace(/#{1,6}\s*/g, '') // Remove headers
-        .replace(/\*{1,2}([^*]+)\*{1,2}/g, '$1') // Remove bold/italic
-        .trim();
-      
+      const desc = cleanDescription(match[1]);
       if (desc.length > 50) {
-        return desc.substring(0, 2000); // Limit description length
+        return desc;
       }
     }
   }
   
-  // Fallback: try to get main content
-  const lines = content.split('\n').filter(line => {
-    const trimmed = line.trim();
-    return trimmed.length > 30 && 
-           !trimmed.startsWith('#') &&
-           !trimmed.startsWith('!') &&
-           !trimmed.includes('R$') &&
-           !trimmed.match(/^\d+x\s+de/i) &&
-           !trimmed.match(/^(Comprar|Adicionar|Frete|Parcele|PIX)/i);
-  });
-  
-  if (lines.length > 0) {
-    const description = lines.slice(0, 10).join('\n').trim();
-    if (description.length > 50) {
-      return description.substring(0, 2000);
-    }
-  }
-  
   return null;
+}
+
+function cleanDescription(text: string): string {
+  return text
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Keep link text, remove URL
+    .replace(/!\[.*?\]\(.*?\)/g, '') // Remove images
+    .replace(/\*{1,2}([^*]+)\*{1,2}/g, '$1') // Remove bold/italic markers
+    .replace(/^\s*[-*]\s+\[.*?\]\(.*?\)\s*$/gm, '') // Remove navigation links
+    .replace(/^\s*\* \* \*\s*$/gm, '') // Remove horizontal rules
+    .split('\n')
+    .filter(line => {
+      const trimmed = line.trim();
+      // Filter out navigation, price, and CTA lines
+      return trimmed.length > 0 &&
+        !trimmed.match(/^(Comprar|Adicionar|Frete|Parcele|PIX|Calcular|Avise-me)/i) &&
+        !trimmed.includes('R$') &&
+        !trimmed.match(/^\d+x\s+de/i) &&
+        !trimmed.match(/^https?:\/\//);
+    })
+    .join('\n')
+    .trim()
+    .substring(0, 2000);
 }
 
 function extractProductInfo(markdown: string): { description?: string; brand?: string } {
