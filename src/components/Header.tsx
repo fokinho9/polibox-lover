@@ -1,7 +1,7 @@
 import { Truck, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 const Header = () => {
-  return <header className="bg-background border-b border-border sticky top-0 z-50">
+  return <header className="bg-background border-b border-border">
       {/* Top bar */}
       <div className="bg-gradient-to-r from-secondary via-secondary/80 to-secondary py-2.5">
         <div className="container-main flex items-center justify-center gap-8 text-sm">
