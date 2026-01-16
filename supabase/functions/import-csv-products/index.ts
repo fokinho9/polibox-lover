@@ -336,13 +336,59 @@ serve(async (req) => {
       );
     }
     
-    // Insert products in batches
+    // Get all existing products to check for duplicates
+    const productNames = products.map(p => p.name);
+    const { data: existingProducts, error: fetchError } = await supabase
+      .from('products')
+      .select('id, name, category')
+      .in('name', productNames);
+    
+    if (fetchError) {
+      console.error('Error fetching existing products:', fetchError);
+    }
+    
+    // Create a map of existing products by name
+    const existingMap = new Map<string, { id: string; category: string | null }>();
+    if (existingProducts) {
+      for (const p of existingProducts) {
+        existingMap.set(p.name, { id: p.id, category: p.category });
+      }
+    }
+    
+    // Separate new products from existing ones that need category update
+    const newProducts: ProductData[] = [];
+    const productsToUpdateCategory: { id: string; newCategory: string }[] = [];
+    
+    for (const product of products) {
+      const existing = existingMap.get(product.name);
+      
+      if (existing) {
+        // Product exists - check if we need to add the new category
+        const currentCategories = existing.category ? existing.category.split(',').map(c => c.trim()) : [];
+        
+        if (!currentCategories.includes(category)) {
+          // Add the new category to the existing ones
+          const updatedCategory = [...currentCategories, category].join(', ');
+          productsToUpdateCategory.push({ id: existing.id, newCategory: updatedCategory });
+          console.log(`Product "${product.name.substring(0, 40)}..." already exists - adding category "${category}"`);
+        } else {
+          console.log(`Product "${product.name.substring(0, 40)}..." already has category "${category}" - skipping`);
+        }
+      } else {
+        // New product - add to insert list
+        newProducts.push(product);
+      }
+    }
+    
+    // Insert new products in batches
     const batchSize = 100;
     let insertedCount = 0;
+    let updatedCount = 0;
     let errors: string[] = [];
     
-    for (let i = 0; i < products.length; i += batchSize) {
-      const batch = products.slice(i, i + batchSize);
+    // Insert new products
+    for (let i = 0; i < newProducts.length; i += batchSize) {
+      const batch = newProducts.slice(i, i + batchSize);
       
       const { error } = await supabase
         .from('products')
@@ -350,24 +396,40 @@ serve(async (req) => {
       
       if (error) {
         console.error('Batch insert error:', error);
-        errors.push(`Batch ${Math.floor(i/batchSize)}: ${error.message}`);
+        errors.push(`Insert batch ${Math.floor(i/batchSize)}: ${error.message}`);
       } else {
         insertedCount += batch.length;
         console.log(`Inserted batch ${Math.floor(i/batchSize) + 1}: ${batch.length} products`);
       }
     }
     
-    const productsWithImages = products.filter(p => p.image_url).length;
+    // Update existing products with new category
+    for (const update of productsToUpdateCategory) {
+      const { error } = await supabase
+        .from('products')
+        .update({ category: update.newCategory })
+        .eq('id', update.id);
+      
+      if (error) {
+        console.error(`Error updating product ${update.id}:`, error);
+        errors.push(`Update ${update.id}: ${error.message}`);
+      } else {
+        updatedCount++;
+      }
+    }
+    
+    const productsWithImages = newProducts.filter(p => p.image_url).length;
     
     return new Response(
       JSON.stringify({ 
         success: true, 
         products_found: products.length,
         products_inserted: insertedCount,
+        products_updated: updatedCount,
         products_with_images: productsWithImages,
         category,
         errors: errors.length > 0 ? errors : undefined,
-        sample: products.slice(0, 3).map(p => ({ name: p.name, price: p.price, image_url: p.image_url }))
+        sample: newProducts.slice(0, 3).map(p => ({ name: p.name, price: p.price, image_url: p.image_url }))
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
