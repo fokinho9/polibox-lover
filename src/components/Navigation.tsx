@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, Percent, Droplet, Car, Sparkles, Calculator, Search, Paintbrush, Settings } from "lucide-react";
+import { Menu, Percent, Droplet, Car, Sparkles, Calculator, Search, Paintbrush, Settings, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,6 +18,7 @@ const navItems = [
   { icon: Sparkles, label: "POLIMENTO", href: "/categoria/polimento" },
   { icon: Car, label: "INTERIOR", href: "/categoria/interior" },
   { icon: Paintbrush, label: "CERAS", href: "/categoria/ceras" },
+  { icon: Package, label: "KITS", href: "/categoria/kits" },
   { icon: Settings, label: "EQUIPAMENTOS", href: "/categoria/equipamentos" },
 ];
 
