@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Gift, CheckCircle, ChevronRight, X, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useQuiz } from "@/contexts/QuizContext";
+import confetti from "canvas-confetti";
 
 const questions = [
   {
@@ -28,6 +29,42 @@ interface QuizModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
+const fireConfetti = () => {
+  const duration = 3000;
+  const end = Date.now() + duration;
+
+  const colors = ['#00E5FF', '#00B8D4', '#FFD700', '#FF6B6B', '#4CAF50'];
+
+  (function frame() {
+    confetti({
+      particleCount: 3,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0 },
+      colors: colors
+    });
+    confetti({
+      particleCount: 3,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1 },
+      colors: colors
+    });
+
+    if (Date.now() < end) {
+      requestAnimationFrame(frame);
+    }
+  }());
+
+  // Big burst in the center
+  confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { y: 0.6 },
+    colors: colors
+  });
+};
+
 const QuizModal = ({ open, onOpenChange }: QuizModalProps) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
@@ -43,6 +80,8 @@ const QuizModal = ({ open, onOpenChange }: QuizModalProps) => {
     } else {
       setCompleted(true);
       completeQuiz();
+      // Fire confetti when quiz is completed
+      setTimeout(() => fireConfetti(), 200);
     }
   };
 
