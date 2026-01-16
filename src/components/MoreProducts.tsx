@@ -2,17 +2,18 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { productsApi, Product } from "@/lib/api/products";
 import ProductCard from "./ProductCard";
-import { Loader2, Flame, ArrowRight, Sparkles } from "lucide-react";
+import { Loader2, Package, ArrowRight, Star } from "lucide-react";
 
-const ProductGrid = () => {
+const MoreProducts = () => {
   const { data: products = [], isLoading } = useQuery({
-    queryKey: ['products-home'],
+    queryKey: ['products-more'],
     queryFn: async () => {
       const allProducts = await productsApi.getAll();
+      // Get products sorted by price (best value) excluding the ones already shown in offers
       return allProducts
-        .filter(p => p.price > 0 && p.discount_percent && p.discount_percent > 0)
-        .sort((a, b) => (b.discount_percent || 0) - (a.discount_percent || 0))
-        .slice(0, 12);
+        .filter(p => p.price > 0)
+        .sort((a, b) => a.price - b.price)
+        .slice(12, 24); // Skip first 12 (shown in offers), get next 12
     },
   });
 
@@ -22,12 +23,14 @@ const ProductGrid = () => {
         <div className="container-main">
           <div className="flex items-center justify-center gap-3 py-20">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="text-lg text-muted-foreground">Carregando ofertas...</span>
+            <span className="text-lg text-muted-foreground">Carregando produtos...</span>
           </div>
         </div>
       </section>
     );
   }
+
+  if (products.length === 0) return null;
 
   return (
     <section className="py-12 md:py-16 bg-background relative overflow-hidden">
@@ -42,18 +45,18 @@ const ProductGrid = () => {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
-                <Flame className="h-6 w-6 md:h-7 md:w-7 text-white" />
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center shadow-lg shadow-primary/20">
+                <Package className="h-6 w-6 md:h-7 md:w-7 text-white" />
               </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
-                <Sparkles className="h-2.5 w-2.5 text-primary-foreground" />
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center">
+                <Star className="h-2.5 w-2.5 text-white" />
               </div>
             </div>
             <div>
               <h2 className="font-display font-black text-2xl md:text-3xl lg:text-4xl text-foreground">
-                SUPER <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">OFERTAS</span>
+                MAIS <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-cyan-400">PRODUTOS</span>
               </h2>
-              <p className="text-muted-foreground text-sm mt-0.5">Os melhores descontos para você</p>
+              <p className="text-muted-foreground text-sm mt-0.5">Confira nossa seleção completa</p>
             </div>
           </div>
           
@@ -61,7 +64,7 @@ const ProductGrid = () => {
             to="/categoria/ofertas" 
             className="group inline-flex items-center gap-2 px-5 py-2.5 bg-card hover:bg-card/80 border border-border hover:border-primary/30 rounded-full text-sm font-medium text-foreground transition-all duration-300"
           >
-            Ver todas
+            Ver todos
             <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
@@ -93,4 +96,4 @@ const ProductGrid = () => {
   );
 };
 
-export default ProductGrid;
+export default MoreProducts;
