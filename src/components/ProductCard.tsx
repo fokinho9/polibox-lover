@@ -166,7 +166,7 @@ const ProductCard = ({
               Por: <span className="text-foreground font-semibold">R$ {finalPrice.toFixed(2).replace('.', ',')}</span>
             </p>
 
-            {/* PIX Price - Highlighted */}
+            {/* Price - Card format */}
             <div className={`flex items-center gap-2 rounded-lg px-2.5 py-2 border ${hasCompletedQuiz ? 'bg-gradient-to-r from-primary/25 to-cyan-glow/15 border-primary/40' : 'bg-gradient-to-r from-primary/15 to-primary/5 border-primary/20'}`}>
               <div className="relative flex items-center justify-center">
                 <div className="w-2 h-2 rounded-full bg-primary animate-ping absolute" />
@@ -174,9 +174,8 @@ const ProductCard = ({
               </div>
               <div className="flex items-baseline gap-1.5">
                 <span className="text-primary font-bold text-sm md:text-base">
-                  R$ {finalPixPrice.toFixed(2).replace('.', ',')}
+                  R$ {finalPrice.toFixed(2).replace('.', ',')}
                 </span>
-                <span className="text-[10px] text-primary/70 font-medium">PIX</span>
               </div>
             </div>
 
