@@ -290,21 +290,9 @@ const ProductDetailPage = () => {
       <Header />
       <Navigation />
       
-      {/* Urgency Banner */}
-      {product.discount_percent && product.discount_percent >= 20 && (
-        <div className="bg-gradient-to-r from-red-600 via-orange-500 to-red-600 text-white py-2.5 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M0%200h20v20H0z%22%20fill%3D%22%23fff%22%20fill-opacity%3D%22.03%22%2F%3E%3C%2Fsvg%3E')] animate-pulse" />
-          <div className="container-main flex items-center justify-center gap-3 text-sm font-bold relative">
-            <Flame className="h-5 w-5 animate-pulse" />
-            <span>🔥 OFERTA RELÂMPAGO: {product.discount_percent}% OFF por tempo limitado!</span>
-            <Timer className="h-5 w-5" />
-          </div>
-        </div>
-      )}
-
-      {/* Quiz Discount Banner */}
+      {/* Quiz Discount Banner - Orange Theme */}
       {hasCompletedQuiz && (
-        <div className="bg-gradient-to-r from-primary via-cyan-500 to-primary text-white py-3 relative overflow-hidden">
+        <div className="bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 text-white py-3 relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M0%200h20v20H0z%22%20fill%3D%22%23fff%22%20fill-opacity%3D%22.05%22%2F%3E%3C%2Fsvg%3E')]" />
           <div className="container-main flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 relative">
             <div className="flex items-center gap-2">
