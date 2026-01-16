@@ -11,6 +11,7 @@ import MoreProducts from "@/components/MoreProducts";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
+import QuizBanner from "@/components/QuizBanner";
 
 const Index = () => {
   return (
@@ -19,7 +20,9 @@ const Index = () => {
         <Header />
         <Navigation />
       </div>
+      <QuizBanner />
       <CategoryTags />
+      <HeroBanner />
       <PromoSection />
       <OfferBanners />
       <ProductGrid />
