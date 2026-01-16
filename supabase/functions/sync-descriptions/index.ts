@@ -46,20 +46,23 @@ function extractDescription(markdown: string): string | null {
 function cleanDescription(text: string): string {
   return text
     .replace(/\n{3,}/g, '\n\n')
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Keep link text, remove URL
+    .replace(/\[([^\]]+)\]\(https?:\/\/[^)]*polibox\.com\.br[^)]*\)/gi, '') // Remove polibox links entirely
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Keep other link text, remove URL
     .replace(/!\[.*?\]\(.*?\)/g, '') // Remove images
     .replace(/\*{1,2}([^*]+)\*{1,2}/g, '$1') // Remove bold/italic markers
     .replace(/^\s*[-*]\s+\[.*?\]\(.*?\)\s*$/gm, '') // Remove navigation links
     .replace(/^\s*\* \* \*\s*$/gm, '') // Remove horizontal rules
+    .replace(/https?:\/\/[^\s]*polibox\.com\.br[^\s]*/gi, '') // Remove any raw polibox URLs
     .split('\n')
     .filter(line => {
       const trimmed = line.trim();
-      // Filter out navigation, price, and CTA lines
+      // Filter out navigation, price, CTA lines and polibox references
       return trimmed.length > 0 &&
         !trimmed.match(/^(Comprar|Adicionar|Frete|Parcele|PIX|Calcular|Avise-me)/i) &&
         !trimmed.includes('R$') &&
         !trimmed.match(/^\d+x\s+de/i) &&
-        !trimmed.match(/^https?:\/\//);
+        !trimmed.match(/^https?:\/\//) &&
+        !trimmed.includes('polibox.com.br');
     })
     .join('\n')
     .trim()
