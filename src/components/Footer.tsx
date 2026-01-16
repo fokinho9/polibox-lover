@@ -1,5 +1,6 @@
 import { Phone, Mail, MapPin, Clock, CreditCard, Shield, Truck, Instagram, Facebook, Youtube, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
+import logoPolicar from "@/assets/logo-policar.png";
 
 const Footer = () => {
   return (
@@ -71,7 +72,7 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Logo and about */}
           <div className="col-span-2 lg:col-span-1">
-            <h2 className="font-display text-3xl font-bold text-primary mb-4">POLIBOX</h2>
+            <img src={logoPolicar} alt="Policar" className="h-14 w-auto mb-4" />
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">
               Sua loja especializada em produtos para estética automotiva. 
               Qualidade e preço justo para profissionais e entusiastas.
@@ -100,9 +101,9 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="mailto:contato@polibox.com.br" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
+              <a href="mailto:contato@policar.com.br" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
                   <Mail className="h-4 w-4 text-primary" />
-                  contato@polibox.com.br
+                  contato@policar.com.br
                 </a>
               </li>
               <li className="flex items-center gap-3 text-muted-foreground">
@@ -157,7 +158,7 @@ const Footer = () => {
       {/* Copyright */}
       <div className="border-t border-border py-6">
         <div className="container-main flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <span>© 2025 Polibox - Todos os direitos reservados</span>
+          <span>© 2025 Policar - Todos os direitos reservados</span>
           <div className="flex items-center gap-6">
             <Link to="/privacidade" className="hover:text-primary transition-colors">Privacidade</Link>
             <Link to="/termos" className="hover:text-primary transition-colors">Termos</Link>
