@@ -21,17 +21,19 @@ const Index = () => {
   const [hasTriggered, setHasTriggered] = useState(false);
 
   useEffect(() => {
+    // Don't show quiz if already completed or already triggered this session
     if (hasCompletedQuiz || hasTriggered) return;
 
     const handleScroll = () => {
-      if (window.scrollY > 100 && !hasTriggered) {
+      // Trigger quiz after scrolling 50px
+      if (window.scrollY > 50 && !hasTriggered) {
         setShowQuiz(true);
         setHasTriggered(true);
         window.removeEventListener('scroll', handleScroll);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [hasCompletedQuiz, hasTriggered]);
 
