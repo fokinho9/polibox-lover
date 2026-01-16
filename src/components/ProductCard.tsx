@@ -2,6 +2,7 @@ import { ShoppingCart, Zap, Flame, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
+import { useQuiz } from "@/contexts/QuizContext";
 import { useToast } from "@/hooks/use-toast";
 
 interface ProductCardProps {
@@ -30,7 +31,19 @@ const ProductCard = ({
   brand,
 }: ProductCardProps) => {
   const { addToCart } = useCart();
+  const { hasCompletedQuiz, discountPercent } = useQuiz();
   const { toast } = useToast();
+
+  // Apply quiz discount
+  const quizMultiplier = hasCompletedQuiz ? (100 - discountPercent) / 100 : 1;
+  const finalPrice = price * quizMultiplier;
+  const finalPixPrice = pixPrice * quizMultiplier;
+  const finalOldPrice = hasCompletedQuiz ? price : oldPrice;
+  const finalDiscount = hasCompletedQuiz ? discountPercent : discount;
+  const finalInstallments = installments ? {
+    count: installments.count,
+    value: installments.value * quizMultiplier
+  } : undefined;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -41,11 +54,11 @@ const ProductCard = ({
     const product = {
       id,
       name,
-      price,
+      price: finalPrice,
       image_url: image,
-      pix_price: pixPrice,
-      old_price: oldPrice,
-      discount_percent: discount,
+      pix_price: finalPixPrice,
+      old_price: finalOldPrice,
+      discount_percent: finalDiscount,
       brand,
     };
 
@@ -74,12 +87,12 @@ const ProductCard = ({
         {/* Image Container */}
         <div className="relative aspect-square bg-gradient-to-br from-muted/30 via-background to-muted/50 overflow-hidden">
           {/* Discount Badge */}
-          {discount && discount > 0 && (
+          {finalDiscount && finalDiscount > 0 && (
             <div className="absolute top-2 left-2 z-10">
               <div className="relative">
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-black rounded-md shadow-lg">
-                  <Flame className="h-3 w-3" />
-                  -{discount}%
+                <span className={`inline-flex items-center gap-1 px-2.5 py-1 ${hasCompletedQuiz ? 'bg-gradient-to-r from-primary to-cyan-glow' : 'bg-gradient-to-r from-orange-500 to-red-500'} text-white text-[10px] font-black rounded-md shadow-lg`}>
+                  {hasCompletedQuiz ? <Sparkles className="h-3 w-3" /> : <Flame className="h-3 w-3" />}
+                  -{finalDiscount}%
                 </span>
               </div>
             </div>
@@ -128,35 +141,35 @@ const ProductCard = ({
           {/* Prices */}
           <div className="mt-auto space-y-1.5">
             {/* Old Price */}
-            {oldPrice && oldPrice > price && (
+            {finalOldPrice && finalOldPrice > finalPrice && (
               <p className="text-[10px] text-muted-foreground">
-                De: <span className="line-through">R$ {oldPrice.toFixed(2).replace('.', ',')}</span>
+                De: <span className="line-through">R$ {finalOldPrice.toFixed(2).replace('.', ',')}</span>
               </p>
             )}
 
             {/* Current Price */}
             <p className="text-xs text-muted-foreground">
-              Por: <span className="text-foreground font-semibold">R$ {price.toFixed(2).replace('.', ',')}</span>
+              Por: <span className="text-foreground font-semibold">R$ {finalPrice.toFixed(2).replace('.', ',')}</span>
             </p>
 
             {/* PIX Price - Highlighted */}
-            <div className="flex items-center gap-2 bg-gradient-to-r from-primary/15 to-primary/5 rounded-lg px-2.5 py-2 border border-primary/20">
+            <div className={`flex items-center gap-2 rounded-lg px-2.5 py-2 border ${hasCompletedQuiz ? 'bg-gradient-to-r from-primary/25 to-cyan-glow/15 border-primary/40' : 'bg-gradient-to-r from-primary/15 to-primary/5 border-primary/20'}`}>
               <div className="relative flex items-center justify-center">
                 <div className="w-2 h-2 rounded-full bg-primary animate-ping absolute" />
                 <div className="w-2 h-2 rounded-full bg-primary relative" />
               </div>
               <div className="flex items-baseline gap-1.5">
                 <span className="text-primary font-bold text-sm md:text-base">
-                  R$ {pixPrice.toFixed(2).replace('.', ',')}
+                  R$ {finalPixPrice.toFixed(2).replace('.', ',')}
                 </span>
                 <span className="text-[10px] text-primary/70 font-medium">PIX</span>
               </div>
             </div>
 
             {/* Installments */}
-            {installments && (
+            {finalInstallments && (
               <p className="text-[10px] text-muted-foreground">
-                ou {installments.count}x de R$ {installments.value.toFixed(2).replace('.', ',')}
+                ou {finalInstallments.count}x de R$ {finalInstallments.value.toFixed(2).replace('.', ',')}
               </p>
             )}
           </div>

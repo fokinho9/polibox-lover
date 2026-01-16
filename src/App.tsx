@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
+import { QuizProvider } from "@/contexts/QuizContext";
 import FloatingCart from "@/components/FloatingCart";
 import ScrollToTop from "@/components/ScrollToTop";
 import Index from "./pages/Index";
@@ -30,10 +31,11 @@ const queryClient = new QueryClient();
 // App component with all providers
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <CartProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
+    <QuizProvider>
+      <CartProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
         <BrowserRouter>
           <ScrollToTop />
           <FloatingCart />
@@ -61,7 +63,8 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
     </CartProvider>
-  </QueryClientProvider>
+  </QuizProvider>
+</QueryClientProvider>
 );
 
 export default App;
