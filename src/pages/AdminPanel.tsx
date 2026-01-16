@@ -23,7 +23,8 @@ import {
   Wrench,
   AlertTriangle,
   FileText,
-  ShoppingCart
+  ShoppingCart,
+  Image
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -390,6 +391,9 @@ const AdminPanel = () => {
   
   // Count products without description
   const productsWithoutDescription = products.filter(p => !p.description || p.description.length <= 10).length;
+  
+  // Count products with image
+  const productsWithImage = products.filter(p => p.image_url && p.image_url.length > 0).length;
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -464,6 +468,11 @@ const AdminPanel = () => {
               {productsWithoutDescription} sem descrição
             </Badge>
           )}
+          
+          <Badge variant="outline" className="border-blue-500 text-blue-400 px-3 py-2">
+            <Image className="h-4 w-4 mr-2" />
+            {productsWithImage} com imagem
+          </Badge>
         </div>
 
         {/* CSV Import Section */}
