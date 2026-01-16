@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import { Product } from '@/lib/api/products';
+import { applyDiscount } from '@/lib/utils';
 
 interface CartItem {
   product: Product;
@@ -68,7 +69,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
+    (sum, item) => sum + applyDiscount(item.product.price) * item.quantity,
     0
   );
 

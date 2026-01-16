@@ -16,6 +16,7 @@ import { useCart } from "@/contexts/CartContext";
 import { productsApi, Product } from "@/lib/api/products";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { applyDiscount } from "@/lib/utils";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -407,8 +408,8 @@ const CheckoutPage = () => {
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="font-bold text-primary text-sm md:text-base">{formatPrice(item.product.price * item.quantity)}</p>
-                            {item.quantity > 1 && <p className="text-[10px] md:text-xs text-muted-foreground">{formatPrice(item.product.price)} un.</p>}
+                            <p className="font-bold text-primary text-sm md:text-base">{formatPrice(applyDiscount(item.product.price) * item.quantity)}</p>
+                            {item.quantity > 1 && <p className="text-[10px] md:text-xs text-muted-foreground">{formatPrice(applyDiscount(item.product.price))} un.</p>}
                           </div>
                         </div>
                       ))}

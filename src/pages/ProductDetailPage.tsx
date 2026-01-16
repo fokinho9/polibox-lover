@@ -22,6 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCart } from "@/contexts/CartContext";
 import { useQuiz } from "@/contexts/QuizContext";
 import { useToast } from "@/hooks/use-toast";
+import { applyDiscount } from "@/lib/utils";
 
 // 100+ unique comments pool
 const allComments = [
@@ -281,9 +282,10 @@ const ProductDetailPage = () => {
   }
 
   const quizMultiplier = hasCompletedQuiz ? (100 - discountPercent) / 100 : 1;
-  const displayPrice = product.price * quizMultiplier;
+  const basePrice = applyDiscount(product.price);
+  const displayPrice = basePrice * quizMultiplier;
   const allImages = [product.image_url, ...(product.additional_images || [])].filter(Boolean);
-  const isFreeShipping = product.price >= 299;
+  const isFreeShipping = basePrice >= 299;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-card/20">
@@ -486,7 +488,7 @@ const ProductDetailPage = () => {
                         </div>
                         <div>
                           <p className="text-white font-black text-sm tracking-wide">DESCONTO IMPERDÍVEL</p>
-                          <p className="text-white/80 text-xs">Economize R$ {product.old_price ? (product.old_price - product.price).toFixed(2).replace('.', ',') : '0,00'}</p>
+                          <p className="text-white/80 text-xs">Economize R$ {product.old_price ? (applyDiscount(product.old_price) - basePrice).toFixed(2).replace('.', ',') : '0,00'}</p>
                         </div>
                       </div>
                       <Flame className="h-6 w-6 text-yellow-400 animate-pulse" />
@@ -516,7 +518,7 @@ const ProductDetailPage = () => {
                 {(product.old_price || hasCompletedQuiz) && (
                   <div className="flex items-center gap-2 relative flex-wrap">
                     <span className="text-muted-foreground line-through text-base">
-                      R$ {(hasCompletedQuiz ? product.price : product.old_price)?.toFixed(2).replace('.', ',')}
+                      R$ {(hasCompletedQuiz ? basePrice : applyDiscount(product.old_price || product.price))?.toFixed(2).replace('.', ',')}
                     </span>
                     {(product.discount_percent || hasCompletedQuiz) && (
                       <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white border-0 text-[10px] font-black animate-pulse">

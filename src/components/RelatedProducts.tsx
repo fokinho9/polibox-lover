@@ -5,6 +5,7 @@ import { ShoppingCart, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
+import { applyDiscount } from "@/lib/utils";
 
 interface RelatedProductsProps {
   currentProductId: string;
@@ -110,7 +111,8 @@ const RelatedProducts = ({ currentProductId, category, brand }: RelatedProductsP
       
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {relatedProducts.map((product) => {
-          const pixPrice = product.pix_price || product.price * 0.95;
+          const discountedPrice = applyDiscount(product.price);
+          const pixPrice = applyDiscount(product.pix_price || product.price * 0.95);
           
           return (
             <Link
@@ -152,16 +154,16 @@ const RelatedProducts = ({ currentProductId, category, brand }: RelatedProductsP
                 
                 {/* Prices */}
                 <div className="space-y-1">
-                  {product.old_price && product.old_price > product.price && (
+                {product.old_price && product.old_price > product.price && (
                     <p className="text-xs text-muted-foreground line-through">
-                      R$ {product.old_price.toFixed(2)}
+                      R$ {applyDiscount(product.old_price).toFixed(2)}
                     </p>
                   )}
                   <p className="text-lg font-bold text-primary">
-                    R$ {pixPrice.toFixed(2)}
+                    R$ {discountedPrice.toFixed(2)}
                   </p>
                   <p className="text-xs text-emerald-400 font-medium">
-                    no PIX
+                    no PIX: R$ {pixPrice.toFixed(2)}
                   </p>
                 </div>
 
