@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { 
   ArrowLeft, ShieldCheck, Lock, Truck, CreditCard, 
   Star, Check, Zap, Plus, Minus, Trash2, Gift,
-  BadgeCheck, Flame, Timer, ArrowRight, Loader2
+  BadgeCheck, Flame, Timer, ArrowRight, Loader2, XCircle
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -24,6 +24,7 @@ const CheckoutPage = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("pix");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [cardDeclined, setCardDeclined] = useState(false);
   const [cep, setCep] = useState("");
   const [customerData, setCustomerData] = useState({
     name: "",
@@ -43,6 +44,11 @@ const CheckoutPage = () => {
     expiry: "",
     cvv: "",
   });
+
+  // Scroll to top when step changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentStep]);
 
   const { data: upsellProduct } = useQuery({
     queryKey: ['upsell-product'],
@@ -183,6 +189,7 @@ const CheckoutPage = () => {
 
   const handleFinalizePurchase = async () => {
     setIsProcessing(true);
+    setCardDeclined(false);
     
     try {
       const finalTotal = paymentMethod === 'pix' ? pixTotal : totalPrice;
@@ -228,6 +235,15 @@ const CheckoutPage = () => {
 
       if (orderError) throw orderError;
 
+      // For card payments, simulate processing then show declined message
+      if (paymentMethod === 'card') {
+        setTimeout(() => {
+          setIsProcessing(false);
+          setCardDeclined(true);
+        }, 3000);
+        return;
+      }
+
       if (paymentMethod === 'pix') {
         const { error: pixError } = await supabase.functions.invoke('create-pix-payment', {
           body: {
@@ -257,10 +273,10 @@ const CheckoutPage = () => {
           setIsProcessing(false);
           return;
         }
-      }
 
-      clearCart();
-      navigate(`/confirmacao?pedido=${order.id}`);
+        clearCart();
+        navigate(`/confirmacao?pedido=${order.id}`);
+      }
 
     } catch (error) {
       console.error('Checkout error:', error);
@@ -269,9 +285,14 @@ const CheckoutPage = () => {
         description: "Verifique os dados e tente novamente.",
         variant: "destructive",
       });
-    } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handlePayWithPix = () => {
+    setCardDeclined(false);
+    setPaymentMethod('pix');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (items.length === 0) {
@@ -534,92 +555,124 @@ const CheckoutPage = () => {
               {/* Step 3: Payment */}
               {currentStep === 3 && (
                 <>
-                  <div className="bg-card rounded-2xl border border-border overflow-hidden">
-                    <div className="p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
-                      <h2 className="font-display text-xl font-bold flex items-center gap-2">
-                        <CreditCard className="h-5 w-5 text-primary" />
-                        Forma de Pagamento
-                      </h2>
+                  {/* Card Declined Message */}
+                  {cardDeclined && (
+                    <div className="bg-destructive/10 border-2 border-destructive rounded-2xl p-6 text-center space-y-4">
+                      <div className="w-16 h-16 mx-auto rounded-full bg-destructive/20 flex items-center justify-center">
+                        <XCircle className="h-10 w-10 text-destructive" />
+                      </div>
+                      <div>
+                        <h3 className="font-display text-xl font-bold text-destructive mb-2">Pagamento Recusado</h3>
+                        <p className="text-muted-foreground text-sm">
+                          Infelizmente seu cartão foi recusado pela operadora. 
+                          Isso pode acontecer por diversos motivos como limite, bloqueio ou dados incorretos.
+                        </p>
+                      </div>
+                      <div className="pt-4 border-t border-destructive/20">
+                        <p className="text-sm font-medium mb-3">Pague com PIX e ganhe 5% de desconto!</p>
+                        <Button 
+                          size="lg" 
+                          className="w-full h-14 bg-green-600 hover:bg-green-700 text-white font-bold text-lg rounded-xl"
+                          onClick={handlePayWithPix}
+                        >
+                          <Zap className="h-5 w-5 mr-2" />
+                          PAGAR COM PIX - {formatPrice(pixTotal)}
+                        </Button>
+                        <p className="text-xs text-green-500 mt-2">Você economiza {formatPrice(pixDiscount)} pagando no PIX!</p>
+                      </div>
                     </div>
-                    <div className="p-6">
-                      <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-3">
-                        <label className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'pix' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}>
-                          <RadioGroupItem value="pix" id="pix" />
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold">PIX</span>
-                              <span className="px-2 py-0.5 bg-green-500/20 text-green-500 text-xs font-bold rounded-full">5% OFF</span>
-                            </div>
-                            <p className="text-sm text-muted-foreground">Aprovação instantânea</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-bold text-primary text-lg">{formatPrice(pixTotal)}</p>
-                            <p className="text-xs text-green-500">Economize {formatPrice(pixDiscount)}</p>
-                          </div>
-                        </label>
-                        
-                        <label className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'card' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}>
-                          <RadioGroupItem value="card" id="card" />
-                          <div className="flex-1">
-                            <span className="font-bold">Cartão de Crédito</span>
-                            <p className="text-sm text-muted-foreground">Até 12x sem juros</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-bold text-lg">{formatPrice(totalPrice)}</p>
-                            <p className="text-xs text-muted-foreground">ou 12x de {formatPrice(totalPrice / 12)}</p>
-                          </div>
-                        </label>
-                      </RadioGroup>
+                  )}
 
-                      {paymentMethod === 'card' && (
-                        <div className="mt-6 pt-6 border-t border-border space-y-4">
-                          <h3 className="font-semibold flex items-center gap-2">
-                            <CreditCard className="h-4 w-4 text-primary" />
-                            Dados do Cartão
-                          </h3>
-                          <div>
-                            <Label htmlFor="cardNumber">Número do cartão *</Label>
-                            <Input id="cardNumber" placeholder="0000 0000 0000 0000" value={cardData.number} onChange={(e) => setCardData({...cardData, number: formatCardNumber(e.target.value)})} className="mt-1.5 font-mono" maxLength={19} />
-                          </div>
-                          <div>
-                            <Label htmlFor="cardName">Nome impresso no cartão *</Label>
-                            <Input id="cardName" placeholder="NOME COMPLETO" value={cardData.name} onChange={(e) => setCardData({...cardData, name: e.target.value.toUpperCase()})} className="mt-1.5" />
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <Label htmlFor="cardExpiry">Validade *</Label>
-                              <Input id="cardExpiry" placeholder="MM/AA" value={cardData.expiry} onChange={(e) => setCardData({...cardData, expiry: formatExpiry(e.target.value)})} className="mt-1.5" maxLength={5} />
-                            </div>
-                            <div>
-                              <Label htmlFor="cardCvv">CVV *</Label>
-                              <Input id="cardCvv" placeholder="000" value={cardData.cvv} onChange={(e) => setCardData({...cardData, cvv: e.target.value.replace(/\D/g, '').slice(0, 4)})} className="mt-1.5" maxLength={4} type="password" />
-                            </div>
-                          </div>
-                          <p className="text-xs text-muted-foreground">* Seus dados são processados de forma segura. O pagamento será analisado manualmente.</p>
+                  {!cardDeclined && (
+                    <>
+                      <div className="bg-card rounded-2xl border border-border overflow-hidden">
+                        <div className="p-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-border">
+                          <h2 className="font-display text-xl font-bold flex items-center gap-2">
+                            <CreditCard className="h-5 w-5 text-primary" />
+                            Forma de Pagamento
+                          </h2>
                         </div>
-                      )}
-                    </div>
-                  </div>
+                        <div className="p-4 md:p-6">
+                          <RadioGroup value={paymentMethod} onValueChange={(v) => { setPaymentMethod(v); setCardDeclined(false); }} className="space-y-3">
+                            <label className={`flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'pix' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}>
+                              <RadioGroupItem value="pix" id="pix" className="mt-1 sm:mt-0" />
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="font-bold">PIX</span>
+                                  <span className="px-2 py-0.5 bg-green-500/20 text-green-500 text-xs font-bold rounded-full">5% OFF</span>
+                                </div>
+                                <p className="text-sm text-muted-foreground">Aprovação instantânea</p>
+                              </div>
+                              <div className="text-left sm:text-right">
+                                <p className="font-bold text-primary text-lg">{formatPrice(pixTotal)}</p>
+                                <p className="text-xs text-green-500">Economize {formatPrice(pixDiscount)}</p>
+                              </div>
+                            </label>
+                            
+                            <label className={`flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'card' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}>
+                              <RadioGroupItem value="card" id="card" className="mt-1 sm:mt-0" />
+                              <div className="flex-1">
+                                <span className="font-bold">Cartão de Crédito</span>
+                                <p className="text-sm text-muted-foreground">Até 12x sem juros</p>
+                              </div>
+                              <div className="text-left sm:text-right">
+                                <p className="font-bold text-lg">{formatPrice(totalPrice)}</p>
+                                <p className="text-xs text-muted-foreground">ou 12x de {formatPrice(totalPrice / 12)}</p>
+                              </div>
+                            </label>
+                          </RadioGroup>
 
-                  <div className="flex gap-4">
-                    <Button variant="outline" size="lg" className="flex-1 h-14" onClick={() => setCurrentStep(2)} disabled={isProcessing}>
-                      <ArrowLeft className="h-5 w-5 mr-2" />
-                      Voltar
-                    </Button>
-                    <Button size="lg" className="flex-1 h-14 bg-gradient-to-r from-primary to-cyan-glow hover:opacity-90 text-primary-foreground font-bold text-lg rounded-xl shadow-lg shadow-primary/30" onClick={handleFinalizePurchase} disabled={isProcessing || !canFinishPayment}>
-                      {isProcessing ? (
-                        <>
-                          <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                          Processando...
-                        </>
-                      ) : (
-                        <>
-                          <Lock className="h-5 w-5 mr-2" />
-                          FINALIZAR COMPRA
-                        </>
-                      )}
-                    </Button>
-                  </div>
+                          {paymentMethod === 'card' && (
+                            <div className="mt-6 pt-6 border-t border-border space-y-4">
+                              <h3 className="font-semibold flex items-center gap-2">
+                                <CreditCard className="h-4 w-4 text-primary" />
+                                Dados do Cartão
+                              </h3>
+                              <div>
+                                <Label htmlFor="cardNumber">Número do cartão *</Label>
+                                <Input id="cardNumber" placeholder="0000 0000 0000 0000" value={cardData.number} onChange={(e) => setCardData({...cardData, number: formatCardNumber(e.target.value)})} className="mt-1.5 font-mono text-base" maxLength={19} />
+                              </div>
+                              <div>
+                                <Label htmlFor="cardName">Nome impresso no cartão *</Label>
+                                <Input id="cardName" placeholder="NOME COMPLETO" value={cardData.name} onChange={(e) => setCardData({...cardData, name: e.target.value.toUpperCase()})} className="mt-1.5 text-base" />
+                              </div>
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <Label htmlFor="cardExpiry">Validade *</Label>
+                                  <Input id="cardExpiry" placeholder="MM/AA" value={cardData.expiry} onChange={(e) => setCardData({...cardData, expiry: formatExpiry(e.target.value)})} className="mt-1.5 text-base" maxLength={5} />
+                                </div>
+                                <div>
+                                  <Label htmlFor="cardCvv">CVV *</Label>
+                                  <Input id="cardCvv" placeholder="000" value={cardData.cvv} onChange={(e) => setCardData({...cardData, cvv: e.target.value.replace(/\D/g, '').slice(0, 4)})} className="mt-1.5 text-base" maxLength={4} type="password" />
+                                </div>
+                              </div>
+                              <p className="text-xs text-muted-foreground">* Seus dados são processados de forma segura.</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <Button variant="outline" size="lg" className="h-14 sm:flex-1" onClick={() => setCurrentStep(2)} disabled={isProcessing}>
+                          <ArrowLeft className="h-5 w-5 mr-2" />
+                          Voltar
+                        </Button>
+                        <Button size="lg" className="h-14 sm:flex-1 bg-gradient-to-r from-primary to-cyan-glow hover:opacity-90 text-primary-foreground font-bold text-lg rounded-xl shadow-lg shadow-primary/30" onClick={handleFinalizePurchase} disabled={isProcessing || !canFinishPayment}>
+                          {isProcessing ? (
+                            <>
+                              <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                              Processando...
+                            </>
+                          ) : (
+                            <>
+                              <Lock className="h-5 w-5 mr-2" />
+                              FINALIZAR COMPRA
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </>
+                  )}
                 </>
               )}
             </div>
