@@ -109,24 +109,35 @@ const AdminOrdersPage = () => {
 
   const handleWhatsApp = (order: Order) => {
     const phone = order.customer_phone.replace(/\D/g, '');
-    const itemsList = order.items?.map(item => `   • ${item.quantity}x ${item.name}`).join('\n') || '';
+    const itemsList = order.items?.map(item => `   ✅ ${item.quantity}x *${item.name}* - ${formatPrice(item.price * item.quantity)}`).join('\n') || '';
+    const totalItems = order.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+    
     const message = encodeURIComponent(
-      `Olá ${order.customer_name}! 👋\n\n` +
-      `Somos da *Polibox* e estamos entrando em contato referente ao seu pedido:\n\n` +
-      `🧾 *Pedido #${order.id.slice(0, 8).toUpperCase()}*\n` +
-      `📅 Data: ${new Date(order.created_at).toLocaleDateString('pt-BR')}\n\n` +
-      `📦 *Itens do pedido:*\n${itemsList}\n\n` +
-      `💰 *Subtotal:* ${formatPrice(Number(order.subtotal))}\n` +
-      `🚚 *Frete:* ${Number(order.shipping_cost) === 0 ? 'Grátis' : formatPrice(Number(order.shipping_cost))}\n` +
-      (Number(order.discount) > 0 ? `🎁 *Desconto:* -${formatPrice(Number(order.discount))}\n` : '') +
-      `💵 *Total:* ${formatPrice(Number(order.total))}\n\n` +
-      `📍 *Endereço de entrega:*\n` +
+      `Olá *${order.customer_name}*! 👋\n\n` +
+      `Aqui é a equipe da *POLIBOX - Estética Automotiva* 🚗✨\n\n` +
+      `Estamos entrando em contato sobre o seu pedido recente:\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━\n` +
+      `🧾 *PEDIDO #${order.id.slice(0, 8).toUpperCase()}*\n` +
+      `📅 Realizado em: ${new Date(order.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}\n` +
+      `━━━━━━━━━━━━━━━━━━━━\n\n` +
+      `📦 *PRODUTOS ESCOLHIDOS (${totalItems} ${totalItems === 1 ? 'item' : 'itens'}):*\n\n${itemsList}\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━\n` +
+      `💰 Subtotal: ${formatPrice(Number(order.subtotal))}\n` +
+      `🚚 Frete: ${Number(order.shipping_cost) === 0 ? '*GRÁTIS* 🎉' : formatPrice(Number(order.shipping_cost))}\n` +
+      (Number(order.discount) > 0 ? `🎁 Desconto PIX: *-${formatPrice(Number(order.discount))}*\n` : '') +
+      `━━━━━━━━━━━━━━━━━━━━\n` +
+      `💵 *TOTAL: ${formatPrice(Number(order.total))}*\n\n` +
+      `📍 *ENTREGA:*\n` +
       `${order.shipping_address}, ${order.shipping_number}\n` +
-      `${order.shipping_neighborhood} - ${order.shipping_city}/${order.shipping_state}\n` +
+      `${order.shipping_neighborhood}\n` +
+      `${order.shipping_city} - ${order.shipping_state}\n` +
       `CEP: ${order.shipping_cep}\n\n` +
-      `💳 *Forma de pagamento:* ${order.payment_method === 'pix' ? 'PIX' : 'Cartão de Crédito'}\n` +
-      `📊 *Status:* ${order.payment_status === 'paid' ? '✅ Pago' : order.payment_status === 'pending' ? '⏳ Pendente' : order.payment_status === 'analyzing' ? '🔍 Em análise' : '❌ Falhou'}\n\n` +
-      `Como podemos ajudar você hoje? 😊`
+      `💳 Pagamento: *${order.payment_method === 'pix' ? 'PIX' : 'Cartão de Crédito'}*\n` +
+      `📊 Status: ${order.payment_status === 'paid' ? '✅ *APROVADO*' : order.payment_status === 'pending' ? '⏳ *Aguardando pagamento*' : order.payment_status === 'analyzing' ? '🔍 *Em análise*' : '❌ *Não aprovado*'}\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━\n\n` +
+      `Como podemos ajudar você hoje? 😊\n\n` +
+      `_Atenciosamente,_\n` +
+      `*Equipe Polibox* 🏆`
     );
     window.open(`https://wa.me/55${phone}?text=${message}`, '_blank');
   };
