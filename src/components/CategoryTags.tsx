@@ -1,12 +1,11 @@
 import { Link } from "react-router-dom";
-import { Calculator, Trophy, Bike, Sparkles, Circle, Droplet, Package } from "lucide-react";
+import { Calculator, Trophy, Bike, Circle, Droplet, Package } from "lucide-react";
 
 const categories = [
   { icon: Calculator, label: "Calculadora de diluição", href: "/calculadora" },
+  { icon: Bike, label: "Motos", href: "/categoria/motos" },
   { icon: Trophy, label: "Mais vendidos", href: "/categoria/mais-vendidos" },
   { icon: Package, label: "Kits", href: "/categoria/kits" },
-  { icon: Bike, label: "Motos", href: "/categoria/motos" },
-  { icon: Sparkles, label: "Ceras e Selantes", href: "/categoria/ceras-selantes" },
   { icon: Circle, label: "Pneu Pretinho", href: "/categoria/pneu-pretinho" },
   { icon: Droplet, label: "Limpadores APC", href: "/categoria/limpadores-apc" },
 ];

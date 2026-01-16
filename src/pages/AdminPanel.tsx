@@ -42,10 +42,15 @@ import { ProductCreateModal, NewProduct } from "@/components/admin/ProductCreate
 const MENU_CATEGORIES = [
   { value: "ofertas", label: "Ofertas" },
   { value: "kits", label: "Kits" },
+  { value: "motos", label: "Motos" },
   { value: "lavagem", label: "Lavagem" },
   { value: "polimento", label: "Polimento" },
   { value: "interior", label: "Interior" },
   { value: "equipamentos", label: "Equipamentos" },
+  { value: "ceras-selantes", label: "Ceras e Selantes" },
+  { value: "pneu-pretinho", label: "Pneu Pretinho" },
+  { value: "limpadores-apc", label: "Limpadores APC" },
+  { value: "mais-vendidos", label: "Mais Vendidos" },
   { value: "cursos", label: "Cursos" },
   { value: "novidades", label: "Novidades" },
 ];
