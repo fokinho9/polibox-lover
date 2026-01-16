@@ -7,6 +7,7 @@ import OfferBanners from "@/components/OfferBanners";
 import ProductGrid from "@/components/ProductGrid";
 import BrandShowcase from "@/components/BrandShowcase";
 import CategoryCarousel from "@/components/CategoryCarousel";
+import MoreProducts from "@/components/MoreProducts";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
@@ -22,6 +23,7 @@ const Index = () => {
       <ProductGrid />
       <BrandShowcase />
       <CategoryCarousel />
+      <MoreProducts />
       <Footer />
       <WhatsAppButton />
     </div>
