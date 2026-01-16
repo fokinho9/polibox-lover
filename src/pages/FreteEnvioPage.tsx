@@ -44,7 +44,7 @@ const FreteEnvioPage = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
-                  Compras acima de <span className="text-primary font-bold">R$ 299,00</span> têm frete grátis para todo o Brasil!
+                  <span className="text-emerald-400 font-bold">Frete grátis</span> em todas as compras para todo o Brasil!
                 </p>
                 <ul className="space-y-2">
                   <li className="flex items-center gap-2 text-sm">

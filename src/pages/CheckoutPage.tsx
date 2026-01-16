@@ -68,9 +68,8 @@ const CheckoutPage = () => {
 
   const pixDiscount = totalPrice * 0.05;
   const pixTotal = totalPrice - pixDiscount;
-  const freeShippingThreshold = 299;
-  const remainingForFreeShipping = Math.max(0, freeShippingThreshold - totalPrice);
-  const hasFreeShipping = totalPrice >= freeShippingThreshold;
+  // Always free shipping
+  const hasFreeShipping = true;
 
   const handleAddUpsell = (product: Product) => {
     addToCart({
@@ -194,7 +193,7 @@ const CheckoutPage = () => {
     
     try {
       const finalTotal = paymentMethod === 'pix' ? pixTotal : totalPrice;
-      const shippingCost = hasFreeShipping ? 0 : 19.90;
+      const shippingCost = 0; // Always free shipping
 
       const orderData = {
         customer_name: customerData.name,
@@ -349,20 +348,15 @@ const CheckoutPage = () => {
         </div>
       </div>
 
-      {/* Free shipping progress - hidden on mobile */}
-      {!hasFreeShipping && (
-        <div className="hidden sm:block bg-gradient-to-r from-primary/20 to-cyan-glow/20 border-b border-primary/20">
-          <div className="container-main py-2">
-            <div className="flex items-center justify-center gap-2 text-xs md:text-sm">
-              <Truck className="h-4 w-4 text-primary" />
-              <span>Faltam <strong className="text-primary">{formatPrice(remainingForFreeShipping)}</strong> para FRETE GRÁTIS!</span>
-              <div className="w-24 h-1.5 bg-secondary rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-primary to-cyan-glow transition-all" style={{ width: `${Math.min(100, (totalPrice / freeShippingThreshold) * 100)}%` }} />
-              </div>
-            </div>
+      {/* Free shipping banner - always show */}
+      <div className="bg-gradient-to-r from-emerald-500/20 to-green-500/20 border-b border-emerald-500/20">
+        <div className="container-main py-2">
+          <div className="flex items-center justify-center gap-2 text-xs md:text-sm">
+            <Truck className="h-4 w-4 text-emerald-400" />
+            <span className="text-emerald-400 font-bold">🎉 FRETE GRÁTIS em todas as compras!</span>
           </div>
         </div>
-      )}
+      </div>
 
       <main className="py-4 md:py-8">
         <div className="container-main px-3 md:px-4">
@@ -688,7 +682,7 @@ const CheckoutPage = () => {
                     </div>
                     <div className="flex justify-between text-xs md:text-sm">
                       <span className="text-muted-foreground">Frete</span>
-                      {hasFreeShipping ? <span className="text-green-500 font-bold">GRÁTIS</span> : <span>R$ 19,90</span>}
+                      <span className="text-green-500 font-bold">GRÁTIS</span>
                     </div>
                     {paymentMethod === 'pix' && (
                       <div className="flex justify-between text-xs md:text-sm text-green-500">

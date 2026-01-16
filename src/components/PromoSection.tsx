@@ -28,7 +28,7 @@ const PromoSection = () => {
           {[{
           icon: Truck,
           title: "Frete Grátis",
-          subtitle: "Acima de R$299",
+          subtitle: "Em todas as compras",
           color: "emerald",
           gradient: "from-emerald-500/20 to-emerald-600/10"
         }, {

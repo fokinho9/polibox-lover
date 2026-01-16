@@ -10,7 +10,7 @@ const Header = () => {
           <div className="flex items-center gap-2 text-primary">
             <Truck className="h-4 w-4" />
             <span className="text-foreground font-medium">FRETE GRÁTIS</span>
-            <span className="text-xs text-muted-foreground">por tempo limitado</span>
+            <span className="text-xs text-emerald-400 font-semibold">em todas as compras</span>
           </div>
           <div className="hidden md:flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-yellow-400" />
