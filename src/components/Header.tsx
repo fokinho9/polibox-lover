@@ -28,7 +28,7 @@ const Header = () => {
             <img 
               src={logoPolicar} 
               alt="Policar - Estética Automotiva" 
-              className="h-24 md:h-32 w-auto object-contain"
+              className="h-16 md:h-20 w-auto object-contain"
             />
           </Link>
         </div>
