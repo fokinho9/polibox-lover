@@ -18,7 +18,7 @@ const SobrePage = () => {
           <div className="container-main relative z-10">
             <div className="max-w-3xl mx-auto text-center">
               <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                Sobre a <span className="text-primary">POLIBOX</span>
+                Sobre a <span className="text-primary">POLICAR</span>
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
                 Somos especialistas em estética automotiva, oferecendo os melhores produtos 
@@ -96,7 +96,7 @@ const SobrePage = () => {
         <section className="py-16 bg-card/50">
           <div className="container-main">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-center mb-12">
-              Por que escolher a <span className="text-primary">POLIBOX</span>?
+              Por que escolher a <span className="text-primary">POLICAR</span>?
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="flex flex-col items-center text-center p-6">

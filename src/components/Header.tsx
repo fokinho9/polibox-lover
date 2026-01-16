@@ -1,5 +1,7 @@
 import { Truck, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
+import logoPolicar from "@/assets/logo-policar.png";
+
 const Header = () => {
   return <header className="bg-background border-b border-border">
       {/* Top bar */}
@@ -19,13 +21,15 @@ const Header = () => {
       </div>
 
       {/* Main header */}
-      <div className="container-main py-3">
+      <div className="container-main py-4">
         <div className="flex items-center justify-center">
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
-            <h1 className="font-display text-3xl md:text-4xl font-bold text-primary tracking-wider text-shadow-glow">
-              POLIBOX
-            </h1>
+            <img 
+              src={logoPolicar} 
+              alt="Policar - Estética Automotiva" 
+              className="h-16 md:h-20 w-auto object-contain"
+            />
           </Link>
         </div>
       </div>
