@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { limit = 10 } = await req.json().catch(() => ({}));
+    const { limit = 5 } = await req.json().catch(() => ({}));
 
     const firecrawlApiKey = Deno.env.get('FIRECRAWL_API_KEY');
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
