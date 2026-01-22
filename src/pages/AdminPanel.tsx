@@ -334,7 +334,7 @@ const AdminPanel = () => {
   const handleFixPrices = async () => {
     setIsFixingPrices(true);
     try {
-      const result = await productsApi.fixProductPrices(10);
+      const result = await productsApi.fixProductPrices(5);
       if (result.success) {
         const processed = result.processed ?? 0;
         const fixed = result.fixed ?? 0;
@@ -369,7 +369,7 @@ const AdminPanel = () => {
     setIsSyncingDescriptions(true);
     setSyncProgress(null);
     
-    const BATCH_SIZE = 35;
+    const BATCH_SIZE = 5;
     const TIME_PER_PRODUCT = 1.5; // seconds estimate per product
     
     try {

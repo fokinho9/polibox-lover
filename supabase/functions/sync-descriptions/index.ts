@@ -98,7 +98,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { limit = 10, force = false } = await req.json().catch(() => ({}));
+    const { limit = 5, force = false } = await req.json().catch(() => ({}));
 
     const firecrawlKey = Deno.env.get('FIRECRAWL_API_KEY');
     if (!firecrawlKey) {
