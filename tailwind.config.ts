@@ -56,6 +56,11 @@ export default {
           DEFAULT: "hsl(var(--cyan))",
           glow: "hsl(var(--cyan-glow))",
         },
+        "red-logo": {
+          DEFAULT: "hsl(var(--red-logo))",
+          glow: "hsl(var(--red-glow))",
+          dark: "hsl(var(--red-dark))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

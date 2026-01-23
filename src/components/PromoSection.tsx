@@ -16,7 +16,7 @@ const PromoSection = () => {
           
           {/* Text Logo - Bolder */}
           <h2 className="font-display text-5xl md:text-6xl lg:text-7xl font-black text-foreground mb-4 tracking-tight">
-            MEGA <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-cyan-400 to-primary drop-shadow-[0_0_30px_rgba(34,211,238,0.5)]">PROMOÇÃO</span>
+            MEGA <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-logo via-red-logo-glow to-red-logo drop-shadow-[0_0_30px_rgba(220,38,38,0.5)]">PROMOÇÃO</span>
           </h2>
           
           {/* Benefits Pills */}

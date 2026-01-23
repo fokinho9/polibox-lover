@@ -43,7 +43,7 @@ const ProductGrid = () => {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gradient-to-br from-red-logo to-red-logo-dark flex items-center justify-center shadow-lg shadow-red-logo/30">
                 <Flame className="h-6 w-6 md:h-7 md:w-7 text-white" />
               </div>
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
@@ -52,7 +52,7 @@ const ProductGrid = () => {
             </div>
             <div>
               <h2 className="font-display font-black text-2xl md:text-3xl lg:text-4xl text-foreground">
-                SUPER <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">OFERTAS</span>
+                SUPER <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-logo to-red-logo-glow">OFERTAS</span>
               </h2>
               <p className="text-muted-foreground text-sm mt-0.5">Os melhores descontos para você</p>
             </div>
