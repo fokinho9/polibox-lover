@@ -541,6 +541,23 @@ const ProductDetailPage = () => {
                   <span>ou até <span className="font-bold text-foreground">10x</span> de{" "}
                   <span className="font-bold text-foreground">R$ {(displayPrice / 10).toFixed(2).replace('.', ',')}</span> sem juros</span>
                 </div>
+
+                {/* Wholesale Price - 5+ units */}
+                <div className="relative p-3 bg-gradient-to-r from-red-logo/15 to-red-logo/5 border border-red-logo/30 rounded-xl mt-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Package className="h-4 w-4 text-red-logo" />
+                      <span className="text-sm font-bold text-red-logo">ATACADO</span>
+                      <Badge className="bg-red-logo/20 text-red-logo border-red-logo/30 text-[10px]">
+                        -20% OFF
+                      </Badge>
+                    </div>
+                    <span className="font-display font-bold text-lg text-red-logo">
+                      R$ {(displayPrice * 0.8).toFixed(2).replace('.', ',')}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">A partir de 5 unidades do mesmo produto</p>
+                </div>
               </div>
 
               {/* Shipping Calculator */}

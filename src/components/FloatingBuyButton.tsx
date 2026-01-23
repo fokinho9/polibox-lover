@@ -27,19 +27,17 @@ const FloatingBuyButton = ({ onBuy, price }: FloatingBuyButtonProps) => {
       <div className="container-main max-w-lg mx-auto">
         <div className="bg-card/95 backdrop-blur-md rounded-2xl border border-primary/30 p-4 shadow-2xl shadow-primary/20">
           <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-xs text-muted-foreground">Por apenas</p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-display font-bold text-primary">
-                  R$ {price.toFixed(2).replace('.', ',')}
-                </span>
-              </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Por apenas</span>
+              <span className="text-xl font-display font-bold text-primary">
+                R$ {price.toFixed(2).replace('.', ',')}
+              </span>
             </div>
             <Button 
               onClick={onBuy}
-              className="h-14 px-8 btn-buy gap-2 text-base font-display relative overflow-hidden"
+              className="h-12 px-6 btn-buy gap-2 text-sm font-display relative overflow-hidden animate-pulse-glow"
             >
-              <ShoppingCart className="h-5 w-5" />
+              <ShoppingCart className="h-4 w-4" />
               COMPRAR
               
               {/* Animated glow */}
