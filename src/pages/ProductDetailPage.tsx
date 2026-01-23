@@ -543,16 +543,16 @@ const ProductDetailPage = () => {
                 </div>
 
                 {/* Wholesale Price - 5+ units */}
-                <div className="relative p-3 bg-gradient-to-r from-red-logo/15 to-red-logo/5 border border-red-logo/30 rounded-xl mt-2">
+                <div className="relative p-3 bg-gradient-to-r from-green-500/15 to-green-500/5 border border-green-500/30 rounded-xl mt-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Package className="h-4 w-4 text-red-logo" />
-                      <span className="text-sm font-bold text-red-logo">ATACADO</span>
-                      <Badge className="bg-red-logo/20 text-red-logo border-red-logo/30 text-[10px]">
+                      <Package className="h-4 w-4 text-green-500" />
+                      <span className="text-sm font-bold text-green-500">ATACADO</span>
+                      <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-[10px]">
                         -20% OFF
                       </Badge>
                     </div>
-                    <span className="font-display font-bold text-lg text-red-logo">
+                    <span className="font-display font-bold text-lg text-green-500">
                       R$ {(displayPrice * 0.8).toFixed(2).replace('.', ',')}
                     </span>
                   </div>

@@ -141,8 +141,8 @@ const FloatingCart = () => {
                       {/* Wholesale Badge */}
                       {isWholesale && (
                         <div className="flex items-center gap-1 mb-1">
-                          <Package className="h-3 w-3 text-red-logo" />
-                          <span className="text-[10px] font-bold text-red-logo">ATACADO</span>
+                          <Package className="h-3 w-3 text-green-500" />
+                          <span className="text-[10px] font-bold text-green-500">ATACADO</span>
                         </div>
                       )}
                       
@@ -153,7 +153,7 @@ const FloatingCart = () => {
                             {formatPrice(regularPrice)}
                           </span>
                         )}
-                        <span className={`font-bold text-lg ${isWholesale ? 'text-red-logo' : 'text-primary'}`}>
+                        <span className={`font-bold text-lg ${isWholesale ? 'text-green-500' : 'text-primary'}`}>
                           {formatPrice(unitPrice)}
                         </span>
                       </div>
@@ -206,12 +206,12 @@ const FloatingCart = () => {
             <div className="border-t border-border p-5 space-y-3 bg-gradient-to-t from-primary/5 to-transparent">
               {/* Savings Banner */}
               {totalSavings > 0 && (
-                <div className="flex items-center justify-between p-3 bg-red-logo/10 border border-red-logo/30 rounded-xl">
+                <div className="flex items-center justify-between p-3 bg-green-500/10 border border-green-500/30 rounded-xl">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-red-logo" />
-                    <span className="text-sm font-bold text-red-logo">Economia atacado:</span>
+                    <Sparkles className="h-4 w-4 text-green-500" />
+                    <span className="text-sm font-bold text-green-500">Economia atacado:</span>
                   </div>
-                  <span className="font-bold text-red-logo">-{formatPrice(totalSavings)}</span>
+                  <span className="font-bold text-green-500">-{formatPrice(totalSavings)}</span>
                 </div>
               )}
               
