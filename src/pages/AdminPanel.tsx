@@ -84,6 +84,7 @@ const AdminPanel = () => {
   const [isFixingPrices, setIsFixingPrices] = useState(false);
   const [isSyncingDescriptions, setIsSyncingDescriptions] = useState(false);
   const [isSyncingImages, setIsSyncingImages] = useState(false);
+  const [isSyncingSingleImage, setIsSyncingSingleImage] = useState(false);
   const [syncProgress, setSyncProgress] = useState<{
     current: number;
     total: number;
@@ -526,6 +527,44 @@ const AdminPanel = () => {
     }
   };
 
+  const handleSyncSingleImage = async () => {
+    setIsSyncingSingleImage(true);
+    
+    try {
+      const result = await productsApi.syncImages(1);
+      
+      if (result.success) {
+        if (result.updated && result.updated > 0) {
+          const productName = result.results?.[0]?.name || 'Produto';
+          toast({
+            title: "✅ Imagem sincronizada!",
+            description: `${productName}`,
+          });
+        } else {
+          toast({
+            title: "Nenhuma imagem atualizada",
+            description: result.results?.[0]?.error || "Produto já tem imagem ou não encontrada.",
+          });
+        }
+        queryClient.invalidateQueries({ queryKey: ['products'] });
+      } else {
+        toast({
+          title: "Erro",
+          description: result.error || "Falha ao sincronizar imagem.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: error instanceof Error ? error.message : "Falha ao executar sincronização.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSyncingSingleImage(false);
+    }
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
@@ -629,6 +668,25 @@ const AdminPanel = () => {
               <>
                 <Image className="h-4 w-4 mr-2" />
                 Sincronizar Imagens ({products.length - productsWithImage})
+              </>
+            )}
+          </Button>
+          
+          <Button 
+            onClick={handleSyncSingleImage}
+            disabled={isSyncingSingleImage || (products.length - productsWithImage) === 0}
+            variant="outline"
+            className="border-pink-500 text-pink-500 hover:bg-pink-500/10"
+          >
+            {isSyncingSingleImage ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Sincronizando 1...
+              </>
+            ) : (
+              <>
+                <Image className="h-4 w-4 mr-2" />
+                +1 Imagem
               </>
             )}
           </Button>
