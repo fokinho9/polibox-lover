@@ -1,11 +1,24 @@
-import { ShoppingCart, X, Trash2, Plus, Minus, Check, ArrowLeft } from "lucide-react";
+import { ShoppingCart, X, Trash2, Plus, Minus, Check, ArrowLeft, Package, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { Link } from "react-router-dom";
 import { applyDiscount } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 const FloatingCart = () => {
-  const { items, removeFromCart, updateQuantity, totalPrice, totalItems, isCartOpen, setIsCartOpen, lastAddedProduct } = useCart();
+  const { 
+    items, 
+    removeFromCart, 
+    updateQuantity, 
+    totalPrice, 
+    totalItems, 
+    totalSavings,
+    isCartOpen, 
+    setIsCartOpen, 
+    lastAddedProduct,
+    getItemUnitPrice,
+    hasWholesaleDiscount
+  } = useCart();
 
   const formatPrice = (price: number) => {
     return price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -101,56 +114,107 @@ const FloatingCart = () => {
                 <p className="text-sm mt-2 text-muted-foreground/70">Adicione produtos para começar</p>
               </div>
             ) : (
-              items.map((item) => (
-                <div key={item.product.id} className="flex gap-4 p-4 bg-gradient-to-r from-card to-card/50 rounded-2xl border border-border hover:border-primary/30 transition-colors">
-                  <div className="w-24 h-24 rounded-xl overflow-hidden bg-secondary/50 flex-shrink-0">
-                    <img 
-                      src={item.product.image_url || '/placeholder.svg'} 
-                      alt={item.product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-sm line-clamp-2 mb-2">{item.product.name}</h3>
-                    <p className="text-primary font-bold text-lg">{formatPrice(applyDiscount(item.product.price))}</p>
-                    <div className="flex items-center gap-3 mt-3">
-                      <div className="flex items-center gap-1 bg-secondary/50 rounded-xl p-1">
+              items.map((item) => {
+                const isWholesale = hasWholesaleDiscount(item);
+                const unitPrice = getItemUnitPrice(item);
+                const regularPrice = applyDiscount(item.product.price);
+                
+                return (
+                  <div key={item.product.id} className="flex gap-4 p-4 bg-gradient-to-r from-card to-card/50 rounded-2xl border border-border hover:border-primary/30 transition-colors">
+                    <div className="w-24 h-24 rounded-xl overflow-hidden bg-secondary/50 flex-shrink-0 relative">
+                      <img 
+                        src={item.product.image_url || '/placeholder.svg'} 
+                        alt={item.product.name}
+                        className="w-full h-full object-cover"
+                      />
+                      {isWholesale && (
+                        <div className="absolute top-1 left-1">
+                          <Badge className="bg-red-logo text-white text-[8px] px-1.5 py-0.5">
+                            -20%
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-sm line-clamp-2 mb-1">{item.product.name}</h3>
+                      
+                      {/* Wholesale Badge */}
+                      {isWholesale && (
+                        <div className="flex items-center gap-1 mb-1">
+                          <Package className="h-3 w-3 text-red-logo" />
+                          <span className="text-[10px] font-bold text-red-logo">ATACADO</span>
+                        </div>
+                      )}
+                      
+                      {/* Price */}
+                      <div className="flex items-center gap-2">
+                        {isWholesale && (
+                          <span className="text-xs text-muted-foreground line-through">
+                            {formatPrice(regularPrice)}
+                          </span>
+                        )}
+                        <span className={`font-bold text-lg ${isWholesale ? 'text-red-logo' : 'text-primary'}`}>
+                          {formatPrice(unitPrice)}
+                        </span>
+                      </div>
+                      
+                      {/* Quantity hint for wholesale */}
+                      {!isWholesale && item.quantity >= 3 && (
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          +{5 - item.quantity} unid. para desconto atacado
+                        </p>
+                      )}
+                      
+                      <div className="flex items-center gap-3 mt-2">
+                        <div className="flex items-center gap-1 bg-secondary/50 rounded-xl p-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-lg hover:bg-primary/20"
+                            onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          <span className="w-10 text-center font-bold">{item.quantity}</span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-lg hover:bg-primary/20"
+                            onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 rounded-lg hover:bg-primary/20"
-                          onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                          className="h-8 w-8 ml-auto text-destructive hover:bg-destructive/10 rounded-lg"
+                          onClick={() => removeFromCart(item.product.id)}
                         >
-                          <Minus className="h-4 w-4" />
-                        </Button>
-                        <span className="w-10 text-center font-bold">{item.quantity}</span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 rounded-lg hover:bg-primary/20"
-                          onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                        >
-                          <Plus className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 ml-auto text-destructive hover:bg-destructive/10 rounded-lg"
-                        onClick={() => removeFromCart(item.product.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
                     </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
 
           {/* Footer */}
           {items.length > 0 && (
-            <div className="border-t border-border p-5 space-y-4 bg-gradient-to-t from-primary/5 to-transparent">
+            <div className="border-t border-border p-5 space-y-3 bg-gradient-to-t from-primary/5 to-transparent">
+              {/* Savings Banner */}
+              {totalSavings > 0 && (
+                <div className="flex items-center justify-between p-3 bg-red-logo/10 border border-red-logo/30 rounded-xl">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-red-logo" />
+                    <span className="text-sm font-bold text-red-logo">Economia atacado:</span>
+                  </div>
+                  <span className="font-bold text-red-logo">-{formatPrice(totalSavings)}</span>
+                </div>
+              )}
+              
               <div className="flex justify-between text-xl font-bold">
                 <span>Total:</span>
                 <span className="text-primary">{formatPrice(totalPrice)}</span>

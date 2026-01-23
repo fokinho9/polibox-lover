@@ -21,7 +21,7 @@ import { applyDiscount } from "@/lib/utils";
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { items, removeFromCart, updateQuantity, totalPrice, totalItems, addToCart, clearCart } = useCart();
+  const { items, removeFromCart, updateQuantity, totalPrice, totalItems, totalSavings, addToCart, clearCart, getItemUnitPrice, hasWholesaleDiscount } = useCart();
   const [currentStep, setCurrentStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("pix");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -378,35 +378,54 @@ const CheckoutPage = () => {
                       </h2>
                     </div>
                     <div className="divide-y divide-border">
-                      {items.map((item) => (
-                        <div key={item.product.id} className="p-3 md:p-4 flex gap-3">
-                          <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg md:rounded-xl overflow-hidden bg-secondary/30 flex-shrink-0">
-                            <img src={item.product.image_url || '/placeholder.svg'} alt={item.product.name} className="w-full h-full object-cover" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-medium text-xs md:text-sm line-clamp-2 mb-0.5">{item.product.name}</h3>
-                            {item.product.brand && <span className="text-[10px] md:text-xs text-primary font-medium">{item.product.brand}</span>}
-                            <div className="flex items-center gap-2 mt-1.5">
-                              <div className="flex items-center gap-0.5 bg-secondary/50 rounded-md p-0.5">
-                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.product.id, item.quantity - 1)}>
-                                  <Minus className="h-3 w-3" />
-                                </Button>
-                                <span className="w-6 text-center text-xs font-bold">{item.quantity}</span>
-                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.product.id, item.quantity + 1)}>
-                                  <Plus className="h-3 w-3" />
+                      {items.map((item) => {
+                        const isWholesale = hasWholesaleDiscount(item);
+                        const unitPrice = getItemUnitPrice(item);
+                        const regularPrice = applyDiscount(item.product.price);
+                        
+                        return (
+                          <div key={item.product.id} className="p-3 md:p-4 flex gap-3">
+                            <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg md:rounded-xl overflow-hidden bg-secondary/30 flex-shrink-0 relative">
+                              <img src={item.product.image_url || '/placeholder.svg'} alt={item.product.name} className="w-full h-full object-cover" />
+                              {isWholesale && (
+                                <div className="absolute top-0.5 left-0.5 bg-red-logo text-white text-[8px] px-1 py-0.5 rounded font-bold">
+                                  -20%
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-medium text-xs md:text-sm line-clamp-2 mb-0.5">{item.product.name}</h3>
+                              {item.product.brand && <span className="text-[10px] md:text-xs text-primary font-medium">{item.product.brand}</span>}
+                              {isWholesale && (
+                                <span className="ml-2 text-[10px] font-bold text-red-logo">ATACADO</span>
+                              )}
+                              <div className="flex items-center gap-2 mt-1.5">
+                                <div className="flex items-center gap-0.5 bg-secondary/50 rounded-md p-0.5">
+                                  <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.product.id, item.quantity - 1)}>
+                                    <Minus className="h-3 w-3" />
+                                  </Button>
+                                  <span className="w-6 text-center text-xs font-bold">{item.quantity}</span>
+                                  <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.product.id, item.quantity + 1)}>
+                                    <Plus className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                                <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive hover:bg-destructive/10" onClick={() => removeFromCart(item.product.id)}>
+                                  <Trash2 className="h-3 w-3" />
                                 </Button>
                               </div>
-                              <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive hover:bg-destructive/10" onClick={() => removeFromCart(item.product.id)}>
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
+                            </div>
+                            <div className="text-right">
+                              {isWholesale && (
+                                <p className="text-[10px] text-muted-foreground line-through">{formatPrice(regularPrice * item.quantity)}</p>
+                              )}
+                              <p className={`font-bold text-sm md:text-base ${isWholesale ? 'text-red-logo' : 'text-primary'}`}>
+                                {formatPrice(unitPrice * item.quantity)}
+                              </p>
+                              {item.quantity > 1 && <p className="text-[10px] md:text-xs text-muted-foreground">{formatPrice(unitPrice)} un.</p>}
                             </div>
                           </div>
-                          <div className="text-right">
-                            <p className="font-bold text-primary text-sm md:text-base">{formatPrice(applyDiscount(item.product.price) * item.quantity)}</p>
-                            {item.quantity > 1 && <p className="text-[10px] md:text-xs text-muted-foreground">{formatPrice(applyDiscount(item.product.price))} un.</p>}
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -678,8 +697,14 @@ const CheckoutPage = () => {
                   <div className="p-3 md:p-4 space-y-2">
                     <div className="flex justify-between text-xs md:text-sm">
                       <span className="text-muted-foreground">Subtotal ({totalItems})</span>
-                      <span>{formatPrice(totalPrice)}</span>
+                      <span>{formatPrice(totalPrice + totalSavings)}</span>
                     </div>
+                    {totalSavings > 0 && (
+                      <div className="flex justify-between text-xs md:text-sm text-red-logo">
+                        <span className="flex items-center gap-1">🏷️ Desconto Atacado</span>
+                        <span>-{formatPrice(totalSavings)}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-xs md:text-sm">
                       <span className="text-muted-foreground">Frete</span>
                       <span className="text-green-500 font-bold">GRÁTIS</span>

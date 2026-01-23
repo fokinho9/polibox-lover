@@ -15,10 +15,17 @@ interface CartContextType {
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
+  totalSavings: number;
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
   lastAddedProduct: Product | null;
+  getItemPrice: (item: CartItem) => number;
+  getItemUnitPrice: (item: CartItem) => number;
+  hasWholesaleDiscount: (item: CartItem) => boolean;
 }
+
+const WHOLESALE_THRESHOLD = 5;
+const WHOLESALE_DISCOUNT = 0.20; // 20% discount
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -67,11 +74,41 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setItems([]);
   }, []);
 
+  // Check if item qualifies for wholesale discount
+  const hasWholesaleDiscount = useCallback((item: CartItem) => {
+    return item.quantity >= WHOLESALE_THRESHOLD;
+  }, []);
+
+  // Get unit price with wholesale discount if applicable
+  const getItemUnitPrice = useCallback((item: CartItem) => {
+    const basePrice = applyDiscount(item.product.price);
+    if (item.quantity >= WHOLESALE_THRESHOLD) {
+      return basePrice * (1 - WHOLESALE_DISCOUNT);
+    }
+    return basePrice;
+  }, []);
+
+  // Get total price for an item
+  const getItemPrice = useCallback((item: CartItem) => {
+    return getItemUnitPrice(item) * item.quantity;
+  }, [getItemUnitPrice]);
+
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  
   const totalPrice = items.reduce(
-    (sum, item) => sum + applyDiscount(item.product.price) * item.quantity,
+    (sum, item) => sum + getItemPrice(item),
     0
   );
+
+  // Calculate total savings from wholesale discounts
+  const totalSavings = items.reduce((sum, item) => {
+    if (item.quantity >= WHOLESALE_THRESHOLD) {
+      const regularPrice = applyDiscount(item.product.price) * item.quantity;
+      const discountedPrice = getItemPrice(item);
+      return sum + (regularPrice - discountedPrice);
+    }
+    return sum;
+  }, 0);
 
   return (
     <CartContext.Provider
@@ -83,9 +120,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         clearCart,
         totalItems,
         totalPrice,
+        totalSavings,
         isCartOpen,
         setIsCartOpen,
         lastAddedProduct,
+        getItemPrice,
+        getItemUnitPrice,
+        hasWholesaleDiscount,
       }}
     >
       {children}
