@@ -1,11 +1,38 @@
-import { Phone, Mail, MapPin, Clock, CreditCard, Shield, Truck, Instagram, Facebook, Youtube, Sparkles, Store } from "lucide-react";
+import { useState } from "react";
+import { Phone, Mail, MapPin, Clock, CreditCard, Shield, Truck, Instagram, Facebook, Youtube, Sparkles, Store, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import logoPolicar from "@/assets/logo-policar.png";
 import lojaPolicar from "@/assets/loja-policar.png";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const Footer = () => {
+  const [isPhotoOpen, setIsPhotoOpen] = useState(false);
+
   return (
     <footer className="bg-card border-t border-border">
+      {/* Photo Lightbox Modal */}
+      <Dialog open={isPhotoOpen} onOpenChange={setIsPhotoOpen}>
+        <DialogContent className="max-w-4xl p-0 bg-transparent border-0 shadow-none">
+          <div className="relative">
+            <button 
+              onClick={() => setIsPhotoOpen(false)}
+              className="absolute -top-12 right-0 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <img 
+              src={lojaPolicar} 
+              alt="Loja Policar" 
+              className="w-full h-auto rounded-2xl shadow-2xl"
+            />
+            <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-sm rounded-xl p-4">
+              <h3 className="font-display text-xl text-white mb-1">POLICAR - Estética Automotiva</h3>
+              <p className="text-white/70 text-sm">Rio de Janeiro, RJ • Seg-Sex: 9h às 18h | Sáb: 9h às 13h</p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Store Location Section - Above footer */}
       <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 py-10 border-b border-primary/20">
         {/* Background glow effects */}
@@ -15,11 +42,9 @@ const Footer = () => {
         
         <div className="container-main relative">
           <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
-            {/* Circular Store Photo - Clickable */}
-            <a 
-              href={lojaPolicar} 
-              target="_blank" 
-              rel="noopener noreferrer"
+            {/* Circular Store Photo - Clickable to open lightbox */}
+            <button 
+              onClick={() => setIsPhotoOpen(true)}
               className="relative flex-shrink-0 group cursor-pointer"
             >
               <div className="w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-4 border-primary/40 shadow-2xl shadow-primary/30 ring-4 ring-primary/20 group-hover:ring-primary/40 group-hover:border-primary/60 transition-all duration-300 group-hover:scale-105">
@@ -35,7 +60,7 @@ const Footer = () => {
               <div className="absolute inset-0 rounded-full flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <span className="text-white text-xs font-medium">Ver foto</span>
               </div>
-            </a>
+            </button>
             
             {/* Location Info */}
             <div className="text-center md:text-left flex-1">
