@@ -69,6 +69,7 @@ const BRAND_CATEGORIES = [
   { value: "spartan", label: "SPARTAN" },
   { value: "soft99", label: "SOFT99" },
   { value: "rapifix", label: "RAPIFIX" },
+  { value: "vintex", label: "VINTEX" },
 ];
 
 // Todas as categorias combinadas para importação
