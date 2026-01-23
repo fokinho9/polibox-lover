@@ -797,7 +797,7 @@ const ProductDetailPage = () => {
                   </div>
                   <div className="flex-1">
                     <span className="font-semibold text-sm md:text-base">Calcular Frete</span>
-                    {isFreeShipping && <p className="text-xs text-emerald-400 font-bold">🎉 FRETE GRÁTIS para este produto!</p>}
+                    {isFreeShipping}
                   </div>
                 </div>
                 <div className="flex gap-2">
