@@ -83,7 +83,14 @@ const AdminPanel = () => {
   const [isImporting, setIsImporting] = useState(false);
   const [isFixingPrices, setIsFixingPrices] = useState(false);
   const [isSyncingDescriptions, setIsSyncingDescriptions] = useState(false);
+  const [isSyncingImages, setIsSyncingImages] = useState(false);
   const [syncProgress, setSyncProgress] = useState<{
+    current: number;
+    total: number;
+    updated: number;
+    estimatedTime: string;
+  } | null>(null);
+  const [imagesSyncProgress, setImagesSyncProgress] = useState<{
     current: number;
     total: number;
     updated: number;
@@ -444,6 +451,81 @@ const AdminPanel = () => {
     }
   };
 
+  const handleSyncImages = async () => {
+    setIsSyncingImages(true);
+    setImagesSyncProgress(null);
+    
+    const TIME_PER_PRODUCT = 4; // seconds estimate per product (scraping takes time)
+    
+    try {
+      // Count products without images
+      const productsNeedingImages = products.filter(p => !p.image_url || p.image_url.length === 0).length;
+      
+      if (productsNeedingImages === 0) {
+        toast({
+          title: "Todas as imagens sincronizadas!",
+          description: "Todos os produtos já têm imagens.",
+        });
+        setIsSyncingImages(false);
+        return;
+      }
+      
+      let totalProcessed = 0;
+      let totalUpdated = 0;
+      
+      while (totalProcessed < productsNeedingImages) {
+        const remaining = productsNeedingImages - totalProcessed;
+        const estimatedSeconds = remaining * TIME_PER_PRODUCT;
+        const estimatedMinutes = Math.ceil(estimatedSeconds / 60);
+        
+        setImagesSyncProgress({
+          current: totalProcessed,
+          total: productsNeedingImages,
+          updated: totalUpdated,
+          estimatedTime: estimatedMinutes > 1 ? `~${estimatedMinutes} min restantes` : `< 1 min restante`,
+        });
+        
+        const result = await productsApi.syncImages(1);
+        
+        if (!result.success) {
+          toast({
+            title: "Erro na sincronização",
+            description: result.error || "Falha ao sincronizar imagem.",
+            variant: "destructive",
+          });
+          break;
+        }
+        
+        totalProcessed += result.processed || 0;
+        totalUpdated += result.updated || 0;
+        
+        // If no products were processed, we're done
+        if (!result.processed || result.processed === 0) {
+          break;
+        }
+        
+        // Small delay between requests
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+      
+      toast({
+        title: "Sincronização de imagens concluída!",
+        description: `${totalUpdated} imagens atualizadas de ${totalProcessed} processados.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: error instanceof Error ? error.message : "Falha ao executar sincronização de imagens.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSyncingImages(false);
+      setImagesSyncProgress(null);
+    }
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
@@ -531,6 +613,42 @@ const AdminPanel = () => {
               </>
             )}
           </Button>
+          
+          <Button 
+            onClick={handleSyncImages}
+            disabled={isSyncingImages || (products.length - productsWithImage) === 0}
+            variant="outline"
+            className="border-purple-500 text-purple-500 hover:bg-purple-500/10"
+          >
+            {isSyncingImages ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Sincronizando...
+              </>
+            ) : (
+              <>
+                <Image className="h-4 w-4 mr-2" />
+                Sincronizar Imagens ({products.length - productsWithImage})
+              </>
+            )}
+          </Button>
+          
+          {/* Image Sync Progress */}
+          {imagesSyncProgress && (
+            <div className="w-full bg-card border border-border rounded-lg p-4">
+              <div className="flex justify-between text-sm mb-2">
+                <span>Sincronizando imagens: {imagesSyncProgress.current}/{imagesSyncProgress.total}</span>
+                <span>{imagesSyncProgress.updated} atualizadas</span>
+              </div>
+              <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-purple-500 transition-all duration-300"
+                  style={{ width: `${(imagesSyncProgress.current / imagesSyncProgress.total) * 100}%` }}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">{imagesSyncProgress.estimatedTime}</p>
+            </div>
+          )}
           
           {productsWithoutPrice > 0 && (
             <Badge variant="outline" className="border-red-500 text-red-400 px-3 py-2">

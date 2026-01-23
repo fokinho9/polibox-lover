@@ -243,4 +243,23 @@ export const productsApi = {
 
     return data;
   },
+
+  async syncImages(limit: number = 1): Promise<{ 
+    success: boolean; 
+    processed?: number; 
+    updated?: number; 
+    errors?: number;
+    results?: { id: string; name: string; image_url?: string; error?: string }[];
+    error?: string 
+  }> {
+    const { data, error } = await supabase.functions.invoke('sync-images', {
+      body: { limit },
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return data;
+  },
 };
