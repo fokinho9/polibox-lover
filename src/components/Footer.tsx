@@ -1,6 +1,7 @@
-import { Phone, Mail, MapPin, Clock, CreditCard, Shield, Truck, Instagram, Facebook, Youtube, Sparkles } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, CreditCard, Shield, Truck, Instagram, Facebook, Youtube, Sparkles, Store } from "lucide-react";
 import { Link } from "react-router-dom";
 import logoPolicar from "@/assets/logo-policar.png";
+import lojaPolicar from "@/assets/loja-policar.png";
 
 const Footer = () => {
   return (
@@ -151,6 +152,43 @@ const Footer = () => {
               <li><Link to="/termos" className="text-muted-foreground hover:text-primary transition-colors">Termos de Uso</Link></li>
               <li><a href="https://api.whatsapp.com/send?phone=5521996327544" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">Atendimento WhatsApp</a></li>
             </ul>
+          </div>
+        </div>
+
+        {/* Store Location Section */}
+        <div className="mt-12 pt-10 border-t border-border/50">
+          <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8">
+            {/* Circular Store Photo */}
+            <div className="relative flex-shrink-0">
+              <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-primary/30 shadow-xl shadow-primary/20 ring-4 ring-primary/10">
+                <img 
+                  src={lojaPolicar} 
+                  alt="Loja Policar" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-gradient-to-br from-primary to-cyan-500 flex items-center justify-center shadow-lg">
+                <Store className="h-5 w-5 text-white" />
+              </div>
+            </div>
+            
+            {/* Location Info */}
+            <div className="text-center md:text-left flex-1">
+              <h3 className="font-display text-xl md:text-2xl text-foreground mb-2">NOSSA LOJA FÍSICA</h3>
+              <p className="text-muted-foreground mb-4 text-sm md:text-base">
+                Visite nossa loja e confira de perto os melhores produtos para estética automotiva!
+              </p>
+              <div className="flex flex-col sm:flex-row items-center gap-4 text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  <span>Rio de Janeiro, RJ</span>
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Clock className="h-4 w-4 text-primary" />
+                  <span>Seg-Sex: 9h às 18h | Sáb: 9h às 13h</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
