@@ -527,32 +527,49 @@ const AdminPanel = () => {
     }
   };
 
-  const handleSyncSingleImage = async () => {
+  const handleSyncImagesOneByOne = async () => {
     setIsSyncingSingleImage(true);
+    const totalWithoutImage = products.length - productsWithImage;
+    let syncedCount = 0;
+    let errorCount = 0;
     
     try {
-      const result = await productsApi.syncImages(1);
-      
-      if (result.success) {
+      while (true) {
+        const result = await productsApi.syncImages(1);
+        
+        if (!result.success) {
+          errorCount++;
+          if (errorCount >= 3) {
+            toast({
+              title: "Sincronização pausada",
+              description: "Muitos erros consecutivos. Tente novamente.",
+              variant: "destructive",
+            });
+            break;
+          }
+          continue;
+        }
+        
         if (result.updated && result.updated > 0) {
+          syncedCount++;
           const productName = result.results?.[0]?.name || 'Produto';
           toast({
-            title: "✅ Imagem sincronizada!",
-            description: `${productName}`,
+            title: `✅ ${syncedCount}/${totalWithoutImage}`,
+            description: productName,
           });
+          errorCount = 0;
+          queryClient.invalidateQueries({ queryKey: ['products'] });
         } else {
+          // No more products without images
           toast({
-            title: "Nenhuma imagem atualizada",
-            description: result.results?.[0]?.error || "Produto já tem imagem ou não encontrada.",
+            title: "🎉 Sincronização completa!",
+            description: `${syncedCount} imagens sincronizadas.`,
           });
+          break;
         }
-        queryClient.invalidateQueries({ queryKey: ['products'] });
-      } else {
-        toast({
-          title: "Erro",
-          description: result.error || "Falha ao sincronizar imagem.",
-          variant: "destructive",
-        });
+        
+        // Small delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
     } catch (error) {
       toast({
@@ -562,6 +579,7 @@ const AdminPanel = () => {
       });
     } finally {
       setIsSyncingSingleImage(false);
+      queryClient.invalidateQueries({ queryKey: ['products'] });
     }
   };
 
@@ -673,7 +691,7 @@ const AdminPanel = () => {
           </Button>
           
           <Button 
-            onClick={handleSyncSingleImage}
+            onClick={handleSyncImagesOneByOne}
             disabled={isSyncingSingleImage || (products.length - productsWithImage) === 0}
             variant="outline"
             className="border-pink-500 text-pink-500 hover:bg-pink-500/10"
@@ -681,12 +699,12 @@ const AdminPanel = () => {
             {isSyncingSingleImage ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Sincronizando 1...
+                Sincronizando...
               </>
             ) : (
               <>
                 <Image className="h-4 w-4 mr-2" />
-                +1 Imagem
+                Sync Auto 1x1
               </>
             )}
           </Button>
