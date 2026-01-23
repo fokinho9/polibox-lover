@@ -67,12 +67,7 @@ const ProductCard = ({
 
     const success = addToCart(product as any, 1);
     
-    if (success) {
-      toast({
-        title: "🛒 Produto adicionado!",
-        description: `${name} foi adicionado ao carrinho`,
-      });
-    } else {
+    if (!success) {
       toast({
         title: "⚠️ Limite de carrinho atingido",
         description: `O carrinho não pode ultrapassar R$ ${CART_LIMIT.toFixed(2).replace('.', ',')} para manter o frete grátis.`,

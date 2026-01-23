@@ -31,42 +31,26 @@ const FloatingCart = () => {
 
   return (
     <>
-      {/* Top notification when product is added */}
-      {lastAddedProduct && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
-          <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-4 rounded-2xl shadow-2xl shadow-green-500/40 flex items-center gap-4 border border-green-400/30">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
-              <Check className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="font-bold text-base">Produto adicionado ao carrinho!</p>
-              <p className="text-sm text-white/90 truncate max-w-[250px]">{lastAddedProduct.name}</p>
-            </div>
-            <button 
-              onClick={() => setIsCartOpen(true)}
-              className="ml-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-semibold transition-colors"
-            >
-              Ver carrinho
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Floating Cart Button with effect - Bottom right above WhatsApp */}
       {totalItems > 0 && !isCartOpen && (
         <button
           onClick={() => setIsCartOpen(true)}
-          className="fixed bottom-24 right-6 z-50 w-16 h-16 bg-gradient-to-br from-primary to-cyan-glow text-primary-foreground rounded-2xl shadow-lg flex items-center justify-center transition-all hover:scale-110 animate-fade-in group"
+          className={`fixed bottom-24 right-6 z-50 w-16 h-16 bg-gradient-to-br from-primary to-cyan-glow text-primary-foreground rounded-2xl shadow-lg flex items-center justify-center transition-all hover:scale-110 group ${lastAddedProduct ? 'animate-bounce' : 'animate-fade-in'}`}
           style={{
-            boxShadow: '0 0 30px hsl(var(--primary) / 0.6), 0 10px 40px -10px hsl(var(--primary) / 0.7)',
+            boxShadow: lastAddedProduct 
+              ? '0 0 50px hsl(var(--primary) / 0.9), 0 0 80px hsl(var(--primary) / 0.6)'
+              : '0 0 30px hsl(var(--primary) / 0.6), 0 10px 40px -10px hsl(var(--primary) / 0.7)',
           }}
         >
-          <ShoppingCart className="h-7 w-7 group-hover:scale-110 transition-transform" />
-          <span className="absolute -top-2 -right-2 w-7 h-7 bg-destructive text-white text-sm font-bold rounded-full flex items-center justify-center animate-scale-in shadow-lg">
+          <ShoppingCart className={`h-7 w-7 transition-transform ${lastAddedProduct ? 'scale-125' : 'group-hover:scale-110'}`} />
+          <span className={`absolute -top-2 -right-2 w-7 h-7 bg-destructive text-white text-sm font-bold rounded-full flex items-center justify-center shadow-lg ${lastAddedProduct ? 'animate-ping' : 'animate-scale-in'}`}>
             {totalItems}
           </span>
-          {/* Glow effect on hover */}
-          <div className="absolute inset-0 rounded-2xl bg-primary opacity-0 group-hover:opacity-40 blur-xl transition-opacity" />
+          <span className="absolute -top-2 -right-2 w-7 h-7 bg-destructive text-white text-sm font-bold rounded-full flex items-center justify-center shadow-lg">
+            {totalItems}
+          </span>
+          {/* Glow effect */}
+          <div className={`absolute inset-0 rounded-2xl bg-primary blur-xl transition-opacity ${lastAddedProduct ? 'opacity-60' : 'opacity-0 group-hover:opacity-40'}`} />
         </button>
       )}
 
