@@ -1,14 +1,19 @@
 import { useEffect, useState } from "react";
-import { ShoppingCart, Zap } from "lucide-react";
+import { ShoppingCart, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface FloatingBuyButtonProps {
   onBuy: () => void;
   price: number;
+  originalPrice?: number;
+  showWholesale?: boolean;
 }
 
-const FloatingBuyButton = ({ onBuy, price }: FloatingBuyButtonProps) => {
+const FloatingBuyButton = ({ onBuy, price, originalPrice, showWholesale }: FloatingBuyButtonProps) => {
   const [isVisible, setIsVisible] = useState(false);
+
+  // Calculate wholesale price (20% off)
+  const wholesalePrice = price * 0.8;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,6 +37,13 @@ const FloatingBuyButton = ({ onBuy, price }: FloatingBuyButtonProps) => {
               <span className="text-xl font-display font-bold text-primary">
                 R$ {price.toFixed(2).replace('.', ',')}
               </span>
+              {/* Wholesale price indicator */}
+              <div className="flex items-center gap-1.5 mt-1">
+                <Users className="h-3 w-3 text-emerald-400" />
+                <span className="text-[10px] text-emerald-400 font-medium">
+                  5+ un: R$ {wholesalePrice.toFixed(2).replace('.', ',')}
+                </span>
+              </div>
             </div>
             <Button 
               onClick={onBuy}
