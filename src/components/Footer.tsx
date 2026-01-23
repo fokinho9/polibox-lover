@@ -6,13 +6,60 @@ import lojaPolicar from "@/assets/loja-policar.png";
 const Footer = () => {
   return (
     <footer className="bg-card border-t border-border">
-      {/* Benefits bar */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 py-6 border-b border-primary/20">
+      {/* Store Location Section - Above footer */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 py-10 border-b border-primary/20">
         {/* Background glow effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
-        <div className="absolute top-0 left-1/4 w-64 h-32 bg-primary/10 blur-3xl rounded-full" />
-        <div className="absolute top-0 right-1/4 w-64 h-32 bg-cyan-500/10 blur-3xl rounded-full" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+        <div className="absolute top-1/2 left-1/4 w-64 h-32 bg-primary/10 blur-3xl rounded-full -translate-y-1/2" />
+        <div className="absolute top-1/2 right-1/4 w-64 h-32 bg-cyan-500/10 blur-3xl rounded-full -translate-y-1/2" />
         
+        <div className="container-main relative">
+          <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
+            {/* Circular Store Photo - Clickable */}
+            <a 
+              href={lojaPolicar} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="relative flex-shrink-0 group cursor-pointer"
+            >
+              <div className="w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-4 border-primary/40 shadow-2xl shadow-primary/30 ring-4 ring-primary/20 group-hover:ring-primary/40 group-hover:border-primary/60 transition-all duration-300 group-hover:scale-105">
+                <img 
+                  src={lojaPolicar} 
+                  alt="Loja Policar" 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+              </div>
+              <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-gradient-to-br from-primary to-cyan-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <Store className="h-5 w-5 text-white" />
+              </div>
+              <div className="absolute inset-0 rounded-full flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <span className="text-white text-xs font-medium">Ver foto</span>
+              </div>
+            </a>
+            
+            {/* Location Info */}
+            <div className="text-center md:text-left flex-1">
+              <h3 className="font-display text-2xl md:text-3xl text-white mb-3">NOSSA LOJA FÍSICA</h3>
+              <p className="text-white/70 mb-5 text-sm md:text-base max-w-lg">
+                Visite nossa loja e confira de perto os melhores produtos para estética automotiva!
+              </p>
+              <div className="flex flex-col sm:flex-row items-center gap-4 text-sm">
+                <div className="flex items-center gap-2 text-white/80">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  <span>Rio de Janeiro, RJ</span>
+                </div>
+                <div className="flex items-center gap-2 text-white/80">
+                  <Clock className="h-4 w-4 text-primary" />
+                  <span>Seg-Sex: 9h às 18h | Sáb: 9h às 13h</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Benefits bar */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800 py-6 border-b border-border/50">
         <div className="container-main relative grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {/* Frete Grátis */}
           <div className="group relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:border-red-logo/50 transition-all duration-300 hover:shadow-lg hover:shadow-red-logo/10">
@@ -155,42 +202,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Store Location Section */}
-        <div className="mt-12 pt-10 border-t border-border/50">
-          <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8">
-            {/* Circular Store Photo */}
-            <div className="relative flex-shrink-0">
-              <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-primary/30 shadow-xl shadow-primary/20 ring-4 ring-primary/10">
-                <img 
-                  src={lojaPolicar} 
-                  alt="Loja Policar" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-gradient-to-br from-primary to-cyan-500 flex items-center justify-center shadow-lg">
-                <Store className="h-5 w-5 text-white" />
-              </div>
-            </div>
-            
-            {/* Location Info */}
-            <div className="text-center md:text-left flex-1">
-              <h3 className="font-display text-xl md:text-2xl text-foreground mb-2">NOSSA LOJA FÍSICA</h3>
-              <p className="text-muted-foreground mb-4 text-sm md:text-base">
-                Visite nossa loja e confira de perto os melhores produtos para estética automotiva!
-              </p>
-              <div className="flex flex-col sm:flex-row items-center gap-4 text-sm">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <MapPin className="h-4 w-4 text-primary" />
-                  <span>Rio de Janeiro, RJ</span>
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Clock className="h-4 w-4 text-primary" />
-                  <span>Seg-Sex: 9h às 18h | Sáb: 9h às 13h</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Copyright */}
