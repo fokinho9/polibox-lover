@@ -34,15 +34,18 @@ const ProductCard = ({
   const { hasCompletedQuiz, discountPercent, timeRemaining } = useQuiz();
   const { toast } = useToast();
 
-  // Apply quiz discount
+  // Apply quiz discount and cap maximum price at 389.90
   const quizMultiplier = hasCompletedQuiz ? (100 - discountPercent) / 100 : 1;
-  const finalPrice = price * quizMultiplier;
-  const finalPixPrice = pixPrice * quizMultiplier;
+  const MAX_PRICE = 389.90;
+  const calculatedPrice = price * quizMultiplier;
+  const finalPrice = Math.min(calculatedPrice, MAX_PRICE);
+  const calculatedPixPrice = pixPrice * quizMultiplier;
+  const finalPixPrice = Math.min(calculatedPixPrice, MAX_PRICE);
   const finalOldPrice = hasCompletedQuiz ? price : oldPrice;
   const finalDiscount = hasCompletedQuiz ? discountPercent : discount;
   const finalInstallments = installments ? {
     count: installments.count,
-    value: installments.value * quizMultiplier
+    value: Math.min(installments.value * quizMultiplier, MAX_PRICE / installments.count)
   } : undefined;
 
   const handleAddToCart = (e: React.MouseEvent) => {
