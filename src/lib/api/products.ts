@@ -81,6 +81,32 @@ export const productsApi = {
       return data || [];
     }
 
+    // Handle "ceras-selantes" - search in category field with ILIKE
+    if (category === 'ceras-selantes') {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .ilike('category', '%ceras-selantes%')
+        .gt('price', 0)
+        .order('price', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    }
+
+    // Handle "polimento" - most expensive first
+    if (category === 'polimento') {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('category', 'polimento')
+        .gt('price', 0)
+        .order('price', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    }
+
     // Regular category query
     const { data, error } = await supabase
       .from('products')
