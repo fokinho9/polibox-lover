@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useState, ReactNode, useCallback, useMemo } from 'react';
 import { Product } from '@/lib/api/products';
 import { applyDiscount } from '@/lib/utils';
 
@@ -22,6 +22,7 @@ interface CartContextType {
   getItemPrice: (item: CartItem) => number;
   getItemUnitPrice: (item: CartItem) => number;
   hasWholesaleDiscount: (item: CartItem) => boolean;
+  hasCartWholesale: boolean;
 }
 
 const WHOLESALE_THRESHOLD = 5;
@@ -33,6 +34,17 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [lastAddedProduct, setLastAddedProduct] = useState<Product | null>(null);
+
+  const totalItems = useMemo(() => 
+    items.reduce((sum, item) => sum + item.quantity, 0), 
+    [items]
+  );
+
+  // Check if cart total qualifies for wholesale
+  const hasCartWholesale = useMemo(() => 
+    totalItems >= WHOLESALE_THRESHOLD, 
+    [totalItems]
+  );
 
   const addToCart = useCallback((product: Product, quantity: number = 1) => {
     setItems((prev) => {
@@ -74,41 +86,41 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setItems([]);
   }, []);
 
-  // Check if item qualifies for wholesale discount
+  // Check if item qualifies for wholesale discount (5+ of same product OR 5+ total in cart)
   const hasWholesaleDiscount = useCallback((item: CartItem) => {
-    return item.quantity >= WHOLESALE_THRESHOLD;
-  }, []);
+    return item.quantity >= WHOLESALE_THRESHOLD || totalItems >= WHOLESALE_THRESHOLD;
+  }, [totalItems]);
 
   // Get unit price with wholesale discount if applicable
   const getItemUnitPrice = useCallback((item: CartItem) => {
     const basePrice = applyDiscount(item.product.price);
-    if (item.quantity >= WHOLESALE_THRESHOLD) {
+    // Apply discount if: 5+ of same product OR 5+ total items in cart
+    if (item.quantity >= WHOLESALE_THRESHOLD || totalItems >= WHOLESALE_THRESHOLD) {
       return basePrice * (1 - WHOLESALE_DISCOUNT);
     }
     return basePrice;
-  }, []);
+  }, [totalItems]);
 
   // Get total price for an item
   const getItemPrice = useCallback((item: CartItem) => {
     return getItemUnitPrice(item) * item.quantity;
   }, [getItemUnitPrice]);
-
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   
-  const totalPrice = items.reduce(
-    (sum, item) => sum + getItemPrice(item),
-    0
+  const totalPrice = useMemo(() => 
+    items.reduce((sum, item) => sum + getItemPrice(item), 0),
+    [items, getItemPrice]
   );
 
   // Calculate total savings from wholesale discounts
-  const totalSavings = items.reduce((sum, item) => {
-    if (item.quantity >= WHOLESALE_THRESHOLD) {
+  const totalSavings = useMemo(() => {
+    if (totalItems < WHOLESALE_THRESHOLD) return 0;
+    
+    return items.reduce((sum, item) => {
       const regularPrice = applyDiscount(item.product.price) * item.quantity;
       const discountedPrice = getItemPrice(item);
       return sum + (regularPrice - discountedPrice);
-    }
-    return sum;
-  }, 0);
+    }, 0);
+  }, [items, totalItems, getItemPrice]);
 
   return (
     <CartContext.Provider
@@ -127,6 +139,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         getItemPrice,
         getItemUnitPrice,
         hasWholesaleDiscount,
+        hasCartWholesale,
       }}
     >
       {children}

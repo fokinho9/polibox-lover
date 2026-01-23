@@ -17,7 +17,8 @@ const FloatingCart = () => {
     setIsCartOpen, 
     lastAddedProduct,
     getItemUnitPrice,
-    hasWholesaleDiscount
+    hasWholesaleDiscount,
+    hasCartWholesale
   } = useCart();
 
   const formatPrice = (price: number) => {
@@ -105,6 +106,27 @@ const FloatingCart = () => {
             <ArrowLeft className="h-4 w-4" />
             <span className="font-medium">Continuar comprando</span>
           </button>
+
+          {/* Wholesale Banner */}
+          {hasCartWholesale && items.length > 0 && (
+            <div className="mx-4 mt-3 p-3 bg-green-500/15 border border-green-500/30 rounded-xl flex items-center gap-2">
+              <Package className="h-5 w-5 text-green-500" />
+              <div>
+                <p className="text-sm font-bold text-green-500">🎉 ATACADO ATIVADO!</p>
+                <p className="text-xs text-muted-foreground">20% de desconto em todos os produtos</p>
+              </div>
+            </div>
+          )}
+
+          {/* Hint to unlock wholesale */}
+          {!hasCartWholesale && totalItems >= 3 && totalItems < 5 && (
+            <div className="mx-4 mt-3 p-3 bg-primary/10 border border-primary/30 rounded-xl flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <p className="text-xs text-muted-foreground">
+                Adicione mais <span className="font-bold text-primary">{5 - totalItems}</span> {5 - totalItems === 1 ? 'produto' : 'produtos'} para desbloquear <span className="font-bold text-green-500">20% OFF ATACADO</span>
+              </p>
+            </div>
+          )}
 
           {/* Items */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ backgroundColor: 'hsl(220, 18%, 10%)' }}>
