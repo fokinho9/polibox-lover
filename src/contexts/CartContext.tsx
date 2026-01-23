@@ -9,9 +9,9 @@ interface CartItem {
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: Product, quantity?: number) => void;
+  addToCart: (product: Product, quantity?: number) => boolean;
   removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  updateQuantity: (productId: string, quantity: number) => boolean;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
@@ -23,10 +23,13 @@ interface CartContextType {
   getItemUnitPrice: (item: CartItem) => number;
   hasWholesaleDiscount: (item: CartItem) => boolean;
   hasCartWholesale: boolean;
+  isOverLimit: boolean;
+  CART_LIMIT: number;
 }
 
 const WHOLESALE_THRESHOLD = 5;
 const WHOLESALE_DISCOUNT = 0.20; // 20% discount
+const CART_LIMIT = 499.99; // Maximum cart value for free shipping
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -46,41 +49,74 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     [totalItems]
   );
 
-  const addToCart = useCallback((product: Product, quantity: number = 1) => {
-    setItems((prev) => {
-      const existingItem = prev.find((item) => item.product.id === product.id);
-      if (existingItem) {
-        return prev.map((item) =>
+  // Helper to calculate what new total would be
+  const calculateNewTotal = useCallback((newItems: CartItem[]) => {
+    const newTotalItems = newItems.reduce((sum, item) => sum + item.quantity, 0);
+    const hasWholesale = newTotalItems >= WHOLESALE_THRESHOLD;
+    
+    return newItems.reduce((sum, item) => {
+      const basePrice = applyDiscount(item.product.price);
+      const unitPrice = (item.quantity >= WHOLESALE_THRESHOLD || hasWholesale) 
+        ? basePrice * (1 - WHOLESALE_DISCOUNT) 
+        : basePrice;
+      return sum + (unitPrice * item.quantity);
+    }, 0);
+  }, []);
+
+  const addToCart = useCallback((product: Product, quantity: number = 1): boolean => {
+    // Calculate what the new total would be
+    const existingItem = items.find((item) => item.product.id === product.id);
+    const newItems = existingItem 
+      ? items.map((item) =>
           item.product.id === product.id
             ? { ...item, quantity: item.quantity + quantity }
             : item
-        );
-      }
-      return [...prev, { product, quantity }];
-    });
+        )
+      : [...items, { product, quantity }];
+    
+    const newTotal = calculateNewTotal(newItems);
+    
+    // Check if would exceed limit
+    if (newTotal > CART_LIMIT) {
+      return false; // Signal that addition was blocked
+    }
+    
+    setItems(newItems);
     setLastAddedProduct(product);
     
     // Clear notification after 3 seconds
     setTimeout(() => {
       setLastAddedProduct(null);
     }, 3000);
-  }, []);
+    
+    return true;
+  }, [items, calculateNewTotal]);
 
   const removeFromCart = useCallback((productId: string) => {
     setItems((prev) => prev.filter((item) => item.product.id !== productId));
   }, []);
 
-  const updateQuantity = useCallback((productId: string, quantity: number) => {
+  const updateQuantity = useCallback((productId: string, quantity: number): boolean => {
     if (quantity <= 0) {
       removeFromCart(productId);
-      return;
+      return true;
     }
-    setItems((prev) =>
-      prev.map((item) =>
-        item.product.id === productId ? { ...item, quantity } : item
-      )
+    
+    // Calculate what the new total would be
+    const newItems = items.map((item) =>
+      item.product.id === productId ? { ...item, quantity } : item
     );
-  }, [removeFromCart]);
+    
+    const newTotal = calculateNewTotal(newItems);
+    
+    // Check if would exceed limit
+    if (newTotal > CART_LIMIT) {
+      return false; // Signal that update was blocked
+    }
+    
+    setItems(newItems);
+    return true;
+  }, [removeFromCart, items, calculateNewTotal]);
 
   const clearCart = useCallback(() => {
     setItems([]);
@@ -122,6 +158,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }, 0);
   }, [items, totalItems, getItemPrice]);
 
+  // Check if cart is over the limit
+  const isOverLimit = useMemo(() => totalPrice > CART_LIMIT, [totalPrice]);
+
   return (
     <CartContext.Provider
       value={{
@@ -140,6 +179,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         getItemUnitPrice,
         hasWholesaleDiscount,
         hasCartWholesale,
+        isOverLimit,
+        CART_LIMIT,
       }}
     >
       {children}

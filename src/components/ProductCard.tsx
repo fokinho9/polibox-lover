@@ -30,7 +30,7 @@ const ProductCard = ({
   express = true,
   brand,
 }: ProductCardProps) => {
-  const { addToCart } = useCart();
+  const { addToCart, CART_LIMIT } = useCart();
   const { hasCompletedQuiz, discountPercent, timeRemaining } = useQuiz();
   const { toast } = useToast();
 
@@ -65,12 +65,20 @@ const ProductCard = ({
       brand,
     };
 
-    addToCart(product as any, 1);
+    const success = addToCart(product as any, 1);
     
-    toast({
-      title: "🛒 Produto adicionado!",
-      description: `${name} foi adicionado ao carrinho`,
-    });
+    if (success) {
+      toast({
+        title: "🛒 Produto adicionado!",
+        description: `${name} foi adicionado ao carrinho`,
+      });
+    } else {
+      toast({
+        title: "⚠️ Limite de carrinho atingido",
+        description: `O carrinho não pode ultrapassar R$ ${CART_LIMIT.toFixed(2).replace('.', ',')} para manter o frete grátis.`,
+        variant: "destructive"
+      });
+    }
   };
 
   const CardWrapper = ({ children }: { children: React.ReactNode }) => {
