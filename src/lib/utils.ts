@@ -8,7 +8,11 @@ export function cn(...inputs: ClassValue[]) {
 // Global site discount multiplier (20% off = 0.8)
 export const SITE_DISCOUNT = 0.8;
 
-// Apply site discount to a price
+// Maximum price cap after discount
+export const MAX_PRICE = 399.90;
+
+// Apply site discount to a price with max cap
 export function applyDiscount(price: number): number {
-  return price * SITE_DISCOUNT;
+  const discounted = price * SITE_DISCOUNT;
+  return Math.min(discounted, MAX_PRICE);
 }
