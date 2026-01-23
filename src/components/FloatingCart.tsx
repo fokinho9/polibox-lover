@@ -129,7 +129,7 @@ const FloatingCart = () => {
                       />
                       {isWholesale && (
                         <div className="absolute top-1 left-1">
-                          <Badge className="bg-red-logo text-white text-[8px] px-1.5 py-0.5">
+                          <Badge className="bg-green-500 text-white text-[8px] px-1.5 py-0.5">
                             -20%
                           </Badge>
                         </div>
