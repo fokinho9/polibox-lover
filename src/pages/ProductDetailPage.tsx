@@ -455,6 +455,8 @@ const ProductDetailPage = () => {
   const [shippingResult, setShippingResult] = useState<{
     price: string;
     days: string;
+    city?: string;
+    state?: string;
   } | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -508,13 +510,32 @@ const ProductDetailPage = () => {
   const handleCalculateShipping = async () => {
     if (!cep || cep.length < 8) return;
     setIsCalculating(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
-    const price = "GRÁTIS";
-    const days = "7 dias úteis";
-    setShippingResult({
-      price,
-      days
-    });
+    
+    try {
+      const cleanCep = cep.replace(/\D/g, '');
+      const response = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+      const data = await response.json();
+      
+      if (data.erro) {
+        setShippingResult({
+          price: "GRÁTIS",
+          days: "7 dias úteis"
+        });
+      } else {
+        setShippingResult({
+          price: "GRÁTIS",
+          days: "7 dias úteis",
+          city: data.localidade,
+          state: data.uf
+        });
+      }
+    } catch (error) {
+      setShippingResult({
+        price: "GRÁTIS",
+        days: "7 dias úteis"
+      });
+    }
+    
     setIsCalculating(false);
   };
   const reviews = useMemo(() => {
@@ -811,7 +832,16 @@ const ProductDetailPage = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-emerald-400" />
-                        <span className="text-sm">CEP {cep}</span>
+                        <div className="flex flex-col">
+                          {shippingResult.city && shippingResult.state ? (
+                            <>
+                              <span className="text-sm font-medium">{shippingResult.city} - {shippingResult.state}</span>
+                              <span className="text-xs text-muted-foreground">CEP {cep}</span>
+                            </>
+                          ) : (
+                            <span className="text-sm">CEP {cep}</span>
+                          )}
+                        </div>
                       </div>
                       <p className="font-bold text-lg text-emerald-400">
                         {shippingResult.price}
