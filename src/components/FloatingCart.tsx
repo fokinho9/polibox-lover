@@ -122,9 +122,6 @@ const FloatingCart = () => {
                 const unitPrice = getItemUnitPrice(item);
                 const regularPrice = applyDiscount(item.product.price);
                 
-                // Debug log
-                console.log('Cart item:', item.product.name, 'qty:', item.quantity, 'isWholesale:', isWholesale, 'unitPrice:', unitPrice, 'regularPrice:', regularPrice);
-                
                 return (
                   <div key={item.product.id} className="flex gap-4 p-4 bg-gradient-to-r from-card to-card/50 rounded-2xl border border-border hover:border-primary/30 transition-colors">
                     <div className="w-24 h-24 rounded-xl overflow-hidden bg-secondary/50 flex-shrink-0 relative">
