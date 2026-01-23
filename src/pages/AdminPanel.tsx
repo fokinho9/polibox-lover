@@ -556,33 +556,56 @@ const AdminPanel = () => {
             {productsWithImage} com imagem
           </Badge>
           
-          {/* Filter Buttons */}
-          <div className="flex gap-2 ml-auto">
-            <Button
-              variant={filterBy === 'all' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => { setFilterBy('all'); setCurrentPage(1); }}
-            >
-              <Filter className="h-4 w-4 mr-1" />
-              Todos
-            </Button>
-            <Button
-              variant={filterBy === 'with-description' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => { setFilterBy('with-description'); setCurrentPage(1); }}
-              className={filterBy === 'with-description' ? 'bg-green-600 hover:bg-green-700' : 'border-green-500 text-green-500 hover:bg-green-500/10'}
-            >
-              Com Descrição
-            </Button>
-            <Button
-              variant={filterBy === 'without-description' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => { setFilterBy('without-description'); setCurrentPage(1); }}
-              className={filterBy === 'without-description' ? 'bg-orange-600 hover:bg-orange-700' : 'border-orange-500 text-orange-500 hover:bg-orange-500/10'}
-            >
-              Sem Descrição
-            </Button>
-          </div>
+          {products.length - productsWithImage > 0 && (
+            <Badge variant="outline" className="border-purple-500 text-purple-400 px-3 py-2">
+              <Image className="h-4 w-4 mr-2" />
+              {products.length - productsWithImage} sem imagem
+            </Badge>
+          )}
+        </div>
+        
+        {/* Filter Buttons */}
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant={filterBy === 'all' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => { setFilterBy('all'); setCurrentPage(1); }}
+          >
+            <Filter className="h-4 w-4 mr-1" />
+            Todos
+          </Button>
+          <Button
+            variant={filterBy === 'with-description' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => { setFilterBy('with-description'); setCurrentPage(1); }}
+            className={filterBy === 'with-description' ? 'bg-green-600 hover:bg-green-700' : 'border-green-500 text-green-500 hover:bg-green-500/10'}
+          >
+            Com Descrição
+          </Button>
+          <Button
+            variant={filterBy === 'without-description' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => { setFilterBy('without-description'); setCurrentPage(1); }}
+            className={filterBy === 'without-description' ? 'bg-orange-600 hover:bg-orange-700' : 'border-orange-500 text-orange-500 hover:bg-orange-500/10'}
+          >
+            Sem Descrição
+          </Button>
+          <Button
+            variant={filterBy === 'with-image' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => { setFilterBy('with-image'); setCurrentPage(1); }}
+            className={filterBy === 'with-image' ? 'bg-blue-600 hover:bg-blue-700' : 'border-blue-500 text-blue-500 hover:bg-blue-500/10'}
+          >
+            Com Imagem
+          </Button>
+          <Button
+            variant={filterBy === 'without-image' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => { setFilterBy('without-image'); setCurrentPage(1); }}
+            className={filterBy === 'without-image' ? 'bg-purple-600 hover:bg-purple-700' : 'border-purple-500 text-purple-500 hover:bg-purple-500/10'}
+          >
+            Sem Imagem ({products.length - productsWithImage})
+          </Button>
         </div>
 
         {/* CSV Import Section */}
