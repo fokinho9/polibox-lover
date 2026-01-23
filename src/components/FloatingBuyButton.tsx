@@ -27,8 +27,8 @@ const FloatingBuyButton = ({ onBuy, price }: FloatingBuyButtonProps) => {
       <div className="container-main max-w-lg mx-auto">
         <div className="bg-card/95 backdrop-blur-md rounded-2xl border border-primary/30 p-4 shadow-2xl shadow-primary/20">
           <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">Por apenas</span>
+            <div className="flex flex-col">
+              <span className="text-[10px] text-muted-foreground uppercase">Por apenas</span>
               <span className="text-xl font-display font-bold text-primary">
                 R$ {price.toFixed(2).replace('.', ',')}
               </span>

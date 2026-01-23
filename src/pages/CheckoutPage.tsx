@@ -397,7 +397,7 @@ const CheckoutPage = () => {
                               <h3 className="font-medium text-xs md:text-sm line-clamp-2 mb-0.5">{item.product.name}</h3>
                               {item.product.brand && <span className="text-[10px] md:text-xs text-primary font-medium">{item.product.brand}</span>}
                               {isWholesale && (
-                                <span className="ml-2 text-[10px] font-bold text-red-logo">ATACADO</span>
+                                <span className="ml-2 text-[10px] font-bold text-green-500">ATACADO</span>
                               )}
                               <div className="flex items-center gap-2 mt-1.5">
                                 <div className="flex items-center gap-0.5 bg-secondary/50 rounded-md p-0.5">
@@ -418,7 +418,7 @@ const CheckoutPage = () => {
                               {isWholesale && (
                                 <p className="text-[10px] text-muted-foreground line-through">{formatPrice(regularPrice * item.quantity)}</p>
                               )}
-                              <p className={`font-bold text-sm md:text-base ${isWholesale ? 'text-red-logo' : 'text-primary'}`}>
+                              <p className={`font-bold text-sm md:text-base ${isWholesale ? 'text-green-500' : 'text-primary'}`}>
                                 {formatPrice(unitPrice * item.quantity)}
                               </p>
                               {item.quantity > 1 && <p className="text-[10px] md:text-xs text-muted-foreground">{formatPrice(unitPrice)} un.</p>}
@@ -700,7 +700,7 @@ const CheckoutPage = () => {
                       <span>{formatPrice(totalPrice + totalSavings)}</span>
                     </div>
                     {totalSavings > 0 && (
-                      <div className="flex justify-between text-xs md:text-sm text-red-logo">
+                      <div className="flex justify-between text-xs md:text-sm text-green-500">
                         <span className="flex items-center gap-1">🏷️ Desconto Atacado</span>
                         <span>-{formatPrice(totalSavings)}</span>
                       </div>
