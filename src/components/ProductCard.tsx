@@ -90,7 +90,7 @@ const ProductCard = ({
           {finalDiscount && finalDiscount > 0 && (
             <div className="absolute top-2 left-2 z-10">
               <div className="relative">
-                <span className={`inline-flex items-center gap-1 px-2.5 py-1 ${hasCompletedQuiz ? 'bg-gradient-to-r from-primary to-cyan-glow' : 'bg-gradient-to-r from-orange-500 to-red-500'} text-white text-[10px] font-black rounded-md shadow-lg`}>
+                <span className={`inline-flex items-center gap-1 px-2.5 py-1 ${hasCompletedQuiz ? 'bg-gradient-to-r from-primary to-cyan-glow' : 'bg-gradient-to-r from-red-logo to-red-logo-glow'} text-white text-[10px] font-black rounded-md shadow-lg shadow-red-logo/40`}>
                   {hasCompletedQuiz ? <Sparkles className="h-3 w-3" /> : <Flame className="h-3 w-3" />}
                   -{finalDiscount}%
                 </span>

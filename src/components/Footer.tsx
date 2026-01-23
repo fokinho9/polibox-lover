@@ -14,14 +14,14 @@ const Footer = () => {
         
         <div className="container-main relative grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {/* Frete Grátis */}
-          <div className="group relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10">
+          <div className="group relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:border-red-logo/50 transition-all duration-300 hover:shadow-lg hover:shadow-red-logo/10">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-red-logo to-red-logo-dark flex items-center justify-center shadow-lg shadow-red-logo/30 group-hover:scale-110 transition-transform">
                 <Truck className="h-5 w-5 text-white" />
               </div>
               <div>
                 <span className="font-bold text-white text-sm">Frete Grátis</span>
-                <p className="text-xs text-emerald-400 font-medium">Para todo Brasil</p>
+                <p className="text-xs text-red-logo font-medium">Para todo Brasil</p>
               </div>
             </div>
           </div>

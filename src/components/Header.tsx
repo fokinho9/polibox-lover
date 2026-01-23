@@ -5,12 +5,12 @@ import logoPolicar from "@/assets/logo-policar.png";
 const Header = () => {
   return <header className="bg-background border-b border-border">
       {/* Top bar */}
-      <div className="bg-gradient-to-r from-secondary via-secondary/80 to-secondary py-2.5">
+      <div className="bg-gradient-to-r from-red-logo/20 via-red-logo/10 to-red-logo/20 py-2.5 border-b border-red-logo/30">
         <div className="container-main flex items-center justify-center gap-8 text-sm">
-          <div className="flex items-center gap-2 text-primary">
+          <div className="flex items-center gap-2 text-red-logo">
             <Truck className="h-4 w-4" />
             <span className="text-foreground font-medium">FRETE GRÁTIS</span>
-            <span className="text-xs text-emerald-400 font-semibold">em todas as compras</span>
+            <span className="text-xs text-red-logo-glow font-semibold">em todas as compras</span>
           </div>
           <div className="hidden md:flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-yellow-400" />

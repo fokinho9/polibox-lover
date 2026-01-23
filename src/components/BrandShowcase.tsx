@@ -46,12 +46,12 @@ const BrandShowcase = () => {
       <div className="container-main">
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 border border-primary/20 rounded-full mb-4">
-            <Star className="h-4 w-4 text-primary" />
-            <span className="text-primary font-medium text-sm">Marcas Premium</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-red-logo/10 border border-red-logo/20 rounded-full mb-4">
+            <Star className="h-4 w-4 text-red-logo" />
+            <span className="text-red-logo font-medium text-sm">Marcas Premium</span>
           </div>
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-black text-foreground mb-2 tracking-tight">
-            AS MELHORES <span className="text-primary">MARCAS</span>
+            AS MELHORES <span className="text-red-logo">MARCAS</span>
           </h2>
           <p className="text-muted-foreground">
             Produtos de alta qualidade para estética automotiva
