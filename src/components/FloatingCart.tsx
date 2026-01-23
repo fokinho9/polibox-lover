@@ -1,9 +1,10 @@
-import { ShoppingCart, X, Trash2, Plus, Minus, Check, ArrowLeft, Package, Sparkles } from "lucide-react";
+import { ShoppingCart, X, Trash2, Plus, Minus, Check, ArrowLeft, Package, Sparkles, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { Link } from "react-router-dom";
 import { applyDiscount } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 
 const FloatingCart = () => {
   const { 
@@ -18,8 +19,11 @@ const FloatingCart = () => {
     lastAddedProduct,
     getItemUnitPrice,
     hasWholesaleDiscount,
-    hasCartWholesale
+    hasCartWholesale,
+    isOverLimit,
+    CART_LIMIT
   } = useCart();
+  const { toast } = useToast();
 
   const formatPrice = (price: number) => {
     return price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -201,14 +205,23 @@ const FloatingCart = () => {
                             <Minus className="h-4 w-4" />
                           </Button>
                           <span className="w-10 text-center font-bold">{item.quantity}</span>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 rounded-lg hover:bg-primary/20"
-                            onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 rounded-lg hover:bg-primary/20"
+                          onClick={() => {
+                            const success = updateQuantity(item.product.id, item.quantity + 1);
+                            if (!success) {
+                              toast({
+                                title: "⚠️ Limite atingido",
+                                description: `O carrinho não pode ultrapassar R$ ${CART_LIMIT.toFixed(2).replace('.', ',')} para manter o frete grátis.`,
+                                variant: "destructive"
+                              });
+                            }
+                          }}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
                         </div>
                         <Button
                           variant="ghost"
