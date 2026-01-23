@@ -14,6 +14,7 @@ const brands = [
   { name: "SPARTAN", slug: "marca-spartan", color: "from-sky-500 to-sky-600" },
   { name: "SOFT99", slug: "marca-soft99", color: "from-pink-500 to-pink-600" },
   { name: "RAPIFIX", slug: "marca-rapifix", color: "from-yellow-500 to-yellow-600" },
+  { name: "VINTEX", slug: "marca-vintex", color: "from-teal-500 to-teal-600" },
 ];
 
 const BrandShowcase = () => {

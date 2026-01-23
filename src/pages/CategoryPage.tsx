@@ -48,6 +48,7 @@ const categoryTitles: Record<string, string> = {
   "marca-spartan": "SPARTAN",
   "marca-soft99": "SOFT99",
   "marca-rapifix": "RAPIFIX",
+  "marca-vintex": "VINTEX",
 };
 
 const CategoryPage = () => {
