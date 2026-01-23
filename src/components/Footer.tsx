@@ -42,25 +42,48 @@ const Footer = () => {
         
         <div className="container-main relative">
           <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
-            {/* Circular Store Photo - Clickable to open lightbox */}
-            <button 
-              onClick={() => setIsPhotoOpen(true)}
+            {/* Store Photo with Google Maps style design */}
+            <div 
               className="relative flex-shrink-0 group cursor-pointer"
+              onClick={() => setIsPhotoOpen(true)}
             >
-              <div className="w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-4 border-primary/40 shadow-2xl shadow-primary/30 ring-4 ring-primary/20 group-hover:ring-primary/40 group-hover:border-primary/60 transition-all duration-300 group-hover:scale-105">
-                <img 
-                  src={lojaPolicar} 
-                  alt="Loja Policar" 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
+              {/* Map-style container */}
+              <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl">
+                {/* Background map pattern */}
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-800/30 via-emerald-700/20 to-teal-800/30" />
+                <div className="absolute inset-0 opacity-30" style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 30h60M30 0v60' stroke='%23ffffff' stroke-width='0.5' fill='none' opacity='0.3'/%3E%3C/svg%3E")`,
+                  backgroundSize: '30px 30px'
+                }} />
+                
+                {/* Store photo in center */}
+                <div className="absolute inset-4 rounded-xl overflow-hidden border-2 border-white/30 shadow-lg">
+                  <img 
+                    src={lojaPolicar} 
+                    alt="Loja Policar" 
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                </div>
+                
+                {/* Map pin marker */}
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center shadow-lg animate-bounce">
+                    <MapPin className="h-4 w-4 text-white" />
+                  </div>
+                  <div className="w-0 h-0 border-l-4 border-r-4 border-t-8 border-l-transparent border-r-transparent border-t-red-500 -mt-1" />
+                </div>
+                
+                {/* Hover overlay */}
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span className="text-white text-sm font-medium bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">Ver foto</span>
+                </div>
               </div>
-              <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-gradient-to-br from-primary to-cyan-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                <Store className="h-5 w-5 text-white" />
+              
+              {/* Location badge */}
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-cyan-500 px-3 py-1 rounded-full shadow-lg">
+                <span className="text-white text-xs font-bold whitespace-nowrap">📍 Rio de Janeiro</span>
               </div>
-              <div className="absolute inset-0 rounded-full flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <span className="text-white text-xs font-medium">Ver foto</span>
-              </div>
-            </button>
+            </div>
             
             {/* Location Info */}
             <div className="text-center md:text-left flex-1">
