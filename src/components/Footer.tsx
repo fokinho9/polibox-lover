@@ -94,7 +94,7 @@ const Footer = () => {
                 </div>
               </div>
               
-              <a href="https://www.google.com/maps/place/R.+Cap.+Jo%C3%A3o+Jos%C3%A9+de+Macedo,+279+-+Centro,+Jacare%C3%AD+-+SP,+12327-030" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-cyan-500 text-white text-sm font-bold rounded-full hover:scale-105 transition-transform shadow-lg shadow-primary/40">
+              <a href="https://maps.app.goo.gl/S85kWhpiBBAfFpcZ9" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-cyan-500 text-white text-sm font-bold rounded-full hover:scale-105 transition-transform shadow-lg shadow-primary/40">
                 <MapPin className="h-4 w-4" />
                 Ver no Google Maps
               </a>
