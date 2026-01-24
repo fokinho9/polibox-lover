@@ -34,38 +34,15 @@ interface QuizModalProps {
 }
 
 const fireConfetti = () => {
-  const duration = 4000;
-  const end = Date.now() + duration;
+  const colors = ['#00E5FF', '#00B8D4', '#FFD700'];
 
-  const colors = ['#00E5FF', '#00B8D4', '#FFD700', '#FF6B6B', '#4CAF50', '#E91E63'];
-
-  (function frame() {
-    confetti({
-      particleCount: 4,
-      angle: 60,
-      spread: 55,
-      origin: { x: 0, y: 0.7 },
-      colors: colors
-    });
-    confetti({
-      particleCount: 4,
-      angle: 120,
-      spread: 55,
-      origin: { x: 1, y: 0.7 },
-      colors: colors
-    });
-
-    if (Date.now() < end) {
-      requestAnimationFrame(frame);
-    }
-  }());
-
-  // Big burst in the center
+  // Single gentle burst
   confetti({
-    particleCount: 150,
-    spread: 100,
+    particleCount: 40,
+    spread: 70,
     origin: { y: 0.6, x: 0.5 },
-    colors: colors
+    colors: colors,
+    gravity: 1.2
   });
 };
 
