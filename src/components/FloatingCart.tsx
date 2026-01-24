@@ -79,9 +79,9 @@ const FloatingCart = () => {
               variant="ghost" 
               size="icon" 
               onClick={() => setIsCartOpen(false)}
-              className="hover:bg-primary/10 h-10 w-10 rounded-xl"
+              className="hover:bg-primary/10 h-10 w-10 rounded-xl bg-secondary"
             >
-              <X className="h-6 w-6" />
+              <X className="h-6 w-6 text-foreground" />
             </Button>
           </div>
 
