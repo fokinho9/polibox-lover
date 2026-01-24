@@ -1,3 +1,4 @@
+// Quiz Context - Reinauguration Discount System
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 interface QuizContextType {
