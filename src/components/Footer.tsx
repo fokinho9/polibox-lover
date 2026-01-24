@@ -4,27 +4,17 @@ import { Link } from "react-router-dom";
 import logoPolicar from "@/assets/logo-policar.png";
 import lojaPolicar from "@/assets/loja-policar.png";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-
 const Footer = () => {
   const [isPhotoOpen, setIsPhotoOpen] = useState(false);
-
-  return (
-    <footer className="bg-card border-t border-border">
+  return <footer className="bg-card border-t border-border">
       {/* Photo Lightbox Modal */}
       <Dialog open={isPhotoOpen} onOpenChange={setIsPhotoOpen}>
         <DialogContent className="max-w-4xl p-0 bg-transparent border-0 shadow-none">
           <div className="relative">
-            <button 
-              onClick={() => setIsPhotoOpen(false)}
-              className="absolute -top-12 right-0 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-colors"
-            >
+            <button onClick={() => setIsPhotoOpen(false)} className="absolute -top-12 right-0 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-colors">
               <X className="h-5 w-5" />
             </button>
-            <img 
-              src={lojaPolicar} 
-              alt="Loja Policar" 
-              className="w-full h-auto rounded-2xl shadow-2xl"
-            />
+            <img src={lojaPolicar} alt="Loja Policar" className="w-full h-auto rounded-2xl shadow-2xl" />
             <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-sm rounded-xl p-4">
               <h3 className="font-display text-xl text-white mb-1">POLICAR - Estética Automotiva</h3>
               <p className="text-white/70 text-sm">R. Cap. João José de Macedo, 279 - Centro, Jacareí - SP</p>
@@ -43,26 +33,19 @@ const Footer = () => {
         <div className="container-main relative">
           <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
             {/* Store Photo with Google Maps style design */}
-            <div 
-              className="relative flex-shrink-0 group cursor-pointer"
-              onClick={() => setIsPhotoOpen(true)}
-            >
+            <div className="relative flex-shrink-0 group cursor-pointer" onClick={() => setIsPhotoOpen(true)}>
               {/* Map-style container */}
               <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl">
                 {/* Background map pattern */}
                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-800/30 via-emerald-700/20 to-teal-800/30" />
                 <div className="absolute inset-0 opacity-30" style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 30h60M30 0v60' stroke='%23ffffff' stroke-width='0.5' fill='none' opacity='0.3'/%3E%3C/svg%3E")`,
-                  backgroundSize: '30px 30px'
-                }} />
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 30h60M30 0v60' stroke='%23ffffff' stroke-width='0.5' fill='none' opacity='0.3'/%3E%3C/svg%3E")`,
+                backgroundSize: '30px 30px'
+              }} />
                 
                 {/* Store photo in center */}
                 <div className="absolute inset-4 rounded-xl overflow-hidden border-2 border-white/30 shadow-lg">
-                  <img 
-                    src={lojaPolicar} 
-                    alt="Loja Policar" 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
+                  <img src={lojaPolicar} alt="Loja Policar" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                 </div>
                 
                 {/* Map pin marker */}
@@ -90,7 +73,7 @@ const Footer = () => {
               {/* Reinauguration Banner */}
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 via-red-500 to-orange-500 rounded-full mb-4 shadow-lg shadow-orange-500/40 animate-pulse">
                 <Sparkles className="h-4 w-4 text-white" />
-                <span className="text-white text-sm font-bold uppercase tracking-wider">🎉 Grande Reinauguração 🎉</span>
+                <span className="text-white text-sm font-bold uppercase tracking-wider">REINAUGURAÇÃO</span>
                 <Sparkles className="h-4 w-4 text-white" />
               </div>
               
@@ -111,12 +94,7 @@ const Footer = () => {
                 </div>
               </div>
               
-              <a 
-                href="https://www.google.com/maps/place/R.+Cap.+Jo%C3%A3o+Jos%C3%A9+de+Macedo,+279+-+Centro,+Jacare%C3%AD+-+SP,+12327-030" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-cyan-500 text-white text-sm font-bold rounded-full hover:scale-105 transition-transform shadow-lg shadow-primary/40"
-              >
+              <a href="https://www.google.com/maps/place/R.+Cap.+Jo%C3%A3o+Jos%C3%A9+de+Macedo,+279+-+Centro,+Jacare%C3%AD+-+SP,+12327-030" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-cyan-500 text-white text-sm font-bold rounded-full hover:scale-105 transition-transform shadow-lg shadow-primary/40">
                 <MapPin className="h-4 w-4" />
                 Ver no Google Maps
               </a>
@@ -281,8 +259,6 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
