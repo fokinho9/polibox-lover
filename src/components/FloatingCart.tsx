@@ -64,11 +64,11 @@ const FloatingCart = () => {
 
       {/* Cart Panel */}
       <div 
-        className={`fixed top-0 right-0 h-full w-full max-w-md border-l border-primary/20 z-50 transform transition-transform duration-300 shadow-2xl bg-[hsl(220,18%,10%)] ${isCartOpen ? 'translate-x-0' : 'translate-x-full'}`}
+         className={`fixed top-0 right-0 h-full w-full max-w-md border-l border-primary/20 z-50 transform transition-transform duration-300 shadow-2xl bg-background ${isCartOpen ? 'translate-x-0' : 'translate-x-full'}`}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-5 border-b border-border bg-gradient-to-r from-primary/10 to-transparent">
+           <div className="flex items-center justify-between p-5 border-b border-border bg-background bg-gradient-to-r from-primary/10 to-background">
             <h2 className="text-xl font-bold flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
                 <ShoppingCart className="h-5 w-5 text-primary" />
@@ -116,7 +116,7 @@ const FloatingCart = () => {
           )}
 
           {/* Items */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[hsl(220,18%,10%)]">
+           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-background">
             {items.length === 0 ? (
               <div className="text-center text-muted-foreground py-16">
                 <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
@@ -132,8 +132,8 @@ const FloatingCart = () => {
                 const regularPrice = applyDiscount(item.product.price);
                 
                 return (
-                  <div key={item.product.id} className="flex gap-4 p-4 bg-gradient-to-r from-card to-card/50 rounded-2xl border border-border hover:border-primary/30 transition-colors">
-                    <div className="w-24 h-24 rounded-xl overflow-hidden bg-secondary/50 flex-shrink-0 relative">
+                   <div key={item.product.id} className="flex gap-4 p-4 bg-card rounded-2xl border border-border hover:border-primary/30 transition-colors">
+                     <div className="w-24 h-24 rounded-xl overflow-hidden bg-secondary flex-shrink-0 relative">
                       <img 
                         src={item.product.image_url || '/placeholder.svg'} 
                         alt={item.product.name}
@@ -178,7 +178,7 @@ const FloatingCart = () => {
                       )}
                       
                       <div className="flex items-center gap-3 mt-2">
-                        <div className="flex items-center gap-1 bg-secondary/50 rounded-xl p-1">
+                         <div className="flex items-center gap-1 bg-secondary rounded-xl p-1">
                           <Button
                             variant="ghost"
                             size="icon"
@@ -224,7 +224,7 @@ const FloatingCart = () => {
 
           {/* Footer */}
           {items.length > 0 && (
-            <div className="border-t border-border p-5 space-y-3 bg-gradient-to-t from-primary/5 to-transparent">
+             <div className="border-t border-border p-5 space-y-3 bg-background bg-gradient-to-t from-primary/5 to-background">
               {/* Savings Banner */}
               {totalSavings > 0 && (
                 <div className="flex items-center justify-between p-3 bg-green-500/10 border border-green-500/30 rounded-xl">
