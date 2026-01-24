@@ -103,21 +103,30 @@ const QuizModal = ({ open, onOpenChange }: QuizModalProps) => {
               <div className="space-y-6">
                 {/* Header with icon */}
                 <div className="text-center">
+                  {/* Reinauguration Banner */}
+                  <div className="relative inline-block mb-4">
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-red-500 to-orange-500 rounded-full blur-xl opacity-60 animate-pulse" />
+                    <div className="relative flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-orange-500 via-red-500 to-orange-500 rounded-full shadow-lg shadow-orange-500/50">
+                      <Star className="h-4 w-4 text-yellow-300 animate-pulse" />
+                      <span className="text-white text-sm font-bold uppercase tracking-wider">🎉 Reinauguração 🎉</span>
+                      <Star className="h-4 w-4 text-yellow-300 animate-pulse" />
+                    </div>
+                  </div>
+                  
                   <div className="relative inline-flex items-center justify-center mb-4">
-                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-red-500 to-orange-500 rounded-full blur-lg opacity-50 animate-pulse" />
-                    <div className="relative w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-red-500 to-orange-500 rounded-full blur-lg opacity-60 animate-pulse" />
+                    <div className="relative w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center shadow-xl shadow-orange-500/50">
                       <Gift className="h-8 w-8 text-white" />
                     </div>
                     <Sparkles className="absolute -top-1 -right-1 h-5 w-5 text-yellow-400 animate-pulse" />
+                    <Zap className="absolute -bottom-1 -left-1 h-4 w-4 text-yellow-300 animate-pulse" style={{ animationDelay: '0.5s' }} />
                   </div>
-                  <div className="inline-block px-3 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded-full mb-2 animate-pulse">
-                    🎉 REINAUGURAÇÃO
-                  </div>
-                  <h2 className="text-2xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-white to-red-400">
+                  
+                  <h2 className="text-3xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-yellow-300 to-red-400 animate-pulse">
                     GANHE 40% OFF
                   </h2>
                   <p className="text-muted-foreground text-sm mt-1">
-                    Responda 4 perguntas e ganhe desconto exclusivo!
+                    Desconto exclusivo de reinauguração!
                   </p>
                 </div>
 
@@ -198,27 +207,38 @@ const QuizModal = ({ open, onOpenChange }: QuizModalProps) => {
                 </div>
 
                 {/* Success message */}
-                <div className="space-y-2">
-                  <div className="inline-block px-3 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded-full mb-1">
-                    🎉 REINAUGURAÇÃO
+                <div className="space-y-3">
+                  {/* Reinauguration Badge */}
+                  <div className="relative inline-block">
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-red-500 to-orange-500 rounded-full blur-lg opacity-60 animate-pulse" />
+                    <div className="relative flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-orange-500 via-red-500 to-orange-500 rounded-full shadow-lg shadow-orange-500/50">
+                      <Sparkles className="h-3 w-3 text-yellow-300" />
+                      <span className="text-white text-xs font-bold uppercase tracking-wider">Reinauguração</span>
+                      <Sparkles className="h-3 w-3 text-yellow-300" />
+                    </div>
                   </div>
-                  <h3 className="text-3xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-primary to-cyan-glow animate-pulse">
+                  
+                  <h3 className="text-3xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-emerald-300 to-green-400 animate-pulse">
                     PARABÉNS!
                   </h3>
-                  <div className="inline-block px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500/20 via-red-500/20 to-orange-500/20 border border-orange-500/30">
-                    <p className="text-2xl font-bold text-orange-400">
-                      40% DE DESCONTO
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Desconto de reinauguração ativado!
-                    </p>
+                  
+                  <div className="relative inline-block">
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500/30 via-red-500/30 to-orange-500/30 rounded-xl blur-md" />
+                    <div className="relative px-6 py-4 rounded-xl bg-gradient-to-r from-orange-500/20 via-red-500/20 to-orange-500/20 border-2 border-orange-500/50">
+                      <p className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-yellow-300 to-red-400">
+                        40% OFF
+                      </p>
+                      <p className="text-sm text-white/80 mt-1">
+                        Desconto de reinauguração ativado!
+                      </p>
+                    </div>
                   </div>
                 </div>
 
                 {/* Timer warning */}
-                <div className="flex items-center justify-center gap-2 text-yellow-400 text-sm">
-                  <Clock className="h-4 w-4" />
-                  <span>Válido por 30 minutos</span>
+                <div className="flex items-center justify-center gap-2 px-4 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-full text-yellow-400 text-sm">
+                  <Clock className="h-4 w-4 animate-pulse" />
+                  <span className="font-semibold">Válido por 30 minutos</span>
                 </div>
 
                 {/* CTA Button */}
