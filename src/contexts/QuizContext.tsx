@@ -11,7 +11,7 @@ interface QuizContextType {
 
 const QuizContext = createContext<QuizContextType | undefined>(undefined);
 
-const DISCOUNT_DURATION_MINUTES = 10;
+const DISCOUNT_DURATION_MINUTES = 30;
 
 const formatTimeRemaining = (ms: number): string => {
   if (ms <= 0) return "00:00:00";
