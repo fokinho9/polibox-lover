@@ -66,23 +66,25 @@ const FloatingCart = () => {
       <div 
          className={`fixed top-0 right-0 h-full w-full max-w-md border-l border-primary/20 z-50 transform transition-transform duration-300 shadow-2xl bg-background ${isCartOpen ? 'translate-x-0' : 'translate-x-full'}`}
       >
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full relative">
+          {/* Close Button - Fixed position for visibility */}
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={() => setIsCartOpen(false)}
+            className="absolute top-4 right-4 z-10 h-10 w-10 rounded-full bg-destructive hover:bg-destructive/90 border-0"
+          >
+            <X className="h-5 w-5 text-white" />
+          </Button>
+          
           {/* Header */}
-           <div className="flex items-center justify-between p-5 border-b border-border bg-background bg-gradient-to-r from-primary/10 to-background">
+          <div className="flex items-center p-5 pr-16 border-b border-border bg-background">
             <h2 className="text-xl font-bold flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
                 <ShoppingCart className="h-5 w-5 text-primary" />
               </div>
               Carrinho ({totalItems})
             </h2>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => setIsCartOpen(false)}
-              className="hover:bg-primary/10 h-10 w-10 rounded-xl bg-secondary"
-            >
-              <X className="h-6 w-6 text-foreground" />
-            </Button>
           </div>
 
           {/* Continue Shopping Button */}
