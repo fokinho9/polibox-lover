@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, Percent, Droplet, Car, Sparkles, Calculator, Search, Paintbrush, Settings, Package, Bike, Trophy, Circle } from "lucide-react";
+import { Menu, Percent, Droplet, Car, Sparkles, Calculator, Search, Paintbrush, Settings, Package, Bike, Trophy, Circle, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { productsApi, Product } from "@/lib/api/products";
 
 const navItems = [
+  { icon: MapPin, label: "RASTREAR PEDIDO", href: "/rastreio", highlight: true, isTracking: true },
   { icon: Percent, label: "OFERTAS", href: "/categoria/ofertas", highlight: true, sublabel: "-40%" },
   { icon: Droplet, label: "LAVAGEM", href: "/categoria/lavagem" },
   { icon: Sparkles, label: "POLIMENTO", href: "/categoria/polimento" },
@@ -119,9 +120,11 @@ const Navigation = () => {
                     to={item.href}
                     onClick={() => setIsOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                      item.highlight 
-                        ? "bg-primary text-primary-foreground hover:bg-cyan-glow" 
-                        : "hover:bg-secondary text-foreground"
+                      (item as any).isTracking
+                        ? "bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600"
+                        : item.highlight 
+                          ? "bg-primary text-primary-foreground hover:bg-cyan-glow" 
+                          : "hover:bg-secondary text-foreground"
                     }`}
                   >
                     <item.icon className="h-5 w-5" />

@@ -25,7 +25,7 @@ import TermosPage from "./pages/TermosPage";
 import NotFound from "./pages/NotFound";
 import SearchPage from "./pages/SearchPage";
 import ConfirmacaoPage from "./pages/ConfirmacaoPage";
-
+import RastreioPage from "./pages/RastreioPage";
 const queryClient = new QueryClient();
 
 // App component with all providers
@@ -57,6 +57,7 @@ const App = () => (
             <Route path="/termos" element={<TermosPage />} />
             <Route path="/busca" element={<SearchPage />} />
             <Route path="/confirmacao" element={<ConfirmacaoPage />} />
+            <Route path="/rastreio" element={<RastreioPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
