@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { ShoppingCart, Zap, Flame, Sparkles, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,7 @@ interface ProductCardProps {
   brand?: string;
 }
 
-const ProductCard = ({
+const ProductCard = forwardRef<HTMLDivElement, ProductCardProps>(({
   id,
   name,
   image,
@@ -29,7 +30,7 @@ const ProductCard = ({
   installments,
   express = true,
   brand,
-}: ProductCardProps) => {
+}, ref) => {
   const { addToCart, CART_LIMIT } = useCart();
   const { hasCompletedQuiz, discountPercent, timeRemaining } = useQuiz();
   const { toast } = useToast();
@@ -89,7 +90,7 @@ const ProductCard = ({
 
   return (
     <CardWrapper>
-      <div className="group h-full flex flex-col bg-card rounded-xl border border-border/50 transition-all duration-500 overflow-hidden hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1">
+      <div ref={ref} className="group h-full flex flex-col bg-card rounded-xl border border-border/50 transition-all duration-500 overflow-hidden hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1">
         {/* Image Container */}
         <div className="relative aspect-square bg-gradient-to-br from-muted/30 via-background to-muted/50 overflow-hidden">
           {/* Discount Badge */}
@@ -205,6 +206,8 @@ const ProductCard = ({
       </div>
     </CardWrapper>
   );
-};
+});
+
+ProductCard.displayName = "ProductCard";
 
 export default ProductCard;
