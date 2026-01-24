@@ -104,17 +104,20 @@ const QuizModal = ({ open, onOpenChange }: QuizModalProps) => {
                 {/* Header with icon */}
                 <div className="text-center">
                   <div className="relative inline-flex items-center justify-center mb-4">
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary via-cyan-glow to-primary rounded-full blur-lg opacity-50 animate-pulse" />
-                    <div className="relative w-16 h-16 bg-gradient-to-br from-primary to-cyan-glow rounded-full flex items-center justify-center">
-                      <Gift className="h-8 w-8 text-primary-foreground" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-red-500 to-orange-500 rounded-full blur-lg opacity-50 animate-pulse" />
+                    <div className="relative w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+                      <Gift className="h-8 w-8 text-white" />
                     </div>
                     <Sparkles className="absolute -top-1 -right-1 h-5 w-5 text-yellow-400 animate-pulse" />
                   </div>
-                  <h2 className="text-2xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-cyan-glow">
+                  <div className="inline-block px-3 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded-full mb-2 animate-pulse">
+                    🎉 REINAUGURAÇÃO
+                  </div>
+                  <h2 className="text-2xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-white to-red-400">
                     GANHE 40% OFF
                   </h2>
                   <p className="text-muted-foreground text-sm mt-1">
-                    Responda 4 perguntas rápidas
+                    Responda 4 perguntas e ganhe desconto exclusivo!
                   </p>
                 </div>
 
@@ -196,15 +199,18 @@ const QuizModal = ({ open, onOpenChange }: QuizModalProps) => {
 
                 {/* Success message */}
                 <div className="space-y-2">
+                  <div className="inline-block px-3 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded-full mb-1">
+                    🎉 REINAUGURAÇÃO
+                  </div>
                   <h3 className="text-3xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-primary to-cyan-glow animate-pulse">
                     PARABÉNS!
                   </h3>
-                  <div className="inline-block px-6 py-3 rounded-xl bg-gradient-to-r from-primary/20 via-cyan-glow/20 to-primary/20 border border-primary/30">
-                    <p className="text-2xl font-bold text-primary">
+                  <div className="inline-block px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500/20 via-red-500/20 to-orange-500/20 border border-orange-500/30">
+                    <p className="text-2xl font-bold text-orange-400">
                       40% DE DESCONTO
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Ativado em todos os produtos!
+                      Desconto de reinauguração ativado!
                     </p>
                   </div>
                 </div>
@@ -212,7 +218,7 @@ const QuizModal = ({ open, onOpenChange }: QuizModalProps) => {
                 {/* Timer warning */}
                 <div className="flex items-center justify-center gap-2 text-yellow-400 text-sm">
                   <Clock className="h-4 w-4" />
-                  <span>Válido por 10 minutos</span>
+                  <span>Válido por 30 minutos</span>
                 </div>
 
                 {/* CTA Button */}

@@ -27,7 +27,7 @@ const Footer = () => {
             />
             <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-sm rounded-xl p-4">
               <h3 className="font-display text-xl text-white mb-1">POLICAR - Estética Automotiva</h3>
-              <p className="text-white/70 text-sm">Rio de Janeiro, RJ • Seg-Sex: 9h às 18h | Sáb: 9h às 13h</p>
+              <p className="text-white/70 text-sm">R. Cap. João José de Macedo, 279 - Centro, Jacareí - SP</p>
             </div>
           </div>
         </DialogContent>
@@ -81,26 +81,40 @@ const Footer = () => {
               
               {/* Location badge */}
               <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-cyan-500 px-3 py-1 rounded-full shadow-lg">
-                <span className="text-white text-xs font-bold whitespace-nowrap">📍 Rio de Janeiro</span>
+                <span className="text-white text-xs font-bold whitespace-nowrap">📍 Jacareí - SP</span>
               </div>
             </div>
             
             {/* Location Info */}
             <div className="text-center md:text-left flex-1">
-              <h3 className="font-display text-2xl md:text-3xl text-white mb-3">NOSSA LOJA FÍSICA</h3>
-              <p className="text-white/70 mb-5 text-sm md:text-base max-w-lg">
-                Visite nossa loja e confira de perto os melhores produtos para estética automotiva!
+              <div className="flex items-center gap-2 mb-2 justify-center md:justify-start">
+                <h3 className="font-display text-2xl md:text-3xl text-white">NOSSA LOJA FÍSICA</h3>
+                <span className="px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded-full animate-pulse">
+                  REINAUGURAÇÃO
+                </span>
+              </div>
+              <p className="text-white/70 mb-3 text-sm md:text-base max-w-lg">
+                🎉 Estamos de volta! Venha conhecer nossa loja reinaugurada com os melhores produtos para estética automotiva!
               </p>
-              <div className="flex flex-col sm:flex-row items-center gap-4 text-sm">
-                <div className="flex items-center gap-2 text-white/80">
-                  <MapPin className="h-4 w-4 text-primary" />
-                  <span>Rio de Janeiro, RJ</span>
+              <div className="flex flex-col gap-2 text-sm mb-4">
+                <div className="flex items-center gap-2 text-white/80 justify-center md:justify-start">
+                  <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span>R. Cap. João José de Macedo, 279 - Centro, Jacareí - SP, 12327-030</span>
                 </div>
-                <div className="flex items-center gap-2 text-white/80">
+                <div className="flex items-center gap-2 text-white/80 justify-center md:justify-start">
                   <Clock className="h-4 w-4 text-primary" />
                   <span>Seg-Sex: 9h às 18h | Sáb: 9h às 13h</span>
                 </div>
               </div>
+              <a 
+                href="https://www.google.com/maps/place/R.+Cap.+Jo%C3%A3o+Jos%C3%A9+de+Macedo,+279+-+Centro,+Jacare%C3%AD+-+SP,+12327-030" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary to-cyan-500 text-white text-sm font-semibold rounded-full hover:opacity-90 transition-opacity shadow-lg"
+              >
+                <MapPin className="h-4 w-4" />
+                Ver no Google Maps
+              </a>
             </div>
           </div>
         </div>
@@ -202,9 +216,9 @@ const Footer = () => {
                   contato@policar.com.br
                 </a>
               </li>
-              <li className="flex items-center gap-3 text-muted-foreground">
-                <MapPin className="h-4 w-4 text-primary" />
-                Rio de Janeiro, RJ
+              <li className="flex items-start gap-3 text-muted-foreground">
+                <MapPin className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                <span>R. Cap. João José de Macedo, 279 - Centro, Jacareí - SP</span>
               </li>
               <li className="flex items-center gap-3 text-muted-foreground">
                 <Clock className="h-4 w-4 text-primary" />
