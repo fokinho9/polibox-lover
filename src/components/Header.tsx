@@ -24,11 +24,11 @@ const Header = () => {
       <div className="container-main py-4">
         <div className="flex items-center justify-center">
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0">
+          <Link to="/" className="flex-shrink-0 relative z-10 cursor-pointer hover:opacity-80 transition-opacity">
             <img 
               src={logoPolicar} 
               alt="Policar - Estética Automotiva" 
-              className="h-10 md:h-12 w-auto object-contain"
+              className="h-10 md:h-12 w-auto object-contain pointer-events-none"
             />
           </Link>
         </div>
