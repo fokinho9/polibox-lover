@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { 
   Check, Clock, XCircle, Copy, 
-  ArrowLeft, ShieldCheck, Loader2, CreditCard
+  ArrowLeft, ShieldCheck, Loader2, CreditCard, RefreshCw
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -16,6 +16,36 @@ const ConfirmacaoPage = () => {
   const orderId = searchParams.get('pedido');
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
+  const queryClient = useQueryClient();
+
+  // Function to actively check payment status via edge function
+  const checkPaymentStatus = useCallback(async () => {
+    if (!orderId || isChecking) return;
+    
+    setIsChecking(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('check-payment-status', {
+        body: { orderId }
+      });
+      
+      if (!error && data?.order) {
+        // Update the query cache with new data
+        queryClient.setQueryData(['order', orderId], data.order);
+        
+        if (data.status === 'paid') {
+          toast({
+            title: "✅ Pagamento Confirmado!",
+            description: "Seu pedido foi aprovado com sucesso.",
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Error checking payment:', err);
+    } finally {
+      setIsChecking(false);
+    }
+  }, [orderId, isChecking, queryClient, toast]);
 
   const { data: order, isLoading } = useQuery({
     queryKey: ['order', orderId],
@@ -31,14 +61,26 @@ const ConfirmacaoPage = () => {
       return data;
     },
     enabled: !!orderId,
-    refetchInterval: (data) => {
-      // Poll every 5 seconds if payment is pending (for PIX auto-confirmation)
-      if (data?.state?.data?.payment_status === 'pending' && data?.state?.data?.payment_method === 'pix') {
-        return 5000;
+    refetchInterval: (query) => {
+      // Poll every 3 seconds if payment is pending PIX
+      const orderData = query.state.data;
+      if (orderData?.payment_status === 'pending' && orderData?.payment_method === 'pix') {
+        return 3000;
       }
       return false;
     },
   });
+
+  // Auto-check payment status every 3 seconds for pending PIX
+  useEffect(() => {
+    if (order?.payment_status === 'pending' && order?.payment_method === 'pix') {
+      const interval = setInterval(() => {
+        checkPaymentStatus();
+      }, 3000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [order?.payment_status, order?.payment_method, checkPaymentStatus]);
 
   const handleCopyPix = async () => {
     if (order?.pix_qrcode) {
@@ -171,22 +213,36 @@ const ConfirmacaoPage = () => {
                     Copie o código abaixo e cole no app do seu banco
                   </p>
                   
-                  <div className="bg-secondary/50 rounded-xl p-4 mb-4">
+                  <div className="bg-secondary rounded-xl p-4 mb-4">
                     <p className="text-xs font-mono break-all text-muted-foreground mb-3">
                       {order.pix_qrcode.substring(0, 80)}...
                     </p>
                     <Button 
                       onClick={handleCopyPix}
-                      className="w-full bg-primary hover:bg-primary/90"
+                      className="w-full bg-primary hover:bg-primary/90 mb-2"
                     >
                       <Copy className="h-4 w-4 mr-2" />
                       {copied ? 'Copiado!' : 'Copiar Código PIX'}
                     </Button>
+                    
+                    <Button 
+                      onClick={checkPaymentStatus}
+                      variant="outline"
+                      className="w-full"
+                      disabled={isChecking}
+                    >
+                      {isChecking ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                      )}
+                      {isChecking ? 'Verificando...' : 'Já paguei, verificar'}
+                    </Button>
                   </div>
 
                   <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Aguardando confirmação do pagamento...</span>
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                    <span>Verificando automaticamente a cada 3s...</span>
                   </div>
                 </div>
               </div>
