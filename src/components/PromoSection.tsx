@@ -1,13 +1,12 @@
-import { Zap, Truck, CreditCard, ShieldCheck, Timer, Sparkles, Flame } from "lucide-react";
+import { Zap, Truck, CreditCard, ShieldCheck } from "lucide-react";
+
 const PromoSection = () => {
   return <section className="py-10 md:py-16 bg-gradient-to-b from-background via-card/30 to-background relative overflow-hidden">
-      {/* Animated Background Effects */}
+      {/* Simplified Background - removed heavy animations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[100px] animate-pulse" style={{
-        animationDelay: '1s'
-      }} />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px]" />
+        <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-cyan-500/5 rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
       </div>
       
       <div className="container-main relative z-10">
