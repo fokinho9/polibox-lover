@@ -26,7 +26,16 @@ import NotFound from "./pages/NotFound";
 import SearchPage from "./pages/SearchPage";
 import ConfirmacaoPage from "./pages/ConfirmacaoPage";
 import RastreioPage from "./pages/RastreioPage";
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 2, // 2 minutes default
+      gcTime: 1000 * 60 * 10, // 10 minutes cache
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 // App component with all providers
 const App = () => (

@@ -65,6 +65,8 @@ const CategoryCarousel = () => {
                 <img
                   src={slide.image}
                   alt={`Categoria ${slide.id}`}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-auto object-contain"
                 />
               </div>

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { ShoppingCart, Zap, Flame, Sparkles, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -107,6 +108,8 @@ const ProductCard = ({
           <img
             src={image}
             alt={name}
+            loading="lazy"
+            decoding="async"
             className="max-w-full max-h-full object-contain transition-transform duration-500 group-hover:scale-110"
             onError={(e) => {
               (e.target as HTMLImageElement).src = "/placeholder.svg";
@@ -204,4 +207,4 @@ const ProductCard = ({
   return cardContent;
 };
 
-export default ProductCard;
+export default memo(ProductCard);
