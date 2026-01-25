@@ -16,6 +16,8 @@ const MoreProducts = () => {
         .sort((a, b) => a.price - b.price)
         .slice(12, 24); // Skip first 12 (shown in offers), get next 12
     },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes cache
   });
 
   if (isLoading) {

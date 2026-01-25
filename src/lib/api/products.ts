@@ -42,6 +42,17 @@ export const productsApi = {
     return data || [];
   },
 
+  // Lightweight version for listings (faster)
+  async getAllLight(): Promise<Partial<Product>[]> {
+    const { data, error } = await supabase
+      .from('products')
+      .select('id, name, price, old_price, pix_price, discount_percent, category, image_url, stock_status, brand, express_delivery, installments_count, installments_value')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
+
   async create(product: Omit<Product, 'id' | 'created_at' | 'updated_at'>): Promise<Product> {
     const { data, error } = await supabase
       .from('products')

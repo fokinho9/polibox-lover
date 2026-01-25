@@ -23,7 +23,7 @@ const RelatedProducts = ({ currentProductId, category, brand }: RelatedProductsP
       // First try to get products from same category
       let query = supabase
         .from('products')
-        .select('*')
+        .select('id, name, price, old_price, pix_price, discount_percent, image_url, express_delivery, brand')
         .neq('id', currentProductId)
         .gt('price', 0)
         .limit(8);
@@ -44,7 +44,7 @@ const RelatedProducts = ({ currentProductId, category, brand }: RelatedProductsP
       // Otherwise, try to get more products by brand or just random ones
       const { data: moreProducts, error: moreError } = await supabase
         .from('products')
-        .select('*')
+        .select('id, name, price, old_price, pix_price, discount_percent, image_url, express_delivery, brand')
         .neq('id', currentProductId)
         .gt('price', 0)
         .order('created_at', { ascending: false })
@@ -61,6 +61,8 @@ const RelatedProducts = ({ currentProductId, category, brand }: RelatedProductsP
       return unique.slice(0, 8);
     },
     enabled: !!currentProductId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes cache
   });
 
   const handleAddToCart = (e: React.MouseEvent, product: any) => {
@@ -125,6 +127,8 @@ const RelatedProducts = ({ currentProductId, category, brand }: RelatedProductsP
                 <img
                   src={product.image_url || '/placeholder.svg'}
                   alt={product.name}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                   onError={(e) => {
                     e.currentTarget.src = '/placeholder.svg';
