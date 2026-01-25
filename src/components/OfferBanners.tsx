@@ -22,10 +22,12 @@ const OfferBanners = () => {
   return <section className="py-8 md:py-12">
       <div className="container-main">
         <div className="grid md:grid-cols-2 gap-4 md:gap-6">
-          {banners.map(banner => <Link key={banner.id} to={banner.href} className="group block overflow-hidden rounded-2xl transition-transform duration-300 hover:scale-[1.02]">
+          {banners.map((banner, index) => <Link key={banner.id} to={banner.href} className="group block overflow-hidden rounded-2xl transition-transform duration-300 hover:scale-[1.02]">
               <img 
                 src={banner.image} 
-                alt={banner.title} 
+                alt={banner.title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-auto rounded-2xl transition-transform duration-500 group-hover:brightness-110" 
               />
             </Link>)}

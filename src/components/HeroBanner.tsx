@@ -45,7 +45,7 @@ const HeroBanner = () => {
         className="flex transition-transform duration-500 ease-out"
         style={{ transform: `translateX(-${currentSlide * 100}%)` }}
       >
-        {slides.map((slide) => (
+        {slides.map((slide, index) => (
           <Link 
             key={slide.id} 
             to={slide.href}
@@ -54,6 +54,9 @@ const HeroBanner = () => {
             <img 
               src={slide.image} 
               alt={`Banner ${slide.id}`}
+              loading={index === 0 ? "eager" : "lazy"}
+              fetchPriority={index === 0 ? "high" : "auto"}
+              decoding={index === 0 ? "sync" : "async"}
               className="w-full h-auto object-cover"
             />
           </Link>

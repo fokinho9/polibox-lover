@@ -21,6 +21,8 @@ const BrandShowcase = () => {
   const { data: allProducts = [] } = useQuery({
     queryKey: ['all-products-brands'],
     queryFn: productsApi.getAll,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 15, // 15 minutes
   });
 
   // Search in brand OR name for more matches
@@ -101,6 +103,8 @@ const BrandShowcase = () => {
                           <img 
                             src={product.image_url || '/placeholder.svg'} 
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover"
                           />
                         </div>
