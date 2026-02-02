@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useQuiz } from "@/contexts/QuizContext";
 import { useToast } from "@/hooks/use-toast";
+import { applyDiscount } from "@/lib/utils";
 
 interface ProductCardProps {
   id?: string;
@@ -55,10 +56,14 @@ const ProductCard = ({
     
     if (!id) return;
 
+    // Apply site discount to get the "Por apenas" price
+    const displayPrice = applyDiscount(price) * quizMultiplier;
+    const cappedPrice = Math.min(displayPrice, MAX_PRICE);
+
     const product = {
       id,
       name,
-      price: finalPrice,
+      price: cappedPrice, // Use the displayed "Por apenas" price (already discounted)
       image_url: image,
       pix_price: finalPixPrice,
       old_price: finalOldPrice,
