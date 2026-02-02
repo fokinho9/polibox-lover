@@ -69,7 +69,13 @@ const RelatedProducts = ({ currentProductId, category, brand }: RelatedProductsP
     e.preventDefault();
     e.stopPropagation();
     
-    addToCart(product, 1);
+    // Apply site discount to the product price before adding to cart
+    const productWithDisplayPrice = {
+      ...product,
+      price: applyDiscount(product.price), // Use the discounted "Por apenas" price
+    };
+    
+    addToCart(productWithDisplayPrice, 1);
     toast({
       title: "🛒 Produto adicionado!",
       description: `${product.name} foi adicionado ao carrinho`,
