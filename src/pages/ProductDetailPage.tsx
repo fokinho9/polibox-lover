@@ -503,7 +503,12 @@ const ProductDetailPage = () => {
   });
   const handleBuyNow = () => {
     if (!product) return;
-    addToCart(product, quantity);
+    // Pass the displayed price (with site discount already applied) to the cart
+    const productWithDisplayPrice = {
+      ...product,
+      price: displayPrice, // Use the "Por apenas" price
+    };
+    addToCart(productWithDisplayPrice, quantity);
     toast({
       title: "🛒 Produto adicionado!",
       description: `${product.name} foi adicionado ao carrinho`

@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, ReactNode, useCallback, useMemo } from 'react';
 import { Product } from '@/lib/api/products';
-import { applyDiscount } from '@/lib/utils';
 
 interface CartItem {
   product: Product;
@@ -50,12 +49,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   );
 
   // Helper to calculate what new total would be
+  // Note: product.price already includes site discount from when it was added to cart
   const calculateNewTotal = useCallback((newItems: CartItem[]) => {
     const newTotalItems = newItems.reduce((sum, item) => sum + item.quantity, 0);
     const hasWholesale = newTotalItems >= WHOLESALE_THRESHOLD;
     
     return newItems.reduce((sum, item) => {
-      const basePrice = applyDiscount(item.product.price);
+      const basePrice = item.product.price; // Already has site discount applied
       const unitPrice = (item.quantity >= WHOLESALE_THRESHOLD || hasWholesale) 
         ? basePrice * (1 - WHOLESALE_DISCOUNT) 
         : basePrice;
@@ -128,9 +128,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, [totalItems]);
 
   // Get unit price with wholesale discount if applicable
+  // The product.price is already the displayed price (with site discount applied)
   const getItemUnitPrice = useCallback((item: CartItem) => {
-    const basePrice = applyDiscount(item.product.price);
-    // Apply discount if: 5+ of same product OR 5+ total items in cart
+    const basePrice = item.product.price; // Already has site discount applied
+    // Apply wholesale discount if: 5+ of same product OR 5+ total items in cart
     if (item.quantity >= WHOLESALE_THRESHOLD || totalItems >= WHOLESALE_THRESHOLD) {
       return basePrice * (1 - WHOLESALE_DISCOUNT);
     }
@@ -148,12 +149,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   );
 
   // Calculate total savings from wholesale discounts
+  // product.price already has site discount, so savings is just from wholesale
   const totalSavings = useMemo(() => {
     if (totalItems < WHOLESALE_THRESHOLD) return 0;
     
     return items.reduce((sum, item) => {
-      const regularPrice = applyDiscount(item.product.price) * item.quantity;
-      const discountedPrice = getItemPrice(item);
+      const regularPrice = item.product.price * item.quantity; // Base price (already discounted)
+      const discountedPrice = getItemPrice(item); // With wholesale discount
       return sum + (regularPrice - discountedPrice);
     }, 0);
   }, [items, totalItems, getItemPrice]);
