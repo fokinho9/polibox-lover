@@ -5,16 +5,16 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
-import { QuizProvider } from "@/contexts/QuizContext";
+import { QuizProvider, useQuiz } from "@/contexts/QuizContext";
 import FloatingCart from "@/components/FloatingCart";
 import ScrollToTop from "@/components/ScrollToTop";
 import { Loader2 } from "lucide-react";
 import QuizModal from "@/components/QuizModal";
 
-// Critical route - load immediately
+// Critical route
 import Index from "./pages/Index";
 
-// Lazy load non-critical routes
+// Lazy routes
 const AdminPanel = lazy(() => import("./pages/AdminPanel"));
 const AdminOrdersPage = lazy(() => import("./pages/AdminOrdersPage"));
 const CategoryPage = lazy(() => import("./pages/CategoryPage"));
@@ -44,28 +44,32 @@ const queryClient = new QueryClient({
   },
 });
 
-// Loading fallback component
+// Loader
 const PageLoader = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
     <Loader2 className="h-8 w-8 animate-spin text-primary" />
   </div>
 );
 
-// Component that controls the QuizModal
+// Component that controls QuizModal
 const AppContent = () => {
   const [openQuiz, setOpenQuiz] = useState(false);
   const location = useLocation();
+  const { hasCompletedQuiz } = useQuiz();
 
   useEffect(() => {
+    // ❌ se já concluiu o quiz, nunca mais abre automaticamente
+    if (hasCompletedQuiz) return;
+
     const alreadyShown = localStorage.getItem("quiz_shown");
 
-    // 👉 se entrar direto na página de produto
+    // 👉 entrar direto em página de produto
     if (!alreadyShown && location.pathname.startsWith("/produto")) {
       setOpenQuiz(true);
       localStorage.setItem("quiz_shown", "true");
     }
 
-    // 👉 continua funcionando por scroll (Home)
+    // 👉 abrir por scroll (Home)
     const handleScroll = () => {
       if (!alreadyShown && window.scrollY > 300) {
         setOpenQuiz(true);
@@ -76,7 +80,7 @@ const AppContent = () => {
     window.addEventListener("scroll", handleScroll);
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [location.pathname]);
+  }, [location.pathname, hasCompletedQuiz]);
 
   return (
     <>
