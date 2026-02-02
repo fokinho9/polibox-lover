@@ -9,7 +9,6 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import ProductCard from "@/components/ProductCard";
 import { productsApi, Product } from "@/lib/api/products";
 import { Button } from "@/components/ui/button";
-import { applyDiscount } from "@/lib/utils";
 import {
   Pagination,
   PaginationContent,
@@ -161,9 +160,9 @@ const CategoryPage = () => {
                     id={product.id}
                     name={product.name}
                     image={product.image_url || "/placeholder.svg"}
-                    oldPrice={product.old_price ? applyDiscount(product.old_price) : undefined}
-                    price={applyDiscount(product.price)}
-                    pixPrice={applyDiscount(product.pix_price || product.price * 0.95)}
+                    oldPrice={product.old_price || undefined}
+                    price={product.price}
+                    pixPrice={product.pix_price || product.price * 0.95}
                     discount={product.discount_percent || undefined}
                     installments={
                       product.installments_count && product.installments_value

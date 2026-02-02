@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Gift, CheckCircle, ChevronRight, Sparkles, Star, Zap, Car, Clock, Shield, Heart } from "lucide-react";
+import { Gift, CheckCircle, ChevronRight, Sparkles, Star, Zap, Car, Clock, Shield, Heart, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useQuiz } from "@/contexts/QuizContext";
@@ -100,6 +100,15 @@ const QuizModal = ({ open, onOpenChange }: QuizModalProps) => {
           <div className="relative z-10 p-4">
             {!completed ? (
               <div className="space-y-4">
+                {/* Close Button */}
+                <button
+                  onClick={handleClose}
+                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-gray-700/50 hover:bg-gray-600 flex items-center justify-center transition-colors z-20"
+                  aria-label="Fechar"
+                >
+                  <X className="h-4 w-4 text-gray-400" />
+                </button>
+                
                 {/* Header with icon */}
                 <div className="text-center">
                   {/* Reinauguration Banner */}

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { productsApi, Product } from "@/lib/api/products";
 import ProductCard from "./ProductCard";
 import { Loader2, Flame, ArrowRight, Sparkles } from "lucide-react";
-import { applyDiscount } from "@/lib/utils";
 
 const ProductGrid = () => {
   const { data: products = [], isLoading } = useQuery({
@@ -77,9 +76,9 @@ const ProductGrid = () => {
               id={product.id}
               name={product.name}
               image={product.image_url || "/placeholder.svg"}
-              oldPrice={product.old_price ? applyDiscount(product.old_price) : undefined}
-              price={applyDiscount(product.price)}
-              pixPrice={applyDiscount(product.pix_price || product.price * 0.95)}
+              oldPrice={product.old_price || undefined}
+              price={product.price}
+              pixPrice={product.pix_price || product.price * 0.95}
               discount={product.discount_percent || undefined}
               installments={
                 product.installments_count && product.installments_value
