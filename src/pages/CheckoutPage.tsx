@@ -17,6 +17,7 @@ import { productsApi, Product } from "@/lib/api/products";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { applyDiscount } from "@/lib/utils";
+import { trackInitiateCheckout, trackAddPaymentInfo, trackPurchase } from "@/lib/pixel";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -50,6 +51,21 @@ const CheckoutPage = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentStep]);
+
+  // Track InitiateCheckout when user enters checkout
+  useEffect(() => {
+    if (items.length > 0) {
+      trackInitiateCheckout({
+        items: items.map(item => ({
+          id: item.product.id,
+          name: item.product.name,
+          price: item.product.price,
+          quantity: item.quantity,
+        })),
+        totalValue: totalPrice,
+      });
+    }
+  }, []); // Only on initial mount
 
   const { data: upsellProduct } = useQuery({
     queryKey: ['upsell-product'],
@@ -245,6 +261,12 @@ const CheckoutPage = () => {
       }
 
       if (paymentMethod === 'pix') {
+        // Track AddPaymentInfo event
+        trackAddPaymentInfo({
+          totalValue: finalTotal + shippingCost,
+          paymentMethod: 'pix',
+        });
+
         const { error: pixError } = await supabase.functions.invoke('create-pix-payment', {
           body: {
             orderId: order.id,
@@ -273,6 +295,18 @@ const CheckoutPage = () => {
           setIsProcessing(false);
           return;
         }
+
+        // Track Purchase event for PIX (will be confirmed on webhook)
+        trackPurchase({
+          orderId: order.id,
+          items: items.map(item => ({
+            id: item.product.id,
+            name: item.product.name,
+            price: item.product.price,
+            quantity: item.quantity,
+          })),
+          totalValue: finalTotal + shippingCost,
+        });
 
         clearCart();
         navigate(`/confirmacao?pedido=${order.id}`);

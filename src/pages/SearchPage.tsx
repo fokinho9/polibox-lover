@@ -17,6 +17,7 @@ import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { productsApi, Product } from "@/lib/api/products";
+import { trackSearch } from "@/lib/pixel";
 
 const popularSearches = [
   "kit polimento",
@@ -44,6 +45,9 @@ const SearchPage = () => {
         setProducts([]);
         return;
       }
+
+      // Track search event
+      trackSearch(query);
 
       setIsLoading(true);
       try {

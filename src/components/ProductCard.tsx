@@ -6,6 +6,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useQuiz } from "@/contexts/QuizContext";
 import { useToast } from "@/hooks/use-toast";
 import { applyDiscount } from "@/lib/utils";
+import { trackAddToCart } from "@/lib/pixel";
 
 interface ProductCardProps {
   id?: string;
@@ -73,7 +74,15 @@ const ProductCard = ({
 
     const success = addToCart(product as any, 1);
     
-    if (!success) {
+    if (success) {
+      // Track add to cart event
+      trackAddToCart({
+        id,
+        name,
+        price: cappedPrice,
+        quantity: 1,
+      });
+    } else {
       toast({
         title: "⚠️ Limite de carrinho atingido",
         description: `O carrinho não pode ultrapassar R$ ${CART_LIMIT.toFixed(2).replace('.', ',')} para manter o frete grátis.`,

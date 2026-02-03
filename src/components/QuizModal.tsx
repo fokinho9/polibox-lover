@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useQuiz } from "@/contexts/QuizContext";
 import confetti from "canvas-confetti";
+import { trackLead } from "@/lib/pixel";
 
 const questions = [
   {
@@ -66,6 +67,7 @@ const QuizModal = ({ open, onOpenChange }: QuizModalProps) => {
       } else {
         setCompleted(true);
         completeQuiz();
+        trackLead('Quiz Reinauguração'); // Track lead event
         setTimeout(() => fireConfetti(), 300);
       }
     }, 400);
