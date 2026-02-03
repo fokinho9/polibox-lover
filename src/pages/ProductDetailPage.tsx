@@ -17,6 +17,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useQuiz } from "@/contexts/QuizContext";
 import { useToast } from "@/hooks/use-toast";
 import { applyDiscount } from "@/lib/utils";
+import { trackViewContent, trackAddToCart } from "@/lib/pixel";
 
 // 100+ unique comments pool
 const allComments = [{
@@ -509,6 +510,15 @@ const ProductDetailPage = () => {
       price: displayPrice, // Use the "Por apenas" price
     };
     addToCart(productWithDisplayPrice, quantity);
+
+    // Track add to cart event
+    trackAddToCart({
+      id: product.id,
+      name: product.name,
+      price: displayPrice,
+      quantity,
+    });
+
     toast({
       title: "🛒 Produto adicionado!",
       description: `${product.name} foi adicionado ao carrinho`
@@ -597,6 +607,18 @@ const ProductDetailPage = () => {
   const displayPrice = basePrice * quizMultiplier;
   const allImages = [product.image_url, ...(product.additional_images || [])].filter(Boolean);
   const isFreeShipping = true; // Always free shipping
+
+  // Track ViewContent event when product loads
+  useEffect(() => {
+    if (product) {
+      trackViewContent({
+        id: product.id,
+        name: product.name,
+        price: displayPrice,
+        category: product.category || undefined,
+      });
+    }
+  }, [product?.id]);
 
   return <div className="min-h-screen bg-gradient-to-b from-background via-background to-card/20">
       <Header />

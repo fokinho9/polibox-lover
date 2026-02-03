@@ -92,8 +92,8 @@ const AppContent = () => {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/admin/pedidos" element={<AdminOrdersPage />} />
+          <Route path="/fokinhofokinho" element={<AdminPanel />} />
+          <Route path="/fokinhofokinho/pedidos" element={<AdminOrdersPage />} />
           <Route path="/categoria/:category" element={<CategoryPage />} />
           <Route path="/produto/:id" element={<ProductDetailPage />} />
           <Route path="/calculadora" element={<CalculadoraPage />} />

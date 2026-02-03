@@ -87,7 +87,7 @@ const FloatingCart = () => {
           </div>
 
           {/* ✅ CONTINUAR COMPRANDO FIXADO ABAIXO DO HEADER */}
-          <div className="sticky top-0 z-40 bg-[hsl(220,18%,10%)]">
+          <div className="flex-shrink-0 bg-[hsl(220,18%,10%)]">
             <button
               onClick={() => setIsCartOpen(false)}
               className="w-full flex items-center gap-2 px-5 py-3 text-primary hover:bg-primary/10 transition-colors border-b border-border"
