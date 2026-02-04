@@ -502,6 +502,14 @@ const ProductDetailPage = () => {
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 1000 * 60 * 10, // 10 minutes cache
   });
+
+  // Calculate prices BEFORE handler functions (needed for handleBuyNow and tracking)
+  const quizMultiplier = hasCompletedQuiz ? (100 - discountPercent) / 100 : 1;
+  const basePrice = product ? applyDiscount(product.price) : 0;
+  const displayPrice = basePrice * quizMultiplier;
+  const allImages = product ? [product.image_url, ...(product.additional_images || [])].filter(Boolean) : [];
+  const isFreeShipping = true; // Always free shipping
+
   const handleBuyNow = () => {
     if (!product) return;
     // Pass the displayed price (with site discount already applied) to the cart
@@ -563,13 +571,6 @@ const ProductDetailPage = () => {
   const averageRating = reviews.length > 0 ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1) : "0";
   const totalPages = Math.ceil(reviews.length / REVIEWS_PER_PAGE);
   const paginatedReviews = reviews.slice((reviewPage - 1) * REVIEWS_PER_PAGE, reviewPage * REVIEWS_PER_PAGE);
-
-  // Calculate prices before any returns (needed for tracking)
-  const quizMultiplier = hasCompletedQuiz ? (100 - discountPercent) / 100 : 1;
-  const basePrice = product ? applyDiscount(product.price) : 0;
-  const displayPrice = basePrice * quizMultiplier;
-  const allImages = product ? [product.image_url, ...(product.additional_images || [])].filter(Boolean) : [];
-  const isFreeShipping = true; // Always free shipping
 
   // Track ViewContent event when product loads - MUST be before early returns
   useEffect(() => {
