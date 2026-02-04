@@ -563,6 +563,26 @@ const ProductDetailPage = () => {
   const averageRating = reviews.length > 0 ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1) : "0";
   const totalPages = Math.ceil(reviews.length / REVIEWS_PER_PAGE);
   const paginatedReviews = reviews.slice((reviewPage - 1) * REVIEWS_PER_PAGE, reviewPage * REVIEWS_PER_PAGE);
+
+  // Calculate prices before any returns (needed for tracking)
+  const quizMultiplier = hasCompletedQuiz ? (100 - discountPercent) / 100 : 1;
+  const basePrice = product ? applyDiscount(product.price) : 0;
+  const displayPrice = basePrice * quizMultiplier;
+  const allImages = product ? [product.image_url, ...(product.additional_images || [])].filter(Boolean) : [];
+  const isFreeShipping = true; // Always free shipping
+
+  // Track ViewContent event when product loads - MUST be before early returns
+  useEffect(() => {
+    if (product) {
+      trackViewContent({
+        id: product.id,
+        name: product.name,
+        price: displayPrice,
+        category: product.category || undefined,
+      });
+    }
+  }, [product?.id, displayPrice]);
+
   if (isLoading) {
     return <div className="min-h-screen bg-background">
         <Header />
@@ -602,23 +622,6 @@ const ProductDetailPage = () => {
         <Footer />
       </div>;
   }
-  const quizMultiplier = hasCompletedQuiz ? (100 - discountPercent) / 100 : 1;
-  const basePrice = applyDiscount(product.price);
-  const displayPrice = basePrice * quizMultiplier;
-  const allImages = [product.image_url, ...(product.additional_images || [])].filter(Boolean);
-  const isFreeShipping = true; // Always free shipping
-
-  // Track ViewContent event when product loads
-  useEffect(() => {
-    if (product) {
-      trackViewContent({
-        id: product.id,
-        name: product.name,
-        price: displayPrice,
-        category: product.category || undefined,
-      });
-    }
-  }, [product?.id]);
 
   return <div className="min-h-screen bg-gradient-to-b from-background via-background to-card/20">
       <Header />
