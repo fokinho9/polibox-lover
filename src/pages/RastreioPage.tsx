@@ -417,7 +417,7 @@ const RastreioPage = () => {
                                   Entre em contato pelo WhatsApp para combinar uma nova entrega.
                                 </p>
                                 <a 
-                                  href="https://api.whatsapp.com/send?phone=5521996327544"
+                                  href="https://api.whatsapp.com/send?phone=5511972238165"
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-flex items-center gap-2 mt-3 text-sm font-semibold text-primary hover:underline"

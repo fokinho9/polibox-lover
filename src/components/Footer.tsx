@@ -188,7 +188,7 @@ const Footer = () => {
             <h3 className="font-display text-lg text-foreground mb-6">CONTATO</h3>
             <ul className="space-y-4 text-sm">
               <li>
-                <a href="tel:+5521996327544" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
+                <a href="tel:+5511972238165" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
                   <Phone className="h-4 w-4 text-primary" />
                   (21) 99632-7544
                 </a>
@@ -242,7 +242,7 @@ const Footer = () => {
             <ul className="space-y-3 text-sm">
               <li><Link to="/privacidade" className="text-muted-foreground hover:text-primary transition-colors">Política de Privacidade</Link></li>
               <li><Link to="/termos" className="text-muted-foreground hover:text-primary transition-colors">Termos de Uso</Link></li>
-              <li><a href="https://api.whatsapp.com/send?phone=5521996327544" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">Atendimento WhatsApp</a></li>
+              <li><a href="https://api.whatsapp.com/send?phone=5511972238165" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">Atendimento WhatsApp</a></li>
             </ul>
           </div>
         </div>
