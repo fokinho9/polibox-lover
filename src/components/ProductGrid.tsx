@@ -6,12 +6,17 @@ import { Loader2, Flame, ArrowRight, Sparkles } from "lucide-react";
 
 const ProductGrid = () => {
   const { data: products = [], isLoading } = useQuery({
-    queryKey: ['products-home'],
+    queryKey: ['products-home-super-ofertas'],
     queryFn: async () => {
+      // Get only Vonixx kits for super ofertas
       const allProducts = await productsApi.getAll();
       return allProducts
-        .filter(p => p.price > 0 && p.discount_percent && p.discount_percent > 0)
-        .sort((a, b) => (b.discount_percent || 0) - (a.discount_percent || 0))
+        .filter(p => 
+          p.price > 0 && 
+          (p.brand?.toLowerCase().includes('vonixx') || p.name?.toLowerCase().includes('vonixx')) &&
+          p.name?.toLowerCase().includes('kit')
+        )
+        .sort((a, b) => (a.price || 0) - (b.price || 0))
         .slice(0, 12);
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -60,7 +65,7 @@ const ProductGrid = () => {
           </div>
           
           <Link 
-            to="/categoria/ofertas" 
+            to="/categoria/super-ofertas" 
             className="group inline-flex items-center gap-2 px-5 py-2.5 bg-card hover:bg-card/80 border border-border hover:border-primary/30 rounded-full text-sm font-medium text-foreground transition-all duration-300"
           >
             Ver todas

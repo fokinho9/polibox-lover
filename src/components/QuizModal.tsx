@@ -90,6 +90,7 @@ const QuizModal = ({ open, onOpenChange }: QuizModalProps) => {
       <DialogContent 
         className="sm:max-w-sm p-0 overflow-hidden border-0 bg-transparent shadow-none" 
         overlayBlur
+        hideCloseButton
       >
         <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl border border-primary/30 shadow-2xl shadow-primary/30 overflow-hidden">
           {/* Animated background effects */}

@@ -15,7 +15,7 @@ import { productsApi, Product } from "@/lib/api/products";
 
 const navItems = [
   { icon: MapPin, label: "RASTREAR PEDIDO", href: "/rastreio", highlight: true, isTracking: true },
-  { icon: Percent, label: "OFERTAS", href: "/categoria/ofertas", highlight: true, sublabel: "-40%" },
+  { icon: Percent, label: "SUPER OFERTAS", href: "/categoria/super-ofertas", highlight: true, sublabel: "VONIXX" },
   { icon: Droplet, label: "LAVAGEM", href: "/categoria/lavagem" },
   { icon: Sparkles, label: "POLIMENTO", href: "/categoria/polimento" },
   { icon: Car, label: "INTERIOR", href: "/categoria/interior" },
