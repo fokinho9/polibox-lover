@@ -29,6 +29,7 @@ const categoryTitles: Record<string, string> = {
   "pneu-pretinho": "Pneu Pretinho",
   "limpadores-apc": "Limpadores APC",
   "ofertas": "Ofertas",
+  "super-ofertas": "Super Ofertas - Kits Vonixx",
   "lavagem": "Lavagem",
   "polimento": "Polimento",
   "interior": "Interior",

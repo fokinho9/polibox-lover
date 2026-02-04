@@ -92,6 +92,20 @@ export const productsApi = {
       return data || [];
     }
 
+    // Handle "super-ofertas" category - only Vonixx kits
+    if (category === 'super-ofertas') {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .or('brand.ilike.%vonixx%,name.ilike.%vonixx%')
+        .ilike('name', '%kit%')
+        .gt('price', 0)
+        .order('price', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    }
+
     // Handle "ceras-selantes" - search in category field with ILIKE
     if (category === 'ceras-selantes') {
       const { data, error } = await supabase

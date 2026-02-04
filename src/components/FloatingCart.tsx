@@ -1,14 +1,18 @@
 import { ShoppingCart, X, Trash2, Plus, Minus, ArrowLeft, Package, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { applyDiscount } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 
 const HEADER_HEIGHT = 72; // ajuste se seu header for maior ou menor
 
+// Pages where floating cart should be hidden
+const HIDDEN_CART_ROUTES = ['/checkout', '/confirmacao', '/pagamento'];
+
 const FloatingCart = () => {
+  const location = useLocation();
   const { 
     items, 
     removeFromCart, 
@@ -26,6 +30,13 @@ const FloatingCart = () => {
   } = useCart();
 
   const { toast } = useToast();
+  
+  // Hide cart on checkout and similar pages
+  const shouldHideCart = HIDDEN_CART_ROUTES.some(route => location.pathname.startsWith(route));
+  
+  if (shouldHideCart) {
+    return null;
+  }
 
   const formatPrice = (price: number) =>
     price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
