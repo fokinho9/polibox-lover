@@ -6,6 +6,7 @@ interface QuizContextType {
   discountPercent: number;
   discountExpiresAt: Date | null;
   timeRemaining: string;
+  isTimerActive: boolean;
   completeQuiz: () => void;
   resetQuiz: () => void;
 }
@@ -26,35 +27,47 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   const [hasCompletedQuiz, setHasCompletedQuiz] = useState(false);
   const [discountExpiresAt, setDiscountExpiresAt] = useState<Date | null>(null);
   const [timeRemaining, setTimeRemaining] = useState("00:00:00");
+  const [isTimerActive, setIsTimerActive] = useState(false);
   const discountPercent = 40;
 
   useEffect(() => {
+    // Check if quiz was ever completed (permanent discount)
+    const quizCompleted = localStorage.getItem("quiz_completed");
     const savedExpiry = localStorage.getItem("quiz_discount_expires");
-    if (savedExpiry) {
-      const expiryDate = new Date(savedExpiry);
-      if (expiryDate > new Date()) {
-        setHasCompletedQuiz(true);
-        setDiscountExpiresAt(expiryDate);
-      } else {
-        localStorage.removeItem("quiz_discount_expires");
-        localStorage.removeItem("quiz_completed");
+    
+    if (quizCompleted === "true") {
+      // Quiz was completed - discount is permanent
+      setHasCompletedQuiz(true);
+      
+      // Check if timer is still active
+      if (savedExpiry) {
+        const expiryDate = new Date(savedExpiry);
+        if (expiryDate > new Date()) {
+          setDiscountExpiresAt(expiryDate);
+          setIsTimerActive(true);
+        } else {
+          // Timer expired but discount remains permanent
+          setIsTimerActive(false);
+          setTimeRemaining("00:00:00");
+        }
       }
     }
   }, []);
 
   useEffect(() => {
-    if (!discountExpiresAt) return;
+    if (!discountExpiresAt || !isTimerActive) return;
 
     const interval = setInterval(() => {
       const now = new Date();
       const remaining = discountExpiresAt.getTime() - now.getTime();
       
       if (remaining <= 0) {
-        setHasCompletedQuiz(false);
+        // Timer expired but keep discount active permanently
+        setIsTimerActive(false);
         setDiscountExpiresAt(null);
         setTimeRemaining("00:00:00");
         localStorage.removeItem("quiz_discount_expires");
-        localStorage.removeItem("quiz_completed");
+        // Do NOT remove quiz_completed - discount stays permanent
         clearInterval(interval);
       } else {
         setTimeRemaining(formatTimeRemaining(remaining));
@@ -62,12 +75,13 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [discountExpiresAt]);
+  }, [discountExpiresAt, isTimerActive]);
 
   const completeQuiz = () => {
     const expiryDate = new Date(Date.now() + DISCOUNT_DURATION_MINUTES * 60 * 1000);
     setHasCompletedQuiz(true);
     setDiscountExpiresAt(expiryDate);
+    setIsTimerActive(true);
     localStorage.setItem("quiz_completed", "true");
     localStorage.setItem("quiz_discount_expires", expiryDate.toISOString());
   };
@@ -76,12 +90,13 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     setHasCompletedQuiz(false);
     setDiscountExpiresAt(null);
     setTimeRemaining("00:00:00");
+    setIsTimerActive(false);
     localStorage.removeItem("quiz_completed");
     localStorage.removeItem("quiz_discount_expires");
   };
 
   return (
-    <QuizContext.Provider value={{ hasCompletedQuiz, discountPercent, discountExpiresAt, timeRemaining, completeQuiz, resetQuiz }}>
+    <QuizContext.Provider value={{ hasCompletedQuiz, discountPercent, discountExpiresAt, timeRemaining, isTimerActive, completeQuiz, resetQuiz }}>
       {children}
     </QuizContext.Provider>
   );
