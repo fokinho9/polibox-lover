@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { applyDiscount } from "@/lib/utils";
 import { trackInitiateCheckout, trackAddPaymentInfo, trackPurchase } from "@/lib/pixel";
+import CheckoutUpsell from "@/components/CheckoutUpsell";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -808,7 +809,10 @@ const CheckoutPage = () => {
                   <div className="flex items-center gap-1 px-2 py-1 bg-card border border-border rounded-full text-[10px]"><Check className="h-2.5 w-2.5 text-green-500" />Nota Fiscal</div>
                   <div className="flex items-center gap-1 px-2 py-1 bg-card border border-border rounded-full text-[10px]"><Check className="h-2.5 w-2.5 text-green-500" />Suporte</div>
                 </div>
-              </div>
+            </div>
+
+              {/* Upsell Section */}
+              <CheckoutUpsell />
             </div>
           </div>
         </div>
